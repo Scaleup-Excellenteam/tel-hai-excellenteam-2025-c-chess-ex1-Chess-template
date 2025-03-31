@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Get the number from the argument or default = 50
+num=${1:-50}
+
+# 1. Get today's date in YYYY-MM-DD format
+date=$(date +%F)
+
+# Create a directory named zero_<date>_files where <date> is today's date
+date_dir="zero_${date}_files"
+mkdir -p "$date_dir"
+cd "$date_dir"
+
+# 2. Create <NUMBER> files, each named File_<N>_.dat
+# 3. Each file must contain only 0, repeated so that the file size in bytes matches its index number N
+for ((i = 0; i < num; i++)); do
+    filename="File_${i}_.dat"
+    head -c "$i" < /dev/zero | tr '\0' '0' > "$filename"
+done
