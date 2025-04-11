@@ -1,10 +1,12 @@
 // Chess 
-#include "Chess.h"
+#include "../include/Chess.h"
 
 int main()
 {
-	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
+	// string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
 //	string board = "##########K###############################R#############r#r#####";
+	string board = "R######R################################################r######r";  // רק הסוס שיזוז
+
 	Chess a(board);
 	int codeResponse = 0;
 	string res = a.getInput();
@@ -26,8 +28,7 @@ int main()
 
 		/**/ 
 		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
+			
 		}
 		/**/
 
