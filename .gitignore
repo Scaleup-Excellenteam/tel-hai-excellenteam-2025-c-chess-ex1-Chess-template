@@ -2,6 +2,9 @@
 /build/
 /CMakeCache.txt
 /CMakeFiles/
+Makefile
+/cmake-build-debug/
+Chess/cmake-build-debug/
 /*.o
 /*.a
 /*.so

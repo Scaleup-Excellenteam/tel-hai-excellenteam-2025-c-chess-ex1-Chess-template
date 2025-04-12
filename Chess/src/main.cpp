@@ -1,40 +1,47 @@
-// Chess 
 #include "Chess.h"
+#include "BoardManager.h"
 
-int main()
-{
-	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
-//	string board = "##########K###############################R#############r#r#####";
-	Chess a(board);
-	int codeResponse = 0;
-	string res = a.getInput();
-	while (res != "exit")
-	{
-		/* 
-		codeResponse value : 
-		Illegal movements : 
-		11 - there is not piece at the source  
-		12 - the piece in the source is piece of your opponent
-		13 - there one of your pieces at the destination 
-		21 - illegal movement of that piece 
-		31 - this movement will cause you checkmate
+int main() {
+	std::string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+	std::string boardCopy = board;
 
-		legal movements : 
-		41 - the last movement was legal and cause check 
-		42 - the last movement was legal, next turn 
-		*/
+	BoardManager manager;
+	Chess* gui = new Chess(boardCopy);
+	bool isWhiteTurn = true;
 
-		/**/ 
-		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
+	std::string res = gui->getInput();
+	while (res != "exit") {
+		int code = manager.validateMove(boardCopy, res);
+
+		// Manually check turn legality (since validateMove doesn't do it)
+		int srcRow = res[0] - 'a';
+		int srcCol = res[1] - '1';
+		char piece = boardCopy[srcRow * 8 + srcCol];
+
+		bool pieceIsWhite = isupper(piece);
+		if (piece == '#' || pieceIsWhite != isWhiteTurn) {
+			code = 12; // Wrong turn or empty square
 		}
-		/**/
 
-		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
+		if (code == 41 || code == 42) {
+			// Apply move
+			int dstRow = res[2] - 'a';
+			int dstCol = res[3] - '1';
+			int srcIndex = srcRow * 8 + srcCol;
+			int dstIndex = dstRow * 8 + dstCol;
+
+			boardCopy[dstIndex] = boardCopy[srcIndex];
+			boardCopy[srcIndex] = '#';
+
+			isWhiteTurn = !isWhiteTurn;  // Flip turn only on legal move
+		}
+
+		gui = new Chess(boardCopy);
+		gui->setCodeResponse(code);
+		res = gui->getInput();
 	}
 
-	cout << endl << "Exiting " << endl; 
+	delete gui;
+	std::cout << "\nExiting\n";
 	return 0;
 }
