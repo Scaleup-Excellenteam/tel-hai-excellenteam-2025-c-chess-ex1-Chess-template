@@ -1,5 +1,10 @@
 // Chess 
 #include "Chess.h"
+#include "Board.h"
+#include "Piece.h"
+#include "Rook.h"
+#include <cctype>
+using namespace std;
 
 int main()
 {
@@ -26,14 +31,23 @@ int main()
 
 		/**/ 
 		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
-		}
-		/**/
 
+                  Board& selfMadeBoard = Board::getInstance();
+
+                  int from_x = res[0] - 'a';
+                  int from_y = res[1] - '0' - 1;
+                  int to_x = res[2] - 'a';
+                  int to_y = res[3] - '0' - 1;
+
+                  codeResponse =  selfMadeBoard.movePiece(from_x , from_y, to_x , to_y);
+
+
+		}
 		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
-	}
+		res = a.getInput();
+	
+		}/**/
+
 
 	cout << endl << "Exiting " << endl; 
 	return 0;
