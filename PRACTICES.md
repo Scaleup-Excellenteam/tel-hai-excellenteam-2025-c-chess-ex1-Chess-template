@@ -17,36 +17,36 @@ The following section presents general C++ practices.
 #include <fstream>
 #include <stdexcept>
 
-std::string readFile(const std::string& filename) {
-    std::ifstream file(filename);
+ string readFile(const  string& filename) {
+     ifstream file(filename);
     if (!file) {
-        throw std::runtime_error("Error: " + filename + " not found");
+        throw  runtime_error("Error: " + filename + " not found");
     }
-    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+     string content(( istreambuf_iterator<char>(file)),  istreambuf_iterator<char>());
     return content;
 }
 ```
 
 ❌ **Not using exception handling when needed**:
 ```cpp
-std::string readFile(const std::string& filename) {
-    std::ifstream file(filename);
-    return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>()); // Undefined behavior if file is missing
+ string readFile(const  string& filename) {
+     ifstream file(filename);
+    return  string(( istreambuf_iterator<char>(file)),  istreambuf_iterator<char>()); // Undefined behavior if file is missing
 }
 ```
 
 ❌ **Using a broad catch statement**:
 ```cpp
 try {
-    int x = std::stoi("abc"); // Will throw std::invalid_argument
+    int x =  stoi("abc"); // Will throw  invalid_argument
 } catch (...) {
-    std::cerr << "Something went wrong!"; // Hides actual issue
+     cerr << "Something went wrong!"; // Hides actual issue
 }
 ```
 
 🔴 **What's wrong?**
 - A broad `catch (...)` clause hides actual exceptions.
-- Specific exceptions (e.g., `std::invalid_argument`, `std::runtime_error`) should be handled explicitly.
+- Specific exceptions (e.g., ` invalid_argument`, ` runtime_error`) should be handled explicitly.
 - No helpful error messages to the user.
 
 ### Input Verification
@@ -58,10 +58,10 @@ try {
 
 int getUserAge() {
     int age;
-    std::cout << "Enter your age: ";
-    std::cin >> age;
-    if (std::cin.fail() || age <= 0) {
-        throw std::invalid_argument("Age must be a valid positive integer.");
+     cout << "Enter your age: ";
+     cin >> age;
+    if ( cin.fail() || age <= 0) {
+        throw  invalid_argument("Age must be a valid positive integer.");
     }
     return age;
 }
@@ -76,7 +76,7 @@ int getUserAge() {
 ```cpp
 void processPrice(double price) {
     if (price < 0) {
-        throw std::invalid_argument("Price cannot be negative!");
+        throw  invalid_argument("Price cannot be negative!");
     }
     // Do something with price
 }
@@ -92,7 +92,7 @@ void processPrice(double price) {
 ```cpp
 const int MAX_USERS = 100;
 const double PI = 3.14159;
-std::string ADMIN_ROLE = "admin";
+ string ADMIN_ROLE = "admin";
 ```
 
 ❌ **Negative Example**:
@@ -122,7 +122,7 @@ double y = 20.5;
 ```cpp
 double divide(double a, double b) {
     if (b == 0) {
-        throw std::invalid_argument("Cannot divide by zero");
+        throw  invalid_argument("Cannot divide by zero");
     }
     return a / b;
 }
@@ -139,8 +139,8 @@ double divide(double a, double b) {
 
 ✅ **Use Functions to Reduce Duplication**:
 ```cpp
-void greet(const std::string& timeOfDay) {
-    std::cout << "Good " << timeOfDay << "!" << std::endl;
+void greet(const  string& timeOfDay) {
+     cout << "Good " << timeOfDay << "!" <<  endl;
 }
 
 int main() {
@@ -153,11 +153,11 @@ int main() {
 ❌ **Hardcoded Messages**:
 ```cpp
 void greetMorning() {
-    std::cout << "Good morning!" << std::endl;
+     cout << "Good morning!" <<  endl;
 }
 
 void greetEvening() {
-    std::cout << "Good evening!" << std::endl;
+     cout << "Good evening!" <<  endl;
 }
 ```
 
@@ -183,7 +183,7 @@ const int MaxUsers = 1000;
 ```cpp
 class UserProfile {
 public:
-    std::string getFullName() const;
+     string getFullName() const;
 };
 ```
 
@@ -211,7 +211,7 @@ double calculateDiscount(double price, double discountRate) {
 ```cpp
 class User {
 private:
-    std::string _sessionToken;
+     string _sessionToken;
 };
 ```
 
@@ -219,7 +219,7 @@ private:
 ```cpp
 class User {
 private:
-    std::string __password;
+     string __password;
 };
 ```
 
