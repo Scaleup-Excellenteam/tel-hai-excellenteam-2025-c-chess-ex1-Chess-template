@@ -1,5 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.15)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project (Chess)
 
 # New CMake versions map C++20 to /std:c++20 instead of c++latest, so <format>

@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/main.cpp.o -c /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/main.cpp",
+  "file": "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/main.cpp",
+  "output": "CMakeFiles/Chess.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/Chess.cpp.o -c /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/Chess.cpp",
+  "file": "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/Chess.cpp",
+  "output": "CMakeFiles/Chess.dir/src/Chess.cpp.o"
+}
+]
