@@ -3,8 +3,8 @@
 CMakeCache.txt
 CMakeFiles/
 Makefile
-cmake_install.cmake
-Chess
+/Chess/cmake-build-debug/
+
 
 # Ignore object files and compiled libraries
 *.o
