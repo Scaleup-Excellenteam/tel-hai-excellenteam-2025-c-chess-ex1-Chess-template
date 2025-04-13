@@ -21,7 +21,9 @@ add_executable (Chess "")
 
 
 add_subdirectory (include)
+add_subdirectory (include/Piece)
 add_subdirectory (src)
+add_subdirectory (src/Piece)
 
 
 

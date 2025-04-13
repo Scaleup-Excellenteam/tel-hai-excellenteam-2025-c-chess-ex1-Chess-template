@@ -26,3 +26,19 @@
 # Ignore temporary image cache
 img/cache/
 
+/.vs/Chess/VSWorkspaceState.json
+/Chess/out/build/x64-Debug
+/.vs/VSWorkspaceState.json
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/CMakeWorkspaceSettings.json
+/.vs/cmake.db
+/.vs/CMake Overview
+/.vs/chess-ex1-DimonFiend/FileContentIndex
+/.vs/chess-ex1-DimonFiend/v17/ipch/AutoPCH
+/.vs/chess-ex1-DimonFiend/v17/Solution.VC.db
+/.vs/chess-ex1-DimonFiend/v17/Browse.VC.opendb
+/.vs/chess-ex1-DimonFiend/v17/Browse.VC.db-shm
+/.vs/chess-ex1-DimonFiend/v17/Browse.VC.db-wal
+/.vs/chess-ex1-DimonFiend/v17/Browse.VC.db
+/.vs/chess-ex1-DimonFiend/v17/.wsuo
