@@ -1,5 +1,8 @@
 #include "Common.h"
 
+bool operator==(const Box& lhs,const Box& rhs){
+    return (lhs.first == rhs.first && lhs.second == rhs.second);
+}
 
 /**
  * @brief Checks if a given box (chessboard coordinate) is within the boundaries of a standard 8x8 chess board.
