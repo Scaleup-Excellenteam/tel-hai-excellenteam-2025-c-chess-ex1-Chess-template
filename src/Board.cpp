@@ -34,8 +34,8 @@ void Board::stringToBoard(const std::string& strBoard) {
         throw std::runtime_error("ERROR: str board size is not 64");
     }
     int index = 0;
-    for (char c = 'A'; c <= 'H' ; c++) {
-        for (int i = 1; i <= 8; ++i) {
+    for (char c = FIRST_ROW; c <= LAST_ROW ; c++) {
+        for (int i = FIRST_COL; i <= LAST_COL; ++i) {
             Box location = {c,i};
             switch (strBoard[index]) {
                 case 'R':_board[location] = std::make_shared<Rook>(location,WHITE);break;
