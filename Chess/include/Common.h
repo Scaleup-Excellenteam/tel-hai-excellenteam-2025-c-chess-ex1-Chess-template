@@ -95,7 +95,16 @@ typedef std::pair<char, int> Box;
 
 
 // ---- Functions ----
-
+/**
+ * @brief Compares two Box objects for equality.
+ * This operator checks if both Box objects represent the same position
+ * or state in the context of the chessboard. The exact comparison logic 
+ * depends on the Box class implementation, typically comparing internal 
+ * coordinates or piece data.
+ * @param lhs The first Box object to compare.
+ * @param rhs The second Box object to compare.
+ * @return true if the boxes are equal, false otherwise.
+ */
 bool operator==(const Box&,const Box&);
 
 /**
