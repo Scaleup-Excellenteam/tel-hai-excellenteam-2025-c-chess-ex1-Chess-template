@@ -1,40 +1,56 @@
-// Chess 
+// Chess
 #include "Chess.h"
+#include "Pieces.h"
+#include "Common.h"
+#include "Move.h"
+#include "Constants.h"
 
 int main()
 {
-	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
-//	string board = "##########K###############################R#############r#r#####";
-	Chess a(board);
+	string strBoard = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+//	string strBoard = "##########K###############################R#############r#r#####";
+    Chess a(strBoard);
 	int codeResponse = 0;
-	string res = a.getInput();
+    Pieces mainBoard(strBoard);
+    COLOR turn = WHITE;
+    mainBoard.updatePotenMoves(turn);
+
+    string res = a.getInput();
 	while (res != "exit")
 	{
-		/* 
-		codeResponse value : 
-		Illegal movements : 
-		11 - there is not piece at the source  
-		12 - the piece in the source is piece of your opponent
-		13 - there one of your pieces at the destination 
-		21 - illegal movement of that piece 
-		31 - this movement will cause you checkmate
+        std::pair<Coordinate ,Coordinate> move = stringToCoordinate(res);
+        Coordinate source = flipChessCoord(move.first);
+        Coordinate target = flipChessCoord(move.second);
 
-		legal movements : 
-		41 - the last movement was legal and cause check 
-		42 - the last movement was legal, next turn 
-		*/
+        const std::shared_ptr<Piece>& sourcePiece = mainBoard.getPiece(source);
+        const std::shared_ptr<Piece>& targetPiece = mainBoard.getPiece(target);
 
-		/**/ 
-		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
-		}
-		/**/
+        if(sourcePiece == nullptr)codeResponse = ERROR_NO_PIECE_AT_SOURCE;
+        else if(sourcePiece->getColor() != turn)codeResponse = ERROR_WRONG_COLOR_AT_SOURCE;
+        else if(targetPiece != nullptr && targetPiece->getColor() == turn)codeResponse = ERROR_TARGET_HAS_FRIENDLY;
+        else if(!sourcePiece->isValidMove(target , mainBoard))codeResponse = ERROR_ILLEGAL_MOVE;
+        else if(sourcePiece->willBeInCheck(target , mainBoard))codeResponse = ERROR_MOVE_CAUSES_CHECK;
+        else {
+            mainBoard.pieceMove(target , sourcePiece);
+            turn = colorNot(turn);
+            mainBoard.updatePotenMoves(turn);
+            mainBoard.isCheck(turn) ? codeResponse = STATUS_CHECK : codeResponse = STATUS_OK;
+        }
 
-		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
+        a.setCodeResponse(codeResponse);
+		res = a.getInput();
 	}
 
-	cout << endl << "Exiting " << endl; 
+	cout << endl << "Exiting " << endl;
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
