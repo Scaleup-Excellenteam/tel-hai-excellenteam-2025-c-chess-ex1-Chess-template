@@ -96,6 +96,8 @@ typedef std::pair<char, int> Box;
 
 // ---- Functions ----
 
+bool operator==(const Box&,const Box&);
+
 /**
  * @brief Checks whether a box is a valid board position.
  * @param box A board coordinate.
