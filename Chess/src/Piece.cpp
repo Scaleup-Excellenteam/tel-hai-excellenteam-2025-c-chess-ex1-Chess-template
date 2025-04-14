@@ -70,8 +70,12 @@ void Piece::addMoves(std::vector<Box> moves) {
  */
 bool Piece::isValidMove(const Box& box,const Board& board) {
     std::vector<Box> rawMoves = getRawMoves(board);
-    auto it = std::find(rawMoves.begin(),rawMoves.end(),box);
-    return it != rawMoves.end();
+    for (auto move : rawMoves){
+        if (move == box){
+            return true;
+        }
+    }
+    return false;
 }
 /**
  * @brief Updates the potential moves based on the current board state.
