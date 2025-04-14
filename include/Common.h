@@ -1,0 +1,85 @@
+#pragma once
+
+#include <iostream>
+#include <utility>
+
+
+/**
+ * @brief Constant representing an attempt to move from an empty square.
+ */
+const int EMPTY_SOURCE = 11;
+
+/**
+ * @brief Constant representing an attempt to move an opponent's piece.
+ */
+const int OPPONENT_SOURCE = 12;
+
+/**
+ * @brief Constant representing a destination occupied by the player's own piece.
+ */
+const int OWN_PIECE_DESTINATION = 13;
+
+/**
+ * @brief Constant representing a move that is not valid by the rules of the game.
+ */
+const int INVALID_MOVE = 21;
+
+/**
+ * @brief Constant representing a move that would leave the player's own king in check.
+ */
+const int OWN_CHECK = 31;
+
+/**
+ * @brief Constant representing a valid move that does not result in check.
+ */
+const int VALID_MOVE = 42;
+
+/**
+ * @brief Constant representing a valid move that puts the opponent in check.
+ */
+const int CHECK_VALID_MOVE = 41;
+
+/**
+ * @brief Enum representing the type of chess piece.
+ */
+enum TYPE {
+    KING,
+    QUEEN,
+    ROOK,
+    BISHOP,
+    KNIGHT,
+    PAWN
+};
+
+/**
+ * @brief Enum representing the color of a piece or player.
+ */
+enum COLOR {
+    BLACK,
+    WHITE
+};
+
+/**
+ * @brief Represents a position on the chess board using (row, column),
+ * where row is a character from 'A' to 'H', and column is an integer from 1 to 8.
+ */
+typedef std::pair<char, int> Box;
+
+
+// ---- Functions ----
+
+/**
+ * @brief Checks whether a box is a valid board position.
+ * @param box A board coordinate.
+ * @return true if within 'A'-'H' or 'a'-'h' and 1-8.
+ */
+bool inBoard(const Box& box);
+
+/**
+ * @brief Returns the opposite color.
+ * @param color The input color.
+ * @return BLACK if WHITE, or WHITE if BLACK.
+ */
+COLOR colorNot(COLOR color);
+
+
