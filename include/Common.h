@@ -39,6 +39,11 @@ const int VALID_MOVE = 42;
  */
 const int CHECK_VALID_MOVE = 41;
 
+const int FIRST_COL = 1;
+const int LAST_COL = 8;
+const char FIRST_ROW = 'A';
+const char LAST_ROW = 'H';
+
 /**
  * @brief Enum representing the type of chess piece.
  */
