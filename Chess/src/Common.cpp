@@ -1,5 +1,14 @@
 #include "Common.h"
 
+/**
+ * @brief Compares two Box objects for equality based on their coordinates.
+ * This operator returns true if both Box objects have the same `first` (row)
+ * and `second` (column) values, meaning they represent the same position
+ * on the chessboard.
+ * @param lhs The first Box object to compare.
+ * @param rhs The second Box object to compare.
+ * @return true if both boxes have identical coordinates, false otherwise.
+ */
 bool operator==(const Box& lhs,const Box& rhs){
     return (lhs.first == rhs.first && lhs.second == rhs.second);
 }
