@@ -5,6 +5,12 @@
 #endif
 
 #include <string>
+#include "Rook.h"
+#include "Bishop.h"
+#include "Queen.h"
+#include "King.h"
+#include "Knight.h"
+#include "Pawn.h"
 
 using std::cout;
 using std::cin; 
@@ -40,4 +46,8 @@ public:
 	Chess& operator=(const Chess&) = delete;
 	string getInput();
 	void setCodeResponse(int codeResponse);
+
+	void calculateResponseCode();
+	const string& getBoardString() const { return m_boardString; }
+	bool getTurn() const { return m_turn; }
 };

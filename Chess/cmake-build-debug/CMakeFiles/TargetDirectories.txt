@@ -1,0 +1,7 @@
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/CMakeFiles/Chess.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/include/CMakeFiles/edit_cache.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/include/CMakeFiles/rebuild_cache.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/src/CMakeFiles/edit_cache.dir
+C:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/cmake-build-debug/src/CMakeFiles/rebuild_cache.dir

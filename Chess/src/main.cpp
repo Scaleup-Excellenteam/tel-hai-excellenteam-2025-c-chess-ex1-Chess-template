@@ -25,14 +25,11 @@ int main()
 		*/
 
 		/**/ 
-		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
-		}
+		a.calculateResponseCode();
 		/**/
 
 		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
+		res = a.getInput();
 	}
 
 	cout << endl << "Exiting " << endl; 

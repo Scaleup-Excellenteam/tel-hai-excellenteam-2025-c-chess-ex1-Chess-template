@@ -179,7 +179,7 @@ void Chess::show() const
 void Chess::displayBoard() const
 {
 	clear();
-	show();
+		show();
 	cout << m_msg<< m_errorMsg;
 	
 }
@@ -210,19 +210,19 @@ bool Chess::isExit() const
 {
 	return ((m_input == "exit") || (m_input == "quit") || (m_input == "EXIT") || (m_input == "QUIT"));
 }
-// execute the movement on board 
+// execute the movement on board
 void Chess::excute()
 {
 	int row = (m_input[0] - 'a');
 	int col = (m_input[1] - '1');
-	char pieceInSource = m_boardString[(row * 8) + col]; 
-	m_boardString[(row * 8) + col] = '#'; 
+	char pieceInSource = m_boardString[(row * 8) + col];
+	m_boardString[(row * 8) + col] = '#';
 
 	row = (m_input[2] - 'a');
 	col = (m_input[3] - '1');
-	m_boardString[(row * 8) + col] = pieceInSource; 
+	m_boardString[(row * 8) + col] = pieceInSource;
 
-	setPieces(); 
+	setPieces();
 }
 // check the response code and switch turn if needed 
 void Chess::doTurn()
@@ -326,4 +326,62 @@ void Chess::setCodeResponse(int codeResponse)
 		((21 == codeResponse) || (codeResponse == 31)) ||
 		((41 == codeResponse) || (codeResponse == 42)))
 		m_codeResponse = codeResponse;
+}
+
+void createBoardFromString(const std::string& boardStr, Piece* board[8][8]) {
+	for (int row = 0; row < 8; ++row) {
+		for (int col = 0; col < 8; ++col) {
+			int index = row * 8 + col;
+			char symbol = boardStr[index];
+			if (symbol == '#' || symbol == ' ') {
+				board[row][col] = nullptr;
+				continue;
+			}
+
+			char lower = std::tolower(symbol);
+			switch (lower) {
+				case 'r': board[row][col] = new Rook(symbol); break;
+				case 'b': board[row][col] = new Bishop(symbol); break;
+				case 'q': board[row][col] = new Queen(symbol); break;
+				case 'k': board[row][col] = new King(symbol); break;
+				case 'n': board[row][col] = new Knight(symbol); break;
+				case 'p': board[row][col] = new Pawn(symbol); break;
+				default: board[row][col] = nullptr; break;
+			}
+		}
+	}
+}
+
+
+void Chess::calculateResponseCode() {
+	Piece* board[8][8] = { nullptr };
+	createBoardFromString(m_boardString, board);
+	int srcRow = m_input[0] - 'a';
+	int srcCol = m_input[1] - '1';
+	int destRow = m_input[2] - 'a';
+	int destCol = m_input[3] - '1';
+
+
+
+	Piece* srcPiece = board[srcRow][srcCol];
+	Piece* destPiece = board[destRow][destCol];
+
+	if (!srcPiece)
+		m_codeResponse = 11;
+	else if ((m_turn && srcPiece->getColor() != Piece::WHITE) ||
+			 (!m_turn && srcPiece->getColor() != Piece::BLACK))
+		m_codeResponse = 12;
+	else if (destPiece && destPiece->getColor() == srcPiece->getColor())
+		m_codeResponse = 13;
+	else if (!srcPiece->isMoveLegal(srcRow, srcCol, destRow, destCol, board))
+		m_codeResponse = 21;
+	else
+		m_codeResponse = 42;
+
+	std::cout << srcRow << srcCol << std::endl;
+
+
+	for (int i = 0; i < 8; ++i)
+		for (int j = 0; j < 8; ++j)
+			delete board[i][j];
 }
