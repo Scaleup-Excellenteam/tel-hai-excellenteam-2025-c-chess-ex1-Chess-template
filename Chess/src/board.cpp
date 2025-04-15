@@ -1,6 +1,9 @@
 #include "board.h"
+#include "Chess.h"
 #include <cassert>
 #include <cctype>
+#include <iostream>
+#include <memory>
 
 Board::Board() {}
 
@@ -11,26 +14,127 @@ Board::Board(string init) {
         if (init[i] == '#')
             continue;
 
-        if (islower(init[i]))
-            is_white = false;
-        else
-            is_white = true;
+        is_white = !islower(init[i]);
 
         switch (tolower(init[i])) {
         case 'r':
-            _board[i] = make_unique<Rook>(is_white);
-//        case 'n':
-//            _board[i] = make_unique<Knight>(is_white);
-//        case 'b':
-//            _board[i] = make_unique<Bishop>(is_white);
-//        case 'q':
-//            _board[i] = make_unique<Queen>(is_white);
+            _board[i] = make_shared<Rook>(is_white);
+            //        case 'n':
+            //            _board[i] = make_unique<Knight>(is_white);
+            //        case 'b':
+            //            _board[i] = make_unique<Bishop>(is_white);
+            //        case 'q':
+            //            _board[i] = make_unique<Queen>(is_white);
         case 'k':
-            _board[i] = make_unique<King>(is_white);
-//        case 'p':
-//            _board[i] = make_unique<Pawn>(is_white);
+            _board[i] = make_shared<King>(is_white);
+            //        case 'p':
+            //            _board[i] = make_unique<Pawn>(is_white);
         }
     }
 }
 
 Board::~Board() {}
+
+bool Board::isPathClear(Position src, Position dst) const {
+    int dx = dst.x - src.x;
+    int dy = dst.y - src.y;
+
+    int xStep = dx == 0 ? 0 : dx / abs(dx);
+    int yStep = dy == 0 ? 0 : dy / abs(dy);
+
+    Position cur = {src.x + xStep, src.y + yStep};
+
+    while (cur != dst) {
+        if (_board[cur.y * SIZE + cur.x]) {
+            return false;
+        }
+        cur.x += xStep;
+        cur.y += yStep;
+    }
+    return true;
+}
+
+bool Board::hasLineOfSight(Position src, Position dst) const {
+    auto piece = _board[src.y * SIZE + src.x];
+    cout << "debug hlos" << endl;
+    if (dynamic_pointer_cast<Rook>(piece)) {
+        cout << "debug hlos rook" << endl;
+        if (!piece->isValidMove(src, dst) || !isPathClear(src, dst)) {
+            return false;
+        }
+    } else if (dynamic_pointer_cast<King>(piece)) {
+        cout << "debug hlos king" << endl;
+        if (!piece->isValidMove(src, dst)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Board::isCheck(bool target_player) const {
+    // needed if a game is initialized with no kings
+    bool has_king = false;
+    Position target_king_position;
+    for (int i = 0; i < SIZE * SIZE; i++) {
+        auto piece = _board[i];
+        if (dynamic_pointer_cast<King>(piece) &&
+            piece->Color() == target_player) {
+            has_king = true;
+            target_king_position = Position{i % SIZE, i / SIZE};
+            break;
+        }
+    }
+    if (has_king == false) {
+        return false;
+    }
+    for (int i = 0; i < SIZE * SIZE; i++) {
+        auto piece = _board[i];
+        if (piece == nullptr || piece->Color() == target_player) {
+            continue;
+        }
+        Position cur = {i % SIZE, i / SIZE};
+        if (hasLineOfSight(cur, target_king_position)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int Board::move(Position src, Position dst) {
+    auto piece = _board[src.y * SIZE + src.x];
+    if (!piece) {
+        return 11;
+    }
+
+    if (piece->Color() != _turn_color) {
+        return 12;
+    }
+
+    auto dst_piece = _board[dst.y * SIZE + dst.y];
+    if (dst_piece != nullptr && dst_piece->Color() == _turn_color) {
+        return 13;
+    }
+    cout << "debug" << endl;
+
+    if (!hasLineOfSight(src, dst)) {
+        return 21;
+    }
+
+    _board[dst.y * SIZE + dst.x] = piece;
+    _board[src.y * SIZE + src.x] = nullptr;
+
+    // check if current player will be checked
+    if (isCheck(_turn_color)) {
+        // return to previous state
+        _board[src.y * SIZE + src.x] = piece;
+        _board[dst.y * SIZE + dst.x] = dst_piece;
+        return 31;
+    }
+
+    _turn_color = !_turn_color;
+
+    if (isCheck(!_turn_color)) {
+        return 41;
+    }
+    return 42;
+}

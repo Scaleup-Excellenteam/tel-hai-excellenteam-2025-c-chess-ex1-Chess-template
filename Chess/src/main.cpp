@@ -2,6 +2,8 @@
 #include "Chess.h"
 #include "board.h"
 
+void parseInput(const string& res, Position &pos1, Position &pos2);
+
 int main() {
     //string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     string board = "##########K###############################R#############r#r#####";
@@ -26,8 +28,11 @@ int main() {
 
         /**/
         { // put your code here instead that code
-            cout << "code response >> ";
-            cin >> codeResponse;
+            Position pos1, pos2;
+
+            parseInput(res, pos1, pos2);
+
+            a.setCodeResponse(b.move(pos1, pos2));
         }
         /**/
 
@@ -37,4 +42,12 @@ int main() {
 
     cout << endl << "Exiting " << endl;
     return 0;
+}
+
+void parseInput(const string& res, Position &pos1, Position &pos2)
+{
+    pos1.y = tolower(res[0]) - 'a';
+    pos1.x = res[1] - '1';
+    pos2.y = tolower(res[2]) - 'a';
+    pos2.x = res[3] - '1';
 }

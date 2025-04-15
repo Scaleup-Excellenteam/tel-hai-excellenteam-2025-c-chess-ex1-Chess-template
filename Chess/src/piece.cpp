@@ -1,29 +1,29 @@
 #include "piece.h"
 #include <cstdlib>
-#include <tuple>
 
-bool Rook::isValidMove(tuple<int, int> pos1, tuple<int, int> pos2) {
-    int x1, y1;
-    int x2, y2;
+// remove
+#include <iostream>
+using namespace std;
 
-    tie(x1, y1) = pos1;
-    tie(x2, y2) = pos2;
+//bool Bishop::isValidMove(Position src, Position dst) {
+//    int dx = dst.x - src.x;
+//    int dy = dst.y - src.y;
+//
+//    // assuming pos1 != pos2 was checked at input
+//
+//    return (x1 == x2 || y1 == y2);
+//}
 
-    // assuming pos1 != pos2 was checked at input
-
-    return (x1 == x2 || y1 == y2);
+bool Rook::isValidMove(Position src, Position dst) {
+    if (src == dst) return false;
+    cout << "debug ivm rook" << endl;
+    return (src.x == dst.x || src.y == dst.y);
 }
 
-bool King::isValidMove(tuple<int, int> pos1, tuple<int, int> pos2) {
-    int x1, y1;
-    int x2, y2;
-
-    tie(x1, y1) = pos1;
-    tie(x2, y2) = pos2;
-
-    // assuming pos1 != pos2 was checked at input
-
-    return (abs(x1 - x2) <= 1 && abs(y1 - y2) <= 1);
+bool King::isValidMove(Position src, Position dst) {
+    if (src == dst) return false;
+    cout << "debug ivm king" << endl;
+    return (abs(src.x - dst.x) <= 1 && abs(src.y - dst.y) <= 1);
 }
 
 // bool Piece::isValid(int n) {
