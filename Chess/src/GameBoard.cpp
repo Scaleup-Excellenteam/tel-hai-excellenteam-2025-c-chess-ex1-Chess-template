@@ -30,7 +30,7 @@ GameBoard::GameBoard() : isWhiteTurn(true) {
             board[row][col] = new Bishop('B', true);
         } else if (row == 7 && col == 2 || row == 7 && col == 5) {
             // Bishop for black
-            board[row][col] = new Bishop('b', true);
+            board[row][col] = new Bishop('b', false);
         } else if (row == 0 && col == 3) {
             // Queen for white
             board[row][col] = new Queen('Q', true);
