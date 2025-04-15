@@ -33,8 +33,8 @@ class Chess {
 	bool isExit() const;
 	void excute();
 	void doTurn();
-
-public:
+	
+	public:
 	Chess(const string& start = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr");
 	Chess(const Chess&)=delete;
 	Chess& operator=(const Chess&) = delete;
