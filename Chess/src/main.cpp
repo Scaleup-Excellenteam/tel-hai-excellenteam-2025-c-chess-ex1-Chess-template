@@ -1,13 +1,17 @@
 // Chess 
 #include "../include/Chess.h"
+#include "../include/GameBoard.h"
+#include <iostream>
+
 
 int main()
 {
-	// string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
+	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
 //	string board = "##########K###############################R#############r#r#####";
-	string board = "R######R################################################r######r";  // רק הסוס שיזוז
+	  // רק הסוס שיזוז
 
 	Chess a(board);
+	
 	int codeResponse = 0;
 	string res = a.getInput();
 	while (res != "exit")
@@ -28,6 +32,10 @@ int main()
 
 		/**/ 
 		{ // put your code here instead that code
+			// gameBoard.displayBoard();
+
+			static GameBoard gameBoard;
+			codeResponse = gameBoard.handleMove(res);
 			
 		}
 		/**/

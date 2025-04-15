@@ -1,15 +1,24 @@
+// Piece.h
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <string>
-using std::string;
-
 class Piece {
+protected:
+    bool m_isWhite;  
 public:
-    virtual ~Piece() {}
-
-    virtual bool isValidMove(int fromX, int fromY, int toX, int toY, const string& board) const = 0;
+    Piece() : m_isWhite(true) {} 
+    Piece(bool isWhite) : m_isWhite(isWhite) {}
+    virtual ~Piece() = default;
+    bool getIsWhite() const { return m_isWhite; }
+    virtual bool isValidMove(int fromX, int fromY, int toX, int toY, const Piece* const board[8][8]) const = 0;
     virtual char getSymbol() const = 0;
+
+
+    static bool isSameColor(const Piece* a, const Piece* b) {
+        if (a == nullptr || b == nullptr)
+            return false;
+        return a->m_isWhite == b->m_isWhite;
+    }
 };
 
-#endif
+#endif // PIECE_H
