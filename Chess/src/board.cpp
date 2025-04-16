@@ -19,6 +19,7 @@ Board::Board(string init) {
         switch (tolower(init[i])) {
         case 'r':
             _board[i] = make_shared<Rook>(is_white);
+            break;
             //        case 'n':
             //            _board[i] = make_unique<Knight>(is_white);
             //        case 'b':
@@ -27,6 +28,7 @@ Board::Board(string init) {
             //            _board[i] = make_unique<Queen>(is_white);
         case 'k':
             _board[i] = make_shared<King>(is_white);
+            break;
             //        case 'p':
             //            _board[i] = make_unique<Pawn>(is_white);
         }
@@ -110,7 +112,7 @@ int Board::move(Position src, Position dst) {
         return 12;
     }
 
-    auto dst_piece = _board[dst.y * SIZE + dst.y];
+    auto dst_piece = _board[dst.y * SIZE + dst.x];
     if (dst_piece != nullptr && dst_piece->Color() == _turn_color) {
         return 13;
     }
@@ -133,7 +135,7 @@ int Board::move(Position src, Position dst) {
 
     _turn_color = !_turn_color;
 
-    if (isCheck(!_turn_color)) {
+    if (isCheck(_turn_color)) {
         return 41;
     }
     return 42;
