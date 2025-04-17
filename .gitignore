@@ -1,5 +1,7 @@
 # Ignore build files and compiled binaries
 /build/
+out/
+.vs/
 /CMakeCache.txt
 /CMakeFiles/
 /*.o
