@@ -98,6 +98,20 @@ build CMakeFiles/Chess.dir/src/Pawn.cpp.obj: CXX_COMPILER__Chess_unscanned_Debug
   OBJECT_DIR = CMakeFiles\Chess.dir
   OBJECT_FILE_DIR = CMakeFiles\Chess.dir\src
 
+build CMakeFiles/Chess.dir/src/PriorityQueue.cpp.obj: CXX_COMPILER__Chess_unscanned_Debug C$:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/src/PriorityQueue.cpp || cmake_object_order_depends_target_Chess
+  DEP_FILE = CMakeFiles\Chess.dir\src\PriorityQueue.cpp.obj.d
+  FLAGS = -g -std=c++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/include
+  OBJECT_DIR = CMakeFiles\Chess.dir
+  OBJECT_FILE_DIR = CMakeFiles\Chess.dir\src
+
+build CMakeFiles/Chess.dir/src/ChessAI.cpp.obj: CXX_COMPILER__Chess_unscanned_Debug C$:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/src/ChessAI.cpp || cmake_object_order_depends_target_Chess
+  DEP_FILE = CMakeFiles\Chess.dir\src\ChessAI.cpp.obj.d
+  FLAGS = -g -std=c++20 -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/include
+  OBJECT_DIR = CMakeFiles\Chess.dir
+  OBJECT_FILE_DIR = CMakeFiles\Chess.dir\src
+
 build CMakeFiles/Chess.dir/src/main.cpp.obj: CXX_COMPILER__Chess_unscanned_Debug C$:/Users/GUYYY/Desktop/study/excellenteam/c++/ex1/chess-ex1-guyyy1000/Chess/src/main.cpp || cmake_object_order_depends_target_Chess
   DEP_FILE = CMakeFiles\Chess.dir\src\main.cpp.obj.d
   FLAGS = -g -std=c++20 -fdiagnostics-color=always
@@ -120,7 +134,7 @@ build CMakeFiles/Chess.dir/src/Chess.cpp.obj: CXX_COMPILER__Chess_unscanned_Debu
 #############################################
 # Link the executable Chess.exe
 
-build Chess.exe: CXX_EXECUTABLE_LINKER__Chess_Debug CMakeFiles/Chess.dir/src/Piece.cpp.obj CMakeFiles/Chess.dir/src/Rook.cpp.obj CMakeFiles/Chess.dir/src/King.cpp.obj CMakeFiles/Chess.dir/src/Queen.cpp.obj CMakeFiles/Chess.dir/src/Bishop.cpp.obj CMakeFiles/Chess.dir/src/Knight.cpp.obj CMakeFiles/Chess.dir/src/Pawn.cpp.obj CMakeFiles/Chess.dir/src/main.cpp.obj CMakeFiles/Chess.dir/src/Chess.cpp.obj
+build Chess.exe: CXX_EXECUTABLE_LINKER__Chess_Debug CMakeFiles/Chess.dir/src/Piece.cpp.obj CMakeFiles/Chess.dir/src/Rook.cpp.obj CMakeFiles/Chess.dir/src/King.cpp.obj CMakeFiles/Chess.dir/src/Queen.cpp.obj CMakeFiles/Chess.dir/src/Bishop.cpp.obj CMakeFiles/Chess.dir/src/Knight.cpp.obj CMakeFiles/Chess.dir/src/Pawn.cpp.obj CMakeFiles/Chess.dir/src/PriorityQueue.cpp.obj CMakeFiles/Chess.dir/src/ChessAI.cpp.obj CMakeFiles/Chess.dir/src/main.cpp.obj CMakeFiles/Chess.dir/src/Chess.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Chess.dir

@@ -291,6 +291,11 @@ string Chess::getInput()
 		doTurn(); 
 
 	displayBoard();
+
+	// The suggested move
+	std::string bestMove = getBestMove(2);
+	std::cout << "Recommended move: " << bestMove << std::endl;
+
 	showAskInput();
 
 	cin >> m_input;
@@ -328,7 +333,7 @@ void Chess::setCodeResponse(int codeResponse)
 		m_codeResponse = codeResponse;
 }
 
-void createBoardFromString(const std::string& boardStr, Piece* board[8][8]) {
+void Chess::createBoardFromString(const std::string& boardStr, Piece* board[8][8]) {
 	for (int row = 0; row < 8; ++row) {
 		for (int col = 0; col < 8; ++col) {
 			int index = row * 8 + col;
@@ -392,4 +397,8 @@ void Chess::calculateResponseCode() {
 	for (int i = 0; i < 8; ++i)
 		for (int j = 0; j < 8; ++j)
 			delete board[i][j];
+}
+
+std::string Chess::getBestMove(int depth) {
+	return m_ai.getBestMove(this, depth);
 }

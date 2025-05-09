@@ -8,10 +8,9 @@
 Bishop::Bishop(char symbol) : Piece(symbol) { }
 
 bool Bishop::isMoveLegal(int srcRow, int srcCol, int destRow, int destCol,
-                         Piece* board[8][8]) const
-{
+                         Piece* board[8][8]) const {
     int d = std::abs(destRow - srcRow);
-    if (d != std::abs(destCol - srcCol))
+    if (d != std::abs(destCol - srcCol) || d == 0) // added d == 0
         return false;
 
     int rowDir = (destRow - srcRow) / d;
