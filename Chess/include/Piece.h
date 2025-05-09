@@ -11,6 +11,7 @@ public:
     enum Color { WHITE, BLACK };
 
     Piece(char symbol);
+    virtual ~Piece();
 
     Color getColor() const;
     char getSymbol() const;

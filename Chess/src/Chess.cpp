@@ -352,6 +352,14 @@ void createBoardFromString(const std::string& boardStr, Piece* board[8][8]) {
 	}
 }
 
+enum ResponseCode {
+	NO_PIECE = 11,
+	WRONG_TURN = 12,
+	SAME_COLOR = 13,
+	ILLEGAL_MOVE = 21,
+	VALID_MOVE = 42
+};
+
 
 void Chess::calculateResponseCode() {
 	Piece* board[8][8] = { nullptr };
@@ -367,16 +375,16 @@ void Chess::calculateResponseCode() {
 	Piece* destPiece = board[destRow][destCol];
 
 	if (!srcPiece)
-		m_codeResponse = 11;
+		m_codeResponse = NO_PIECE;
 	else if ((m_turn && srcPiece->getColor() != Piece::WHITE) ||
 			 (!m_turn && srcPiece->getColor() != Piece::BLACK))
-		m_codeResponse = 12;
+		m_codeResponse = WRONG_TURN;
 	else if (destPiece && destPiece->getColor() == srcPiece->getColor())
-		m_codeResponse = 13;
+		m_codeResponse = SAME_COLOR;
 	else if (!srcPiece->isMoveLegal(srcRow, srcCol, destRow, destCol, board))
-		m_codeResponse = 21;
+		m_codeResponse = ILLEGAL_MOVE;
 	else
-		m_codeResponse = 42;
+		m_codeResponse = VALID_MOVE;
 
 	std::cout << srcRow << srcCol << std::endl;
 

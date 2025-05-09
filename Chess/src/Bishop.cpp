@@ -10,24 +10,16 @@ Bishop::Bishop(char symbol) : Piece(symbol) { }
 bool Bishop::isMoveLegal(int srcRow, int srcCol, int destRow, int destCol,
                          Piece* board[8][8]) const
 {
-    int dRow = std::abs(destRow - srcRow);
-    int dCol = std::abs(destCol - srcCol);
-
-    if (dRow != dCol)
+    int d = std::abs(destRow - srcRow);
+    if (d != std::abs(destCol - srcCol))
         return false;
 
-    int rowDir = (destRow > srcRow) ? 1 : -1;
-    int colDir = (destCol > srcCol) ? 1 : -1;
+    int rowDir = (destRow - srcRow) / d;
+    int colDir = (destCol - srcCol) / d;
 
-    int row = srcRow + rowDir;
-    int col = srcCol + colDir;
-
-    while (row != destRow && col != destCol) {
-        if (board[row][col] != nullptr)
+    for (int i = 1; i < d; ++i) {
+        if (board[srcRow + i * rowDir][srcCol + i * colDir] != nullptr)
             return false;
-
-        row += rowDir;
-        col += colDir;
     }
 
     const Piece* destPiece = board[destRow][destCol];

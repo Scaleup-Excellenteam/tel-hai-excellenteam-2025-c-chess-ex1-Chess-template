@@ -9,6 +9,9 @@ Piece::Piece(char symbol) : _symbol(symbol) {
     _color = (std::isupper(symbol) ? WHITE : BLACK);
 }
 
+Piece::~Piece() = default;
+
+
 Piece::Color Piece::getColor() const {
     return _color;
 }
