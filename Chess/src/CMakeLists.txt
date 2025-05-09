@@ -8,4 +8,5 @@
     Pawn.cpp
     Queen.cpp
     Rook.cpp
+    PriorityQueue.cpp
 )
