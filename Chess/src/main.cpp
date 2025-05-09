@@ -5,9 +5,9 @@ int main()
 {
 	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
 //	string board = "##########K###############################R#############r#r#####";
-	Chess a(board);
+	Chess game(board);
 	int codeResponse = 0;
-	string res = a.getInput();
+	string res = game.getInput();
 	while (res != "exit")
 	{
 		/* 
@@ -25,14 +25,11 @@ int main()
 		*/
 
 		/**/ 
-		{ // put your code here instead that code
-			cout << "code response >> ";
-			cin >> codeResponse;
-		}
+		game.calculateResponseCode();
 		/**/
 
-		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
+		game.setCodeResponse(codeResponse);
+		res = game.getInput();
 	}
 
 	cout << endl << "Exiting " << endl; 
