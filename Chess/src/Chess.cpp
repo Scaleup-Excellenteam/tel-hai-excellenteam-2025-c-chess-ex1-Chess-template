@@ -180,7 +180,6 @@ void Chess::displayBoard() const
 {
 	clear();
 	show();
-	cout << m_msg<< m_errorMsg;
 	
 }
 // print the who is turn before getting input 
@@ -269,6 +268,17 @@ void Chess::doTurn()
 		m_msg = "the last movement was legal \n";
 		break;
 	}
+	case 99:
+	{
+		excute();
+		if(m_turn){
+			m_msg = "White Win \n";
+		}
+		else{
+			m_msg = "Black Win \n";
+		}
+			
+	}
 	}
 }
 
@@ -280,8 +290,13 @@ Chess::Chess(const string& start)
 	setPieces();
 }
 
+void Chess::showRecomendedMove(Move move){
+	cout << "Recomended move: "<< move << endl;
+	cout << m_msg<< m_errorMsg;
+}
+
 // get the source and destination 
-string Chess::getInput()
+string Chess::getInput(Move move)
 {
 	static bool isFirst = true;
 
@@ -290,7 +305,14 @@ string Chess::getInput()
 	else
 		doTurn(); 
 
+	if(m_codeResponse == 99){
+		displayBoard();
+		cout << m_msg<< m_errorMsg;
+		return "exit";
+	}
+
 	displayBoard();
+	showRecomendedMove(move);
 	showAskInput();
 
 	cin >> m_input;
@@ -324,6 +346,6 @@ void Chess::setCodeResponse(int codeResponse)
 {
 	if (((11 <= codeResponse) && (codeResponse <= 13)) ||
 		((21 == codeResponse) || (codeResponse == 31)) ||
-		((41 == codeResponse) || (codeResponse == 42)))
+		((41 == codeResponse) || (codeResponse == 42) || (codeResponse == 99))) 
 		m_codeResponse = codeResponse;
 }

@@ -1,6 +1,7 @@
 // Chess 
 #include "../include/Chess.h"
 #include "../include/GameBoard.h"
+#include "../include/exceptions/InvalidDepthException.h" 
 #include <iostream>
 
 
@@ -11,9 +12,28 @@ int main()
 	  // רק הסוס שיזוז
 
 	Chess a(board);
+	int depth = 0;
 	
+
+	 while (true) {
+		 std::cout << "Please select the depth of the recommendation moves (digit > 0): ";
+		 std::cin >> depth;
+
+        try {
+            if (depth <= 0 ) {
+                throw InvalidDepthException();
+            }
+            break;
+        } catch (const InvalidDepthException& e) {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+
+	static GameBoard gameBoard;
+	MoveScore best = gameBoard.minimax(gameBoard.getBoard(), depth, gameBoard.getisWhiteTurn());
+
 	int codeResponse = 0;
-	string res = a.getInput();
+	string res = a.getInput(best.move);
 	while (res != "exit")
 	{
 		/* 
@@ -34,14 +54,16 @@ int main()
 		{ // put your code here instead that code
 			// gameBoard.displayBoard();
 
-			static GameBoard gameBoard;
-			codeResponse = gameBoard.handleMove(res);
 			
+			codeResponse = gameBoard.handleMove(res);
+			best = gameBoard.minimax(gameBoard.getBoard(), depth, gameBoard.getisWhiteTurn());
+			
+					
 		}
 		/**/
 
 		a.setCodeResponse(codeResponse);
-		res = a.getInput(); 
+		res = a.getInput(best.move); 
 	}
 
 	cout << endl << "Exiting " << endl; 
