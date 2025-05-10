@@ -34,6 +34,7 @@ class Chess {
 	string m_errorMsg = "\n";
 	int m_codeResponse;
 
+	int depth = 0;
 	ChessAI m_ai;
 
 	void clear() const;
@@ -60,6 +61,7 @@ public:
 	const string& getBoardString() const { return m_boardString; }
 	bool getTurn() const { return m_turn; }
 
+	void setDepth(int depth) { this->depth = depth; }
 	std::string getBestMove(int depth);
 	void printBestMoves(int count);
 

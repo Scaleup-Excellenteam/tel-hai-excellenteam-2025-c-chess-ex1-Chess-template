@@ -7,6 +7,13 @@ int main()
 //	string board = "##########K###############################R#############r#r#####";
 	Chess game(board);
 	int codeResponse = 0;
+
+	int depth = 0;
+	std::cout << "Enter the Depth you desire: ";
+	std::cin >> depth;
+	std::cout << std::endl;
+	game.setDepth(depth);
+
 	string res = game.getInput();
 	while (res != "exit")
 	{

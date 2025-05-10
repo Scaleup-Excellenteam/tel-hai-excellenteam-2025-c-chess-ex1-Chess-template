@@ -293,7 +293,7 @@ string Chess::getInput()
 	displayBoard();
 
 	// The suggested move
-	std::string bestMove = getBestMove(2);
+	std::string bestMove = getBestMove(depth);
 	std::cout << "Recommended move: " << bestMove << std::endl;
 
 	showAskInput();
