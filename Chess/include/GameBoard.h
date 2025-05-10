@@ -27,16 +27,17 @@ public:
     bool isCheckmate(bool isWhite);
     //second part
     int getPieceValue(char symbol);
-    int weakPeaceThreat(Piece* board[8][8], bool currentPlayerIsWhite);
-    int threatStrongerPiece(Piece* board[8][8], bool isWhiteTurn);
-    int eatOponentPiece(Piece* board[8][8],int fromX, int fromY, int toX, int toY);
-    int evaluateBoard(Piece* board[8][8], bool isWhiteTurn);
+    int weakPeaceThreat( bool currentPlayerIsWhite);
+    int threatStrongerPiece(bool isWhiteTurn);
+    int eatOponentPiece(int fromX, int fromY, int toX, int toY);
+    int evaluateBoard( bool isWhiteTurn);
     Piece* (*getBoard())[8] {
         return board;
     }
     
-    MoveScore minimax(Piece* board[8][8], int depth, bool isMaximizingPlayer);
+    MoveScore minimax(int depth, bool isMaximizingPlayer);
     void undoMove(int fromRow, int fromCol, int toRow, int toCol, Piece* movedPiece, Piece* capturedPiece);
+    
 
     
  

@@ -13,6 +13,9 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, const Piece* cons
     if (abs(fromX - toX) > 1 || abs(fromY - toY) > 1)
         return false;
 
-    
+    const Piece* target = board[toX][toY];
+    if (target && target->getIsWhite() == this->getIsWhite())
+        return false;
+
     return true;
 }

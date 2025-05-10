@@ -30,7 +30,7 @@ int main()
     }
 
 	static GameBoard gameBoard;
-	MoveScore best = gameBoard.minimax(gameBoard.getBoard(), depth, gameBoard.getisWhiteTurn());
+	MoveScore best = gameBoard.minimax( depth, gameBoard.getisWhiteTurn());
 
 	int codeResponse = 0;
 	string res = a.getInput(best.move);
@@ -56,7 +56,7 @@ int main()
 
 			
 			codeResponse = gameBoard.handleMove(res);
-			best = gameBoard.minimax(gameBoard.getBoard(), depth, gameBoard.getisWhiteTurn());
+			best = gameBoard.minimax(depth, gameBoard.getisWhiteTurn());
 			
 					
 		}

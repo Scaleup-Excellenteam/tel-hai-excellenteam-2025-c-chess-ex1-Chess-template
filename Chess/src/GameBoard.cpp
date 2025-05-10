@@ -184,9 +184,6 @@ bool GameBoard::isOwnKingInCheckAfterMove(int fromRow, int fromCol, int toRow, i
             Piece* attacker = board[row][col];
             if (attacker != nullptr && attacker->getIsWhite() != movingPiece->getIsWhite()) {
                 if (attacker->isValidMove(row, col, kingRow, kingCol, board)) {
-                    std::cout << ">> Threat found from " << attacker->getSymbol()
-                              << " at (" << row << "," << col << ") to king at ("
-                              << kingRow << "," << kingCol << ")\n";
                     inCheck = true;
                 }
             }
@@ -321,18 +318,18 @@ int GameBoard::getPieceValue(char symbol) {
     return value;
 }
 
-int GameBoard::weakPeaceThreat(Piece* board[8][8], bool currentPlayerIsWhite) {
+int GameBoard::weakPeaceThreat(bool currentPlayerIsWhite) {
     int penalty = 0;
     for (int fromX = 0; fromX < 8; ++fromX) {
         for (int fromY = 0; fromY < 8; ++fromY) {
-            Piece* piece = board[fromX][fromY];
+            Piece* piece = this->board[fromX][fromY]; 
             if (piece && piece->getIsWhite() == currentPlayerIsWhite) {
                 int myValue = getPieceValue(piece->getSymbol());
                 for (int toX = 0; toX < 8; ++toX) {
                     for (int toY = 0; toY < 8; ++toY) {
-                        Piece* attacker = board[toX][toY];
+                        Piece* attacker = this->board[toX][toY];  
                         if (attacker && attacker->getIsWhite() != currentPlayerIsWhite &&
-                            attacker->isValidMove(toX, toY, fromX, fromY, board)) {
+                            attacker->isValidMove(toX, toY, fromX, fromY, this->board)) {
                             int attackerValue = getPieceValue(attacker->getSymbol());
                             if (attackerValue < myValue) {
                                 penalty += (myValue - attackerValue);
@@ -347,20 +344,21 @@ int GameBoard::weakPeaceThreat(Piece* board[8][8], bool currentPlayerIsWhite) {
 }
 
 
-int GameBoard::threatStrongerPiece(Piece* board[8][8], bool isWhiteTurn) {
+
+int GameBoard::threatStrongerPiece(bool isWhiteTurn) {
     int score = 0;
 
     for (int fromX = 0; fromX < 8; ++fromX) {
         for (int fromY = 0; fromY < 8; ++fromY) {
-            Piece* attacker = board[fromX][fromY];
+            Piece* attacker = this->board[fromX][fromY];  
             if (attacker && attacker->getIsWhite() == isWhiteTurn) {
                 int attackerValue = getPieceValue(attacker->getSymbol());
 
                 for (int toX = 0; toX < 8; ++toX) {
                     for (int toY = 0; toY < 8; ++toY) {
-                        Piece* target = board[toX][toY];
+                        Piece* target = this->board[toX][toY]; 
                         if (target && target->getIsWhite() != isWhiteTurn &&
-                            attacker->isValidMove(fromX, fromY, toX, toY, board)) {
+                            attacker->isValidMove(fromX, fromY, toX, toY, this->board)) {
                             int targetValue = getPieceValue(target->getSymbol());
                             if (targetValue > attackerValue) {
                                 score += (targetValue - attackerValue);
@@ -374,23 +372,22 @@ int GameBoard::threatStrongerPiece(Piece* board[8][8], bool isWhiteTurn) {
     return score;
 }
 
-int GameBoard::eatOponentPiece(Piece* board[8][8], int fromX, int fromY, int toX, int toY) {
-    Piece* attacker = board[fromX][fromY];
-    Piece* target = board[toX][toY];
+int GameBoard::eatOponentPiece(int fromX, int fromY, int toX, int toY) {
+    Piece* attacker = this->board[fromX][fromY]; 
+    Piece* target = this->board[toX][toY]; 
 
     if (!attacker || !target) return 0;
     if (attacker->getIsWhite() == target->getIsWhite()) return 0;
-    if (!attacker->isValidMove(fromX, fromY, toX, toY, board)) return 0;
+    if (!attacker->isValidMove(fromX, fromY, toX, toY, this->board)) return 0;
 
     return getPieceValue(target->getSymbol());
 }
 
-
-int GameBoard::evaluateBoard(Piece* board[8][8], bool currentPlayerIsWhite) {
+int GameBoard::evaluateBoard(bool currentPlayerIsWhite) {
     int score = 0;
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            Piece* piece = board[i][j];
+            Piece* piece = this->board[i][j]; 
             if (piece != nullptr) {
                 int value = getPieceValue(piece->getSymbol());
                 if (piece->getIsWhite() == currentPlayerIsWhite) {
@@ -401,33 +398,60 @@ int GameBoard::evaluateBoard(Piece* board[8][8], bool currentPlayerIsWhite) {
             }
         }
     }
+
+    for (int fromX = 0; fromX < 8; ++fromX) {
+        for (int fromY = 0; fromY < 8; ++fromY) {
+            Piece* attacker = this->board[fromX][fromY]; 
+            if (attacker && attacker->getIsWhite() == currentPlayerIsWhite) {
+                for (int toX = 0; toX < 8; ++toX) {
+                    for (int toY = 0; toY < 8; ++toY) {
+                        int eatScore = eatOponentPiece(fromX, fromY, toX, toY); 
+                        score += eatScore ;
+                    }
+                }
+            }
+            else{
+                 for (int toX = 0; toX < 8; ++toX) {
+                    for (int toY = 0; toY < 8; ++toY) {
+                        int eatScore = eatOponentPiece(fromX, fromY, toX, toY); 
+                        score -= eatScore ;
+                    }
+                }
+            }
+        }
+    }
+
+    score += weakPeaceThreat(currentPlayerIsWhite);
+    score += threatStrongerPiece(currentPlayerIsWhite);
     return score;
 }
 
 
-MoveScore GameBoard::minimax(Piece* board[8][8], int depth, bool isMaximizingPlayer) {
+MoveScore GameBoard::minimax(int depth, bool isMaximizingPlayer) {
     if (depth == 0) {
-        return { Move{-1, -1, -1, -1}, evaluateBoard(board,isMaximizingPlayer) };
+        return { Move{-1, -1, -1, -1}, evaluateBoard(isMaximizingPlayer) };
     }
 
     PriorityQueue pq;
 
     for (int fromRow = 0; fromRow < 8; ++fromRow) {
         for (int fromCol = 0; fromCol < 8; ++fromCol) {
-            Piece* piece = board[fromRow][fromCol];
+            Piece* piece = this->board[fromRow][fromCol]; 
             if (piece && piece->getIsWhite() == isMaximizingPlayer) {
                 for (int toRow = 0; toRow < 8; ++toRow) {
                     for (int toCol = 0; toCol < 8; ++toCol) {
-                        if (piece->isValidMove(fromRow, fromCol, toRow, toCol, board)) {
-
-                            Piece* captured = board[toRow][toCol];
+                        if (piece->isValidMove(fromRow, fromCol, toRow, toCol, this->board)) { 
+                            Piece* captured = this->board[toRow][toCol]; 
 
                             if (captured && Piece::isSameColor(captured, piece)) {
                                 continue;
                             }
+                            if(isOwnKingInCheckAfterMove(fromRow,fromCol,toRow,toCol)){
+                                continue;
+                            }
 
                             movePiece(fromRow, fromCol, toRow, toCol);
-                            MoveScore result = minimax(board, depth - 1, !isMaximizingPlayer);
+                            MoveScore result = minimax(depth - 1, !isMaximizingPlayer);
                             undoMove(fromRow, fromCol, toRow, toCol, piece, captured);
 
                             Move m = {fromRow, fromCol, toRow, toCol};
@@ -445,6 +469,7 @@ MoveScore GameBoard::minimax(Piece* board[8][8], int depth, bool isMaximizingPla
 
     return { Move{-1, -1, -1, -1}, isMaximizingPlayer ? -10000 : 10000 };
 }
+
 
 void GameBoard::undoMove(int fromRow, int fromCol, int toRow, int toCol, Piece* movedPiece, Piece* capturedPiece) {
     board[fromRow][fromCol] = movedPiece;
