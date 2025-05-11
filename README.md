@@ -149,6 +149,44 @@ You are required to submit each exercise using "GitHub Classroom". To do this, y
 8. Upload the repository link to Moodle.  
 9. Good luck :)
 
+
+# Chess Move Recommendation Algorithm
+
+This project implements an algorithm that recommends the optimal next move for a player based on an analysis of the board states, using three main parameters. The algorithm scans the board up to a user-defined depth (i.e., how many moves ahead to check) and evaluates the quality of each possible move.
+
+## Parameters Evaluated for Each Move
+
+### 1. **Threatening a Weaker Piece**
+If the player's move leads to a situation where their piece is threatened by a weaker opponent's piece, this is considered a poor move. The player is risking a more valuable piece for an unprofitable move, so points are subtracted from the score for such a move.
+
+### 2. **Threatening a Stronger Piece**
+If the player's move results in threatening an opponent's piece that is stronger than the player's attacking piece, this is considered a beneficial move and adds points to the score. For example, if a bishop threatens a queen, this is valued higher due to the strategic advantage it offers.
+
+### 3. **Capturing an Opponent's Piece**
+If an opponent's piece is captured during a move, the algorithm adds the value of the captured piece to the score. More valuable pieces (e.g., queen, rook) are worth more points.
+
+## How the Algorithm Chooses a Move
+
+- **Minimax Algorithm**: The algorithm uses the Minimax method, which simulates every possible option (player's and opponent's moves alternately) up to a given depth.
+- **Simulation**: The algorithm simulates the move by moving the pieces on the board and evaluates what will happen as a result of choosing that move.
+- **Evaluation**: The state of the board is evaluated based on the parameters mentioned above.
+- **Move Selection**: Finally, the move with the highest score is selected, assuming the opponent also plays optimally.
+
+## Value of Pieces
+
+- Pawn: 10 points
+- Knight/Bishop: 30 points
+- Rook: 50 points
+- Queen: 100 points
+- King: 1000 points (for evaluation purposes only)
+
+## Time Complexity
+
+The time complexity of the algorithm is **O(b^d)**, where:
+- **b** = the average number of possible moves (approximately 30–40 in chess)
+- **d** = the search depth (i.e., how many turns ahead the algorithm evaluates)
+
+
 <!-- Center Excellenteam image -->
 <p align="center">
   <img src="./img/excellenteam.png" alt="Excellenteam">
