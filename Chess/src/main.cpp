@@ -8,6 +8,7 @@ int main()
 	string board = "##########K###############################R#############r#r#####";
     auto gui = new Chess(board);
     Board logic(board);
+    cout << logic << endl;
     string res = gui->getInput();
 	while (res != "exit")
 	{
@@ -29,6 +30,7 @@ int main()
             int codeResponse = 0;
             logic.movePiece(res, codeResponse);
             gui->setCodeResponse(codeResponse);
+            cout << logic << endl;
             res = gui->getInput();
         }
 		/**/

@@ -33,6 +33,12 @@ add_executable (Chess ""
         src/Board.cpp
         include/Knight.h
         src/Knight.cpp
+        include/Pawn.h
+        src/Pawn.cpp
+        include/Exception_chess.h
+        src/Exception_chess.cpp
+        include/PriorityQueue.h
+        src/PriorityQueue.cpp
 )
 
 

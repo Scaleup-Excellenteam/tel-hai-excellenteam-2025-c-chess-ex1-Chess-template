@@ -4,6 +4,9 @@
 #include "Queen.h"
 #include "Bishop.h"
 #include "Knight.h"
+#include "Pawn.h"
+#include "Exception_chess.h"
+#include <algorithm>
 #include <cctype>
 
 Board::Board(std::string& boardStr)
@@ -32,50 +35,54 @@ Piece* Board::createPiece(char type) {
         case 'q': return new Queen(type);
         case 'b': return new Bishop(type);
         case 'n': return new Knight(type);
+        case 'p' : return new Pawn(type);
     }
     return nullptr;
 }
 
 bool Board::movePiece(const string& input, int& responseCode) {
-    int col_source = (input[1] - '1');
-    int row_source = input[0] - 'a';
-    int col_dest = (input[3] - '1');
-    int row_dest = input[2] - 'a';
-
-    Piece* srcPiece = board_game[row_source][col_source];
+    int col_source =  input[1] - '1';
+    int row_source =  input[0] - 'a';
+    int col_dest   =  input[3] - '1';
+    int row_dest   =  input[2] - 'a';
+    Piece* srcPiece  = board_game[row_source][col_source];
     Piece* destPiece = board_game[row_dest][col_dest];
-    if (!srcPiece) {
-        responseCode = 11;
+    try {
+        if (!srcPiece)
+            throw Exception_chess(ExceptionType::NoPieceAtSource);
+        bool isWhitePiece = std::isupper(srcPiece->get_type());
+        if (isWhitePiece != isWhiteTurn)
+            throw Exception_chess(ExceptionType::OpponentPieceAtSource);
+        if (destPiece && (std::isupper(destPiece->get_type()) == isWhiteTurn))
+            throw Exception_chess(ExceptionType::FriendlyPieceAtDestination);
+        char t = std::tolower(srcPiece->get_type());
+        if ((t == 'b' || t == 'r' || t == 'q') &&
+            !isPathClear(row_source, col_source, row_dest, col_dest)) {
+            throw Exception_chess(ExceptionType::InvalidPieceMovement);
+        }
+        string flatBoard = toString();
+        if (!srcPiece->is_legel_movement(input, flatBoard, isWhiteTurn))
+            throw Exception_chess(ExceptionType::InvalidPieceMovement);
+        int idx_src  = row_source * 8 + col_source;
+        int idx_dest = row_dest   * 8 + col_dest;
+        char piece = sharedBoardString[idx_src];
+        sharedBoardString[idx_src]  = '#';
+        sharedBoardString[idx_dest] = piece;
+        board_game[row_dest][col_dest]   = board_game[row_source][col_source];
+        board_game[row_source][col_source] = nullptr;
+        isWhiteTurn = !isWhiteTurn;
+        responseCode = 42;
+        return true;
+    } catch (const Exception_chess& ex) {
+        switch (ex.getType()) {
+            case ExceptionType::NoPieceAtSource:           responseCode = 11; break;
+            case ExceptionType::OpponentPieceAtSource:     responseCode = 12; break;
+            case ExceptionType::FriendlyPieceAtDestination:responseCode = 13; break;
+            case ExceptionType::InvalidPieceMovement:      responseCode = 21; break;
+            case ExceptionType::CheckViolation:            responseCode = 31; break;
+        }
         return false;
     }
-
-    bool isWhitePiece = isupper(srcPiece->get_type());
-    if (isWhitePiece != isWhiteTurn) {
-        responseCode = 12;
-        return false;
-    }
-
-    if (destPiece && (isupper(destPiece->get_type()) == isWhiteTurn)) {
-        responseCode = 13;
-        return false;
-    }
-
-    string flatBoard = toString();
-    if (!srcPiece->is_legel_movement(input, flatBoard, isWhiteTurn)) {
-        responseCode = 21;
-        return false;
-    }
-
-    int index_source = row_source * 8 + col_source;
-    int index_dest = row_dest * 8 + col_dest;
-    char piece = sharedBoardString[index_source];
-    sharedBoardString[index_source] = '#';
-    sharedBoardString[index_dest] = piece;
-    board_game[row_dest][col_dest] = board_game[row_source][col_source];
-    board_game[row_source][col_source] = nullptr;
-    responseCode = 42;
-    isWhiteTurn = !isWhiteTurn;
-    return true;
 }
 
 std::string Board::toString() const{
@@ -90,3 +97,129 @@ std::string Board::toString() const{
     return flat;
 }
 
+
+bool Board::isPathClear(int rowSrc, int colSrc, int rowDst, int colDst) const {
+    if (rowSrc == rowDst) {
+        int step = (colDst > colSrc) ? 1 : -1;
+        for (int c = colSrc + step; c != colDst; c += step)
+            if (board_game[rowSrc][c] != nullptr) return false;
+        return true;
+    }
+    else if (colSrc == colDst) {
+        int step = (rowDst > rowSrc) ? 1 : -1;
+        for (int r = rowSrc + step; r != rowDst; r += step)
+            if (board_game[r][colSrc] != nullptr) return false;
+        return true;
+    }
+    else if (std::abs(rowDst - rowSrc) == std::abs(colDst - colSrc)) {
+        int stepR = (rowDst > rowSrc) ? 1 : -1;
+        int stepC = (colDst > colSrc) ? 1 : -1;
+        int r = rowSrc + stepR, c = colSrc + stepC;
+        while (r != rowDst && c != colDst) {
+            if (board_game[r][c] != nullptr) return false;
+            r += stepR;
+            c += stepC;
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+void Board::rebuildBoard() {
+    for (int r = 0; r < 8; ++r)
+        for (int c = 0; c < 8; ++c) {
+            delete board_game[r][c];
+            char ch = sharedBoardString[r * 8 + c];
+            board_game[r][c] = createPiece(ch);
+        }
+}
+
+
+int Board::scorePosition(const std::string& flatBoard) const {
+    int score = 0;
+    for (int i = 0; i < 64; ++i) {
+        char P = flatBoard[i];
+        if (P=='#') continue;
+        bool isWhite = std::isupper(P);
+        int pieceValue = 0;
+        switch (std::tolower(P)) {
+            case 'p': pieceValue=1;  break;
+            case 'n': case 'b': pieceValue=3;  break;
+            case 'r': pieceValue=5;  break;
+            case 'q': pieceValue=9;  break;
+            case 'k': pieceValue=100;break;
+        }
+        score += (isWhite == isWhiteTurn ? +1 : -1) * pieceValue;
+    }
+    return score;
+}
+
+int Board::minimax(int depth) {
+    int myScore = scorePosition(sharedBoardString);
+    if (depth == 0) return myScore;
+    auto next = recommendMoves(depth-1, /*topN=*/1);
+    return myScore - ( next.empty() ? 0 : next[0].second );
+}
+
+
+std::vector<std::pair<std::string,int>>
+Board::recommendMoves(int maxDepth, int topN) {
+    bestMoves.clear();
+    std::string oldBoard = sharedBoardString;
+    bool        oldTurn  = isWhiteTurn;
+    int legalCount = 0;
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            Piece* p = board_game[r][c];
+            if (!p) continue;
+            if (std::isupper(p->get_type()) != isWhiteTurn) continue;
+            char sr = char('a' + r);
+            char sf = char('1' + c);
+            for (int rr = 0; rr < 8; ++rr) {
+                for (int cc = 0; cc < 8; ++cc) {
+                    char dr = char('a' + rr);
+                    char df = char('1' + cc);
+                    std::string mv{ sr, sf, dr, df };
+
+                    int code;
+                    if (movePiece(mv, code)) {
+                        ++legalCount;
+                        int sc = minimax(maxDepth);
+                        bestMoves.push({mv, sc});
+                        if (bestMoves.size() > 5)
+                            bestMoves.popWorst();
+                    }
+                    sharedBoardString = oldBoard;
+                    isWhiteTurn       = oldTurn;
+                    rebuildBoard();
+                }
+            }
+        }
+    }
+    std::vector<std::pair<std::string,int>> all;
+    while (!bestMoves.empty()) {
+        all.emplace_back(bestMoves.pull());
+        bestMoves.poll();
+    }
+    std::reverse(all.begin(), all.end());
+    std::vector<std::pair<std::string,int>> out;
+    for (int i = 0; i < topN && i < (int)all.size(); ++i)
+        out.push_back(all[i]);
+    return out;
+}
+std::ostream& operator<<(std::ostream& os, Board& board) {
+    auto rec = board.recommendMoves(2,3);
+    if (rec.empty()) {
+        os << "No recommended moves available.\n";
+    } else {
+        os << "Recommended moves:";
+        for (auto& [mv,sc] : rec) {
+            os << " " << mv;
+        }
+        os << "\n";
+    }
+    return os;
+}
