@@ -149,11 +149,6 @@ You are required to submit each exercise using "GitHub Classroom". To do this, y
 8. Upload the repository link to Moodle.  
 9. Good luck :)
 
-<!-- Center Excellenteam image -->
-<p align="center">
-  <img src="./img/excellenteam.png" alt="Excellenteam">
-</p>
-
 
 # Chess Move Recommendation Algorithm
 
@@ -192,3 +187,7 @@ The time complexity of the algorithm is **O(b^d)**, where:
 - **d** = the search depth (i.e., how many turns ahead the algorithm evaluates)
 
 
+<!-- Center Excellenteam image -->
+<p align="center">
+  <img src="./img/excellenteam.png" alt="Excellenteam">
+</p>
