@@ -7,7 +7,8 @@
 
 Board::Board() {}
 
-Board::Board(string init) {
+Board::Board(string init)
+{
     assert(init.length() == SIZE * SIZE);
     bool is_white;
     for (int i = 0; i < SIZE * SIZE; i++) {
@@ -41,7 +42,8 @@ Board::Board(string init) {
 
 Board::~Board() {}
 
-bool Board::isPathClear(Position src, Position dst) const {
+bool Board::isPathClear(Position src, Position dst) const
+{
     int dx = dst.x - src.x;
     int dy = dst.y - src.y;
 
@@ -60,7 +62,8 @@ bool Board::isPathClear(Position src, Position dst) const {
     return true;
 }
 
-bool Board::isValidMove(Position src, Position dst) const {
+bool Board::isValidMove(Position src, Position dst) const
+{
     auto piece = _board[src.y * SIZE + src.x];
 
     if (dynamic_pointer_cast<Rook>(piece) ||
@@ -71,7 +74,7 @@ bool Board::isValidMove(Position src, Position dst) const {
                dynamic_pointer_cast<Knight>(piece)) {
         return piece->isValidMove(src, dst);
     } else if (dynamic_pointer_cast<Pawn>(piece)) {
-        auto pawn = dynamic_pointer_cast<Pawn>(piece);
+        auto pawn      = dynamic_pointer_cast<Pawn>(piece);
         auto dst_piece = _board[dst.y * SIZE + dst.x];
 
         if (dst.x == src.x && dst_piece != nullptr) {
@@ -83,7 +86,8 @@ bool Board::isValidMove(Position src, Position dst) const {
     return true;
 }
 
-bool Board::isCheck(bool target_player) const {
+bool Board::isCheck(bool target_player) const
+{
     // needed if a game is initialized with no kings
     bool has_king = false;
     Position target_king_position;
@@ -91,7 +95,7 @@ bool Board::isCheck(bool target_player) const {
         auto piece = _board[i];
         if (dynamic_pointer_cast<King>(piece) &&
             piece->Color() == target_player) {
-            has_king = true;
+            has_king             = true;
             target_king_position = Position{i % SIZE, i / SIZE};
             break;
         }
@@ -112,7 +116,8 @@ bool Board::isCheck(bool target_player) const {
     return false;
 }
 
-int Board::move(Position src, Position dst) {
+int Board::move(Position src, Position dst)
+{
     auto piece = _board[src.y * SIZE + src.x];
     if (!piece) {
         return 11;

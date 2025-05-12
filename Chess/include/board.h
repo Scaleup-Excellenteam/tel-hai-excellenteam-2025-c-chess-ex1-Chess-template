@@ -4,7 +4,8 @@
 #include <string>
 
 using namespace std;
-class Board {
+class Board
+{
 private:
     static const int SIZE = 8;
     array<shared_ptr<Piece>, SIZE * SIZE> _board;

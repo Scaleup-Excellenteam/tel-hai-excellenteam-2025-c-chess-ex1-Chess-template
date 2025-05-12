@@ -3,7 +3,8 @@
 
 using namespace std;
 
-bool Bishop::isValidMove(Position src, Position dst) {
+bool Bishop::isValidMove(Position src, Position dst)
+{
     int dx = dst.x - src.x;
     int dy = dst.y - src.y;
 
@@ -12,19 +13,22 @@ bool Bishop::isValidMove(Position src, Position dst) {
     return abs(dx) == abs(dy);
 }
 
-bool Rook::isValidMove(Position src, Position dst) {
+bool Rook::isValidMove(Position src, Position dst)
+{
     if (src == dst)
         return false;
     return (src.x == dst.x || src.y == dst.y);
 }
 
-bool King::isValidMove(Position src, Position dst) {
+bool King::isValidMove(Position src, Position dst)
+{
     if (src == dst)
         return false;
     return (abs(src.x - dst.x) <= 1 && abs(src.y - dst.y) <= 1);
 }
 
-bool Knight::isValidMove(Position src, Position dst) {
+bool Knight::isValidMove(Position src, Position dst)
+{
     int dx = dst.x - src.x;
     int dy = dst.y - src.y;
 
@@ -33,13 +37,15 @@ bool Knight::isValidMove(Position src, Position dst) {
     return abs(dx) == 2 && abs(dy) == 1 || abs(dx) == 1 && abs(dy) == 2;
 }
 
-bool Queen::isValidMove(Position src, Position dst) {
+bool Queen::isValidMove(Position src, Position dst)
+{
     if (src == dst)
         return false;
     return Rook().isValidMove(src, dst) || Bishop().isValidMove(src, dst);
 }
 
-bool Pawn::isValidMove(Position src, Position dst, bool isAttacking) {
+bool Pawn::isValidMove(Position src, Position dst, bool isAttacking)
+{
     int dx = dst.x - src.x;
     int dy = dst.y - src.y;
     bool is_forward;
@@ -57,10 +63,10 @@ bool Pawn::isValidMove(Position src, Position dst, bool isAttacking) {
     }
 
     if (Color() == WHITE) {
-        is_forward = dy > 0;
+        is_forward  = dy > 0;
         is_starting = src.y == 1;
     } else {
-        is_forward = dy < 0;
+        is_forward  = dy < 0;
         is_starting = src.y == 6;
     }
 
@@ -77,6 +83,7 @@ bool Pawn::isValidMove(Position src, Position dst, bool isAttacking) {
     return false;
 }
 
-bool Pawn::isValidMove(Position src, Position dst) {
+bool Pawn::isValidMove(Position src, Position dst)
+{
     return isValidMove(src, dst, false);
 }

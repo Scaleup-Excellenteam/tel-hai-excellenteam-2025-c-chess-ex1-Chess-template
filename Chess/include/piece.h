@@ -1,13 +1,15 @@
 struct Position {
     int x, y;
-    bool operator==(const Position& other) const {
+    bool operator==(const Position &other) const
+    {
         return this->x == other.x && this->y == other.y;
     }
 };
 
 // This is a Piece,
 // the base class for all pieces
-class Piece {
+class Piece
+{
 private:
     bool _is_white;
 
@@ -19,39 +21,45 @@ public:
     ~Piece() {}
 };
 
-class King : public virtual Piece {
+class King : public virtual Piece
+{
 public:
     bool isValidMove(Position src, Position dst) override;
     King(bool is_white = true) : Piece(is_white) {}
     ~King() {}
 };
 
-class Queen : public Piece {
+class Queen : public Piece
+{
 public:
     bool isValidMove(Position src, Position dst) override;
     Queen(bool is_white = true) : Piece(is_white) {}
 };
 
-class Rook : public virtual Piece {
+class Rook : public virtual Piece
+{
 public:
     bool isValidMove(Position src, Position dst) override;
     Rook(bool is_white = true) : Piece(is_white) {}
     ~Rook() {}
 };
 
-class Knight : public Piece {
+class Knight : public Piece
+{
 public:
     bool isValidMove(Position src, Position dst) override;
     Knight(bool is_white = true) : Piece(is_white) {}
 };
 
-class Bishop : public Piece {
+class Bishop : public Piece
+{
 public:
     bool isValidMove(Position src, Position dst) override;
     Bishop(bool is_white = true) : Piece(is_white) {}
 };
 
-class Pawn : public Piece {
+class Pawn : public Piece
+{
 public:
     // only exists because the method is virtual
     bool isValidMove(Position src, Position dst) override;

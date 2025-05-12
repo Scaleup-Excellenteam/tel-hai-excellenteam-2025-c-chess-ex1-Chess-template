@@ -2,17 +2,22 @@
 #include "Chess.h"
 #include "board.h"
 
-void parseInput(const string& res, Position &pos1, Position &pos2);
+void parseInput(const string &res, Position &pos1, Position &pos2);
 
-int main() {
-    string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-    //string board = "Q#####################B########R###########r######b#####q#######";
-    //string board = "##########K###############################R#############r#r#####";
-    //string board = "##########K#######p#####P#################R#############r#r#####";
+int main()
+{
+    string board =
+        "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+    // string board =
+    // "Q#####################B########R###########r######b#####q#######";
+    // string board =
+    // "##########K###############################R#############r#r#####";
+    // string board =
+    // "##########K#######p#####P#################R#############r#r#####";
     Board b(board);
     Chess a(board);
     int codeResponse = 0;
-    string res = a.getInput();
+    string res       = a.getInput();
     while (res != "exit") {
         /*
         codeResponse value :
@@ -45,7 +50,7 @@ int main() {
     return 0;
 }
 
-void parseInput(const string& res, Position &pos1, Position &pos2)
+void parseInput(const string &res, Position &pos1, Position &pos2)
 {
     pos1.y = tolower(res[0]) - 'a';
     pos1.x = res[1] - '1';
