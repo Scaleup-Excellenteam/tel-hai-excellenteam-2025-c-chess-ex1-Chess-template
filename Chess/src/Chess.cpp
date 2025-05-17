@@ -186,7 +186,11 @@ void Chess::displayBoard() const
 // print the who is turn before getting input 
 void Chess::showAskInput() const 
 {
+<<<<<<< HEAD
 	if (m_turn)
+=======
+    if (m_turn)
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 		cout << "Player 1 (White - Capital letters) >> ";
 	else
 		cout << "Player 2 (Black - Small letters)   >> ";

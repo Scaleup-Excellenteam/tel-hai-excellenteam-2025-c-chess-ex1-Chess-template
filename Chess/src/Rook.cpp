@@ -5,6 +5,15 @@ Rook::Rook(bool is_white): Piece((is_white ? "R" : "r"), is_white){}
 
 
 bool Rook::isValidMove(int from_x , int from_y ,int to_x , int to_y ,const Board &board)const {
+<<<<<<< HEAD
+=======
+    // Don't move to our tool
+    Piece* dest = board.getPieceAt(to_x, to_y);
+    if (dest && dest->isWhite() == this->isWhite()) {
+        return false;
+    }
+
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
     if (from_x != to_x && from_y != to_y) {
         return false;
     }

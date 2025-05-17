@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Chess"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\include\;CMake Files\src\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/hala/chess-part2/Chess/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Chess">
+				<Option output="/home/hala/chess-part2/Chess/cmake-build-debug/Chess" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/hala/chess-part2/Chess/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/hala/chess-part2/Chess/include"/>
+					<Add directory="/usr/include/c++/13"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/13"/>
+					<Add directory="/usr/include/c++/13/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/13/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 Chess"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Chess/fast">
+				<Option output="/home/hala/chess-part2/Chess/cmake-build-debug/Chess" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/hala/chess-part2/Chess/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/hala/chess-part2/Chess/include"/>
+					<Add directory="/usr/include/c++/13"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/13"/>
+					<Add directory="/usr/include/c++/13/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/13/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 Chess/fast"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/hala/chess-part2/Chess/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/hala/chess-part2/Chess/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/hala/chess-part2/Chess/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/hala/chess-part2/Chess/include/InvalidMoveBaseException.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/InvalidPromotionException.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/Model.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/Move.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/MyComparator.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/PriorityQueue.h">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Bishop.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Board.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Chess.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/King.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Knight.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Model.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Pawn.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Piece.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Queen.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/Rook.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/main.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/include/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\include\"/>
+		</Unit>
+		<Unit filename="/home/hala/chess-part2/Chess/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

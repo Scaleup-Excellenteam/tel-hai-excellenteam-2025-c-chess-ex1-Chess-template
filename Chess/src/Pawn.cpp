@@ -5,6 +5,13 @@ Pawn::Pawn(bool is_white): Piece((is_white ? "P" : "p"), is_white){}
 
 bool Pawn::isValidMove(int from_x , int from_y ,int to_x , int to_y ,const Board &board)const {
     Piece* targetPiece = board.getPieceAt(to_x, to_y);
+<<<<<<< HEAD
+=======
+    // If the target tool belongs to the same player – illegal
+    if (targetPiece && targetPiece->isWhite() == this->isWhite()) {
+        return false;
+    }
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
     int direction = is_white ? 1 : -1;
     int startRow = is_white ? 1 : 6;
 

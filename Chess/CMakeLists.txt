@@ -17,7 +17,16 @@ if (MSVC)
     add_compile_options (/W4 /permissive- /Zc:externConstexpr /Zc:inline)
 endif ()
 
-add_executable (Chess "")
+
+add_executable (Chess ""
+        include/MyComparator.h
+        include/PriorityQueue.h
+        include/Model.h
+        src/Model.cpp
+        include/Move.h
+        include/InvalidMoveBaseException.h
+        include/InvalidPromotionException.h
+)
 
 
 add_subdirectory (include)

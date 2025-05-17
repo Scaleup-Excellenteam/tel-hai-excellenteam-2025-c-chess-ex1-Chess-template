@@ -35,6 +35,16 @@ bool Queen::isValidMove(int from_x , int from_y ,int to_x , int to_y ,const Boar
 //    }
 //
 //    return false;
+<<<<<<< HEAD
+=======
+
+    // Don't move to our tool
+    Piece* dest = board.getPieceAt(to_x, to_y);
+    if (dest && dest->isWhite() == this->isWhite()) {
+        return false;
+    }
+
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
     Rook tempRook(is_white); // Create a temporary rook with the same color
     Bishop tempBishop(is_white); // Create a temporary bishop with the same color
 

@@ -1,7 +1,10 @@
 #pragma once
 #include <iostream>
 #ifdef _WIN32
+<<<<<<< HEAD
 #include <Windows.h>
+=======
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 #endif
 
 #include <string>
