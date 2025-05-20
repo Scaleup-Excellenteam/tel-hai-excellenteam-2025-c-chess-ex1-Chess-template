@@ -1,5 +1,6 @@
 #include "PriorityQueue.h"
 #include <algorithm>
+#include <stdexcept>
 
 template <class T>
 int Comparator<T>::operator()(const T &l, const T &r)
@@ -10,6 +11,9 @@ int Comparator<T>::operator()(const T &l, const T &r)
 template <class T, class Comp>
 T PriorityQueue<T, Comp>::poll()
 {
+    if (queue.empty()) {
+        throw std::runtime_error("empty list");
+    }
     T ret = queue.front();
     queue.pop_front();
     return ret;
