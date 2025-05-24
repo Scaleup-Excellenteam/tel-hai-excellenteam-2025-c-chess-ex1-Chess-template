@@ -135,7 +135,6 @@ int Board::move(Position src, Position dst)
     if (dst_piece != nullptr && dst_piece->Color() == _turn_color) {
         return 13;
     }
-    cout << "debug" << endl;
 
     if (!isValidMove(src, dst)) {
         return 21;
