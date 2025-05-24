@@ -10,7 +10,6 @@ using namespace std;
 class Board
 {
 private:
-    static const int SIZE = 8;
     array<shared_ptr<Piece>, SIZE * SIZE> _board;
     bool isPathClear(Position src, Position dst) const;
     bool isCheck(bool target_player) const;

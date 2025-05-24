@@ -2,7 +2,6 @@
 #include <cstdlib>
 
 using namespace std;
-extern const int SIZE;
 
 inline bool isValidPosition(Position pos)
 {
