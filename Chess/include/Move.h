@@ -12,5 +12,5 @@ struct Move {
 };
 
 struct MoveComparator {
-    int operator() (const Move& l, const Move& r);
+    int operator() (const Move& l, const Move& r) const;
 };
