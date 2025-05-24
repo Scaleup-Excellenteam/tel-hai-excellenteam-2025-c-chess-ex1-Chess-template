@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/include
+CXX_INCLUDES = -I/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include
 
 CXX_FLAGS = -std=c++20
 

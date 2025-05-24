@@ -1,4 +1,4 @@
-# Install script for directory: /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/include
+# Install script for directory: /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,6 +45,6 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/include/install_local_manifest.txt"
+  file(WRITE "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

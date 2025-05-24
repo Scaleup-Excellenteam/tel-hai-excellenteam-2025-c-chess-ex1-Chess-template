@@ -8,8 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/Chess.cpp" "CMakeFiles/Chess.dir/src/Chess.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/Chess.cpp.o.d"
-  "/home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/src/main.cpp" "CMakeFiles/Chess.dir/src/main.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/main.cpp.o.d"
+  "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/Chess.cpp" "CMakeFiles/Chess.dir/src/Chess.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/Chess.cpp.o.d"
+  "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/board.cpp" "CMakeFiles/Chess.dir/src/board.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/board.cpp.o.d"
+  "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/main.cpp" "CMakeFiles/Chess.dir/src/main.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/main.cpp.o.d"
+  "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/piece.cpp" "CMakeFiles/Chess.dir/src/piece.cpp.o" "gcc" "CMakeFiles/Chess.dir/src/piece.cpp.o.d"
   "" "Chess" "gcc" "CMakeFiles/Chess.dir/link.d"
   )
 

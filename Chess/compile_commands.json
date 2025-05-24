@@ -1,1 +1,26 @@
-compile_commands.json
+[
+{
+  "directory": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/board.cpp.o -c /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/board.cpp",
+  "file": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/board.cpp",
+  "output": "CMakeFiles/Chess.dir/src/board.cpp.o"
+},
+{
+  "directory": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/piece.cpp.o -c /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/piece.cpp",
+  "file": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/piece.cpp",
+  "output": "CMakeFiles/Chess.dir/src/piece.cpp.o"
+},
+{
+  "directory": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/main.cpp.o -c /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/main.cpp",
+  "file": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/main.cpp",
+  "output": "CMakeFiles/Chess.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess",
+  "command": "/usr/bin/c++  -I/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include -std=c++20 -o CMakeFiles/Chess.dir/src/Chess.cpp.o -c /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/Chess.cpp",
+  "file": "/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/Chess.cpp",
+  "output": "CMakeFiles/Chess.dir/src/Chess.cpp.o"
+}
+]

@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess
+CMAKE_SOURCE_DIR = /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess
+CMAKE_BINARY_DIR = /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/CMakeFiles /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/CMakeFiles /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniku/Desktop/Programming/Excelentim/CPP/Ex1/chess-ex1-dannightmare/Chess/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -153,6 +153,30 @@ src/Chess.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/Chess.cpp.s
 .PHONY : src/Chess.cpp.s
 
+src/board.o: src/board.cpp.o
+.PHONY : src/board.o
+
+# target to build an object file
+src/board.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/board.cpp.o
+.PHONY : src/board.cpp.o
+
+src/board.i: src/board.cpp.i
+.PHONY : src/board.i
+
+# target to preprocess a source file
+src/board.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/board.cpp.i
+.PHONY : src/board.cpp.i
+
+src/board.s: src/board.cpp.s
+.PHONY : src/board.s
+
+# target to generate assembly for a file
+src/board.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/board.cpp.s
+.PHONY : src/board.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -177,6 +201,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/piece.o: src/piece.cpp.o
+.PHONY : src/piece.o
+
+# target to build an object file
+src/piece.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/piece.cpp.o
+.PHONY : src/piece.cpp.o
+
+src/piece.i: src/piece.cpp.i
+.PHONY : src/piece.i
+
+# target to preprocess a source file
+src/piece.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/piece.cpp.i
+.PHONY : src/piece.cpp.i
+
+src/piece.s: src/piece.cpp.s
+.PHONY : src/piece.s
+
+# target to generate assembly for a file
+src/piece.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Chess.dir/build.make CMakeFiles/Chess.dir/src/piece.cpp.s
+.PHONY : src/piece.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -189,9 +237,15 @@ help:
 	@echo "... src/Chess.o"
 	@echo "... src/Chess.i"
 	@echo "... src/Chess.s"
+	@echo "... src/board.o"
+	@echo "... src/board.i"
+	@echo "... src/board.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/piece.o"
+	@echo "... src/piece.i"
+	@echo "... src/piece.s"
 .PHONY : help
 
 
