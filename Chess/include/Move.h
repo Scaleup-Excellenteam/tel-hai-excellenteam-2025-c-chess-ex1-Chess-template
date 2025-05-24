@@ -8,9 +8,12 @@ struct Move {
     // For pawn where I needed to separate diagonal and forward moves
     bool pawn_move = false;
 
-    bool operator==(const Move& rhs) const;
+    bool operator==(const Move &rhs) const;
 };
 
 struct MoveComparator {
-    int operator() (const Move& l, const Move& r) const;
+    int operator()(const Move &l, const Move &r) const
+    {
+        return l.score - r.score;
+    }
 };
