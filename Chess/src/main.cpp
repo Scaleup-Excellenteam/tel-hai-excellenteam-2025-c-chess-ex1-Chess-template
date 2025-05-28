@@ -1,44 +1,94 @@
-// Chess
+#include <thread>
+#include <mutex>
+#include <vector>
+#include <future>
+#include <iostream>
+#include <chrono>
 #include "Chess.h"
+#include "ThreadPool.h"
+#include "PriorityQueue.h"
 
-int main()
-{
-	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-//	string board = "##########K###############################R#############r#r#####";
-	Chess game(board);
-	int codeResponse = 0;
+using namespace std;
 
-	int depth = 0;
-	std::cout << "Enter the Depth you desire: ";
-	std::cin >> depth;
-	std::cout << std::endl;
-	game.setDepth(depth);
+int main() {
+    string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+    Chess game(board);
+    int res;
 
-	string res = game.getInput();
-	while (res != "exit")
-	{
-		/*
-		codeResponse value :
-		Illegal movements :
-		11 - there is not piece at the source
-		12 - the piece in the source is piece of your opponent
-		13 - there one of your pieces at the destination
-		21 - illegal movement of that piece
-		31 - this movement will cause you checkmate
+    int depth, numThreads, mode;
+    cout << "Enter depth: ";
+    cin >> depth;
 
-		legal movements :
-		41 - the last movement was legal and cause check
-		42 - the last movement was legal, next turn
-		*/
+    cout << "Enter number of threads: ";
+    cin >> numThreads;
 
-		/**/
-		game.calculateResponseCode();
-		/**/
+    cout << "Choose mode (1 = manual, 2 = automatic): ";
+    cin >> mode;
 
-		game.setCodeResponse(codeResponse);
-		res = game.getInput();
-	}
+    game.setDepth(depth);
 
-	cout << endl << "Exiting " << endl;
-	return 0;
+    ThreadPool pool(numThreads);
+    mutex pq_mutex;
+
+    int moveCount = 0;
+    const int maxAutoMoves = 8;
+
+    while (mode == 1 || mode == 2 || game.getInput() != "exit") {
+        bool turn = game.getTurn();
+        auto pieces = game.getPiecesOfCurrentTurn();
+
+        PriorityQueue<string> globalPQ;
+        vector<future<void>> futures;
+
+        int totalPieces = pieces.size();
+        int piecesPerThread = totalPieces / numThreads;
+        int remainder = totalPieces % numThreads;
+        int start = 0;
+
+        auto startTime = chrono::high_resolution_clock::now();
+
+        for (int i = 0; i < numThreads; ++i) {
+            int count = piecesPerThread + (i < remainder ? 1 : 0);
+            vector<string> subset(pieces.begin() + start, pieces.begin() + start + count);
+            start += count;
+
+            futures.emplace_back(pool.enqueue([&, subset]() {
+                for (const auto& pos : subset) {
+                    string move = game.getBestMoveForPiece(pos);
+                    if (!move.empty()) {
+                        lock_guard<mutex> lock(pq_mutex);
+                        globalPQ.push(move);
+                    }
+                }
+            }));
+        }
+
+        for (auto& f : futures)
+            f.get();
+
+        auto bestMove = globalPQ.pull();
+        auto endTime = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
+
+
+        if (mode == 2) {
+            // game.displayBoard();
+            cout << "Best move suggested: " << bestMove << " (computed in " << duration << " ms)" << endl;
+            cout << "Auto-playing move: " << bestMove << endl;
+            game.playMove(bestMove);
+            moveCount++;
+            if (moveCount >= maxAutoMoves) break;
+        } else {
+            while(true) {
+                game.displayBoard();
+                cout << "Best move suggested: " << bestMove << " (computed in " << duration << " ms)" << endl;
+                res = game.playMove(game.getInput());
+                if(res)
+                    break;
+            }
+        }
+    }
+
+    cout << "Game ended." << endl;
+    return 0;
 }

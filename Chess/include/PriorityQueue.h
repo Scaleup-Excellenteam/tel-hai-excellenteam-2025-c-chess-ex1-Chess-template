@@ -11,8 +11,9 @@
 template <typename T>
 struct DefaultComparator {
     int operator()(const T& a, const T& b) const {
-        int diff = a - b;
-        return diff;
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
     }
 };
 

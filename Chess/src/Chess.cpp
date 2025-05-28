@@ -283,44 +283,44 @@ Chess::Chess(const string& start)
 // get the source and destination 
 string Chess::getInput()
 {
-	static bool isFirst = true;
+	// static bool isFirst = true;
+	//
+	// if (isFirst)
+	// 	isFirst = false;
+	// else
+	// 	doTurn();
 
-	if (isFirst)
-		isFirst = false;
-	else
-		doTurn(); 
-
-	displayBoard();
+	// displayBoard();
 
 	// The suggested move
-	std::string bestMove = getBestMove(depth);
-	std::cout << "Recommended move: " << bestMove << std::endl;
+	// std::string bestMove = getBestMove(depth);
+	// std::cout << "Recommended move: " << bestMove << std::endl;
 
 	showAskInput();
 
 	cin >> m_input;
-	if (isExit())
-		return "exit";
-	while (!isValid() || isSame())
-	{
-		if (!isValid())
-			m_errorMsg = "Invalid input !! \n";
-		else
-			m_errorMsg = "The source and the destination are the same !! \n";
-		displayBoard();
-		showAskInput();
-		cin >> m_input;
-		if (isExit())
-			return "exit";
-	}
+	// if (isExit())
+	// 	return "exit";
+	// while (!isValid() || isSame())
+	// {
+	// 	if (!isValid())
+	// 		m_errorMsg = "Invalid input !! \n";
+	// 	else
+	// 		m_errorMsg = "The source and the destination are the same !! \n";
+	// 	displayBoard();
+	// 	showAskInput();
+	// 	cin >> m_input;
+	// 	if (isExit())
+	// 		return "exit";
+	// }
 
-	if (m_input != "exit")
-	{
-		if (('A' <= m_input[0]) && (m_input[0] <= 'H'))
-			m_input[0] = (m_input[0] - 'A' + 'a');
-		if (('A' <= m_input[2]) && (m_input[2] <= 'H'))
-			m_input[2] = (m_input[2] - 'A' + 'a');
-	}
+	// if (m_input != "exit")
+	// {
+	// 	if (('A' <= m_input[0]) && (m_input[0] <= 'H'))
+	// 		m_input[0] = (m_input[0] - 'A' + 'a');
+	// 	if (('A' <= m_input[2]) && (m_input[2] <= 'H'))
+	// 		m_input[2] = (m_input[2] - 'A' + 'a');
+	// }
 
 	return m_input;
 }
@@ -402,3 +402,68 @@ void Chess::calculateResponseCode() {
 std::string Chess::getBestMove(int depth) {
 	return m_ai.getBestMove(this, depth);
 }
+
+
+std::vector<std::string> Chess::getPiecesOfCurrentTurn() {
+	std::vector<std::string> pieces;
+	for (int row = 0; row < 8; ++row) {
+		for (int col = 0; col < 8; ++col) {
+			char symbol = m_boardString[row * 8 + col];
+			if (symbol == '#' || symbol == ' ')
+				continue;
+			if (m_turn && isupper(symbol)) // white's turn
+				pieces.push_back(std::string() + (char)('a' + row) + (char)('1' + col));
+			else if (!m_turn && islower(symbol)) // black's turn
+				pieces.push_back(std::string() + (char)('a' + row) + (char)('1' + col));
+		}
+	}
+	return pieces;
+}
+
+std::string Chess::getBestMoveForPiece(const std::string& piecePos) {
+	if (piecePos.size() != 2)
+		return "";
+
+	Piece* board[8][8] = { nullptr };
+	createBoardFromString(m_boardString, board);
+
+	int row = piecePos[0] - 'a';
+	int col = piecePos[1] - '1';
+
+	Piece* piece = board[row][col];
+	if (!piece)
+		return "";
+
+	std::string bestMove = "";
+	for (int i = 0; i < 8; ++i) {
+		for (int j = 0; j < 8; ++j) {
+			if (i == row && j == col) continue;
+			Piece* dest = board[i][j];
+			if (dest && dest->getColor() == piece->getColor()) continue;
+			if (piece->isMoveLegal(row, col, i, j, board)) {
+				bestMove = std::string() + (char)('a' + row) + (char)('1' + col)
+						 + (char)('a' + i) + (char)('1' + j);
+				goto done;
+			}
+		}
+	}
+
+	done:
+		for (int i = 0; i < 8; ++i)
+			for (int j = 0; j < 8; ++j)
+				delete board[i][j];
+
+	return bestMove;
+}
+
+bool Chess::playMove(const std::string& move) {
+	if (move.size() != 4) return false;
+	m_input = move;
+	calculateResponseCode();
+	if (m_codeResponse == 42 || m_codeResponse == 41) {
+		doTurn();
+		return true;
+	}
+	return false;
+}
+

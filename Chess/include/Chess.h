@@ -41,7 +41,6 @@ class Chess {
 	void setFrames();
 	void setPieces();
 	void show() const;
-	void displayBoard() const;
 	void showAskInput() const;
 	bool isSame() const;
 	bool isValid() const;
@@ -56,6 +55,9 @@ public:
 	string getInput();
 	void setCodeResponse(int codeResponse);
 
+	void displayBoard() const;
+
+
 	void createBoardFromString(const std::string& boardStr, Piece* board[8][8]);
 	void calculateResponseCode();
 	const string& getBoardString() const { return m_boardString; }
@@ -64,6 +66,11 @@ public:
 	void setDepth(int depth) { this->depth = depth; }
 	std::string getBestMove(int depth);
 	void printBestMoves(int count);
+
+	std::vector<std::string> getPiecesOfCurrentTurn();
+	std::string getBestMoveForPiece(const std::string& piecePos);
+	bool playMove(const std::string& move);
+
 
 };
 

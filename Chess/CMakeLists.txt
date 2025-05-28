@@ -36,6 +36,8 @@ add_executable (Chess ""
         include/PriorityQueue.h
         src/ChessAI.cpp
         include/ChessAI.h
+        src/ThreadPool.cpp
+        include/ThreadPool.h
 )
 
 
