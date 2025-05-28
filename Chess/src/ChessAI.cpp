@@ -121,3 +121,31 @@ std::string ChessAI::getBestMove(Chess* game, int depth) {
     return bestMoves.pull().move;
 }
 
+std::string ChessAI::getBestMoveForPiece(Chess* game, const std::string& piecePos, int depth) {
+    Piece* board[8][8] = {nullptr};
+    game->createBoardFromString(game->m_boardString, board);
+
+    std::pair<int, int> src = convertInputToCoordinates(piecePos);
+    Piece* piece = board[src.first][src.second];
+    if (!piece) return "";
+
+    PriorityQueue<MoveScore, MoveComparator> bestMoves;
+
+    for (int destRow = 0; destRow < 8; ++destRow) {
+        for (int destCol = 0; destCol < 8; ++destCol) {
+            if (piece->isMoveLegal(src.first, src.second, destRow, destCol, board)) {
+                std::string move = piecePos + convertCoordinatesToInput(destRow, destCol);
+                int score = evaluateMove(game, board, move, game->m_turn, depth);
+                bestMoves.push({move, score});
+                if (bestMoves.size() > 5)
+                    bestMoves.pull();
+            }
+        }
+    }
+
+    for (int i = 0; i < 8; ++i)
+        for (int j = 0; j < 8; ++j)
+            delete board[i][j];
+
+    return bestMoves.empty() ? "" : bestMoves.pull().move;
+}

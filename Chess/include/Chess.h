@@ -67,6 +67,7 @@ public:
 	std::string getBestMove(int depth);
 	void printBestMoves(int count);
 
+
 	std::vector<std::string> getPiecesOfCurrentTurn();
 	std::string getBestMoveForPiece(const std::string& piecePos);
 	bool playMove(const std::string& move);

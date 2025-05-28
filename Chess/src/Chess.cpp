@@ -421,39 +421,8 @@ std::vector<std::string> Chess::getPiecesOfCurrentTurn() {
 }
 
 std::string Chess::getBestMoveForPiece(const std::string& piecePos) {
-	if (piecePos.size() != 2)
-		return "";
+	return m_ai.getBestMoveForPiece(this, piecePos, depth);
 
-	Piece* board[8][8] = { nullptr };
-	createBoardFromString(m_boardString, board);
-
-	int row = piecePos[0] - 'a';
-	int col = piecePos[1] - '1';
-
-	Piece* piece = board[row][col];
-	if (!piece)
-		return "";
-
-	std::string bestMove = "";
-	for (int i = 0; i < 8; ++i) {
-		for (int j = 0; j < 8; ++j) {
-			if (i == row && j == col) continue;
-			Piece* dest = board[i][j];
-			if (dest && dest->getColor() == piece->getColor()) continue;
-			if (piece->isMoveLegal(row, col, i, j, board)) {
-				bestMove = std::string() + (char)('a' + row) + (char)('1' + col)
-						 + (char)('a' + i) + (char)('1' + j);
-				goto done;
-			}
-		}
-	}
-
-	done:
-		for (int i = 0; i < 8; ++i)
-			for (int j = 0; j < 8; ++j)
-				delete board[i][j];
-
-	return bestMove;
 }
 
 bool Chess::playMove(const std::string& move) {

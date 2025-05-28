@@ -19,6 +19,7 @@ public:
     int evaluateMove(Chess* game, Piece* board[8][8], std::string move, bool isPlayerTurn, int depth);
     std::vector<std::string> getAllPossibleMoves(Chess* game, Piece* board[8][8], bool isPlayerTurn);
     int getBasicMoveScore(Piece* board[8][8], std::string move);
+    std::string getBestMoveForPiece(Chess* game, const std::string& piecePos, int depth);
 
 private:
     std::pair<int, int> convertInputToCoordinates(const std::string& move);

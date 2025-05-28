@@ -18,6 +18,7 @@ int main() {
     int depth, numThreads, mode;
     cout << "Enter depth: ";
     cin >> depth;
+    game.setDepth(depth);
 
     cout << "Enter number of threads: ";
     cin >> numThreads;
