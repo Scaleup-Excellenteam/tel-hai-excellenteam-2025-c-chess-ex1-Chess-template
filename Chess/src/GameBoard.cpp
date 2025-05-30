@@ -589,7 +589,7 @@ void GameBoard::runAutoGame(Chess& chess, int depth, int numThreads) {
     MoveScore best = getBestMoveMultithreaded(depth, numThreads);
     std::string res = chess.getInput(best.move, true);
 
-    while (res != "exit") {
+    for ( int i = 0 ; i < 8 && res != "exit" ; i++) {
         int codeResponse = handleMove(res);
         chess.setCodeResponse(codeResponse);
 
