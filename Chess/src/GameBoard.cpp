@@ -475,3 +475,86 @@ void GameBoard::undoMove(int fromRow, int fromCol, int toRow, int toCol, Piece* 
     board[fromRow][fromCol] = movedPiece;
     board[toRow][toCol] = capturedPiece;
 }
+
+std::vector<std::pair<int, int>> GameBoard::getPlayerPieces(bool isWhite) const {
+    std::vector<std::pair<int, int>> positions;
+    for (int row = 0; row < 8; ++row) {
+        for (int col = 0; col < 8; ++col) {
+            Piece* piece = board[row][col];
+            if (piece != nullptr && piece->getIsWhite() == isWhite) {
+                positions.emplace_back(row, col);
+            }
+        }
+    }
+    return positions;
+}
+
+MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
+    std::vector<std::pair<int, int>> pieces = getPlayerPieces(isWhiteTurn);
+    std::mutex resultsMutex;
+    std::vector<MoveScore> allMoves;
+
+    std::atomic<int> tasksRemaining = pieces.size();
+    std::condition_variable allDone;
+    std::mutex cvMutex;
+
+    ThreadPool pool(numThreads);  // יוצרים ThreadPool בגודל הרצוי
+
+    for (const auto& [row, col] : pieces) {
+        pool.enqueue([&, row, col]() {
+            GameBoard localBoard = *this;
+            Piece* piece = localBoard.getPiece(row, col);
+            if (!piece) {
+                if (--tasksRemaining == 0) {
+                    std::lock_guard<std::mutex> lock(cvMutex);
+                    allDone.notify_one();
+                }
+                return;
+            }
+
+            std::vector<std::pair<int, int>> moves = piece->getLegalMoves(row, col, localBoard);
+
+            MoveScore bestMove;
+            for (const auto& [toRow, toCol] : moves) {
+                if (localBoard.isOwnKingInCheckAfterMove(row, col, toRow, toCol)) {
+                    continue;
+                }
+
+                Piece* captured = localBoard.getPiece(toRow, toCol);
+                localBoard.movePiece(row, col, toRow, toCol);
+
+                int score = localBoard.minimax(depth - 1, !isWhiteTurn).score;
+
+                if (score > bestMove.score) {
+                    bestMove = { {row, col, toRow, toCol}, score };
+                }
+
+                localBoard.undoMove(row, col, toRow, toCol, piece, captured);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(resultsMutex);
+                allMoves.push_back(bestMove);
+            }
+
+            if (--tasksRemaining == 0) {
+                std::lock_guard<std::mutex> lock(cvMutex);
+                allDone.notify_one();
+            }
+        });
+    }
+
+    {
+        std::unique_lock<std::mutex> lock(cvMutex);
+        allDone.wait(lock, [&]() { return tasksRemaining == 0; });
+    }
+
+    MoveScore bestOverall;
+    for (const auto& move : allMoves) {
+        if (move.score > bestOverall.score) {
+            bestOverall = move;
+        }
+    }
+
+    return bestOverall;
+}

@@ -5,6 +5,7 @@
 #include "Piece.h"
 #include <vector>
 #include <string>
+#include "ThreadPool.h"
 
 
 
@@ -37,6 +38,12 @@ public:
     
     MoveScore minimax(int depth, bool isMaximizingPlayer);
     void undoMove(int fromRow, int fromCol, int toRow, int toCol, Piece* movedPiece, Piece* capturedPiece);
+
+    //third part
+
+    std::vector<std::pair<int, int>> getPlayerPieces(bool isWhite) const;
+    MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads);
+    std::vector<std::pair<int,int>> getLegalMovesForPiece(int row, int col);
     
 
     
