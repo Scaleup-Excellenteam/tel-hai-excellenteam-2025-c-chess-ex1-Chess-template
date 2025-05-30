@@ -39,7 +39,7 @@ class Chess {
 	Chess(const string& start = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr");
 	Chess(const Chess&)=delete;
 	Chess& operator=(const Chess&) = delete;
-	string getInput(Move move);
+	string getInput(Move move, bool isAuto);
 	void setCodeResponse(int codeResponse);
 	void showRecomendedMove(Move move);
 };

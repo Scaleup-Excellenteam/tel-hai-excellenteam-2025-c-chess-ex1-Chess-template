@@ -6,12 +6,22 @@
 #include <vector>
 #include <string>
 #include "ThreadPool.h"
+#include <chrono>
+#include "Chess.h"
+#include <unordered_map>
 
+
+
+
+
+
+class Chess;
 
 
 class GameBoard {
     Piece* board[8][8];
     bool isWhiteTurn;
+
 
 public:
     GameBoard(); 
@@ -44,6 +54,9 @@ public:
 
     std::vector<std::pair<int, int>> getPlayerPieces(bool isWhite) const;
     MoveScore getBestMoveMultithreaded(int depth, int numThreads);
+    void runAutoGame(Chess& chess, int depth, int numThreads);
+    std::string getCurrentPositionHash();
+   
     
 
     

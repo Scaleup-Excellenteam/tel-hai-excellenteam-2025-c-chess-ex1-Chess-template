@@ -12,6 +12,15 @@ struct Move {
     int fromCol;
     int toRow;
     int toCol;
+
+    std::string toString() const {
+        std::string result;
+        result += ('a' + fromRow);     
+        result += ('1' + fromCol);     
+        result += ('a' + toRow);
+        result += ('1' + toCol);
+        return result;
+    }
 };
 
 std::ostream& operator<<(std::ostream& os, const Move& move);

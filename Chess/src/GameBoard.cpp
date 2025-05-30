@@ -578,3 +578,69 @@ MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
 
     return bestOverall;
 }
+
+void GameBoard::runAutoGame(Chess& chess, int depth, int numThreads) {
+    using namespace std::chrono;
+
+    std::unordered_map<std::string, int> positionCount; 
+
+    auto start = high_resolution_clock::now();
+
+    MoveScore best = getBestMoveMultithreaded(depth, numThreads);
+    std::string res = chess.getInput(best.move, true);
+
+    while (res != "exit") {
+        int codeResponse = handleMove(res);
+        chess.setCodeResponse(codeResponse);
+
+      
+        std::string positionHash = getCurrentPositionHash(); 
+
+        positionCount[positionHash]++;
+        if (positionCount[positionHash] >= 3) {
+            std::cout << "Draw detected due to threefold repetition." << std::endl;
+            break;
+        }
+
+        best = getBestMoveMultithreaded(depth, numThreads);
+        res = chess.getInput(best.move, true);
+    }
+
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+    std::cout << "Auto game took " << duration.count() << " milliseconds." << std::endl;
+}
+
+
+std::string GameBoard::getCurrentPositionHash() {
+    std::string hash;
+
+    for (int row = 0; row < 8; row++) {
+        int emptyCount = 0;
+        for (int col = 0; col < 8; col++) {
+            Piece* piece = board[row][col];
+            if (piece == nullptr) {
+                emptyCount++;
+            } else {
+                
+                if (emptyCount > 0) {
+                    hash += std::to_string(emptyCount);
+                    emptyCount = 0;
+                }
+               
+                hash += piece->getSymbol();  
+            }
+        }
+        if (emptyCount > 0) {
+            hash += std::to_string(emptyCount);
+        }
+        if (row < 7) {
+            hash += '/';
+        }
+    }
+
+    hash += (isWhiteTurn) ? " w" : " b";
+
+    return hash;
+}
+

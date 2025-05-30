@@ -13,7 +13,8 @@ int main()
 
 	Chess a(board);
 	int depth = 0;
-	int numThreads = 4;
+	int numThreads = 0;
+
 	
 
 	 while (true) {
@@ -30,12 +31,24 @@ int main()
         }
     }
 
-	static GameBoard gameBoard;
-	MoveScore best = gameBoard.getBestMoveMultithreaded(depth, numThreads);
+	  while (true) {
+        std::cout << "Please select the number of threads to use (digit > 0): ";
+        std::cin >> numThreads;
 
-	int codeResponse = 0;
-	string res = a.getInput(best.move);
-	while (res != "exit")
+        if (numThreads <= 0) {
+            std::cerr << "Invalid number of threads. Please enter a number greater than zero." << std::endl;
+        } else {
+            break;
+        }
+    }
+
+	static GameBoard gameBoard;
+	gameBoard.runAutoGame(a, depth, numThreads);
+	// MoveScore best = gameBoard.getBestMoveMultithreaded(depth, numThreads);
+
+	// int codeResponse = 0;
+	// string res = a.getInput(best.move,false);
+	// while (res != "exit")
 	{
 		/* 
 		codeResponse value : 
@@ -56,15 +69,15 @@ int main()
 			// gameBoard.displayBoard();
 
 			
-			codeResponse = gameBoard.handleMove(res);
-			best = gameBoard.minimax(depth, gameBoard.getisWhiteTurn());
+			// codeResponse = gameBoard.handleMove(res);
+			// best = gameBoard.minimax(depth, gameBoard.getisWhiteTurn());
 			
 					
 		}
 		/**/
 
-		a.setCodeResponse(codeResponse);
-		res = a.getInput(best.move); 
+		// a.setCodeResponse(codeResponse);
+		// res = a.getInput(best.move,false); 
 	}
 
 	cout << endl << "Exiting " << endl; 

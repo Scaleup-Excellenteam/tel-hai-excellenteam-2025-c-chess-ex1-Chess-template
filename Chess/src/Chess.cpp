@@ -296,7 +296,7 @@ void Chess::showRecomendedMove(Move move){
 }
 
 // get the source and destination 
-string Chess::getInput(Move move)
+string Chess::getInput(Move move, bool isAuto)
 {
 	static bool isFirst = true;
 
@@ -313,6 +313,12 @@ string Chess::getInput(Move move)
 
 	displayBoard();
 	showRecomendedMove(move);
+
+	if (isAuto) {
+		m_input = move.toString(); 
+		cout << "Auto move: " << m_input << endl;
+		return m_input;
+	}
 	showAskInput();
 
 	cin >> m_input;
