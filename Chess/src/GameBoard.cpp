@@ -598,7 +598,7 @@ void GameBoard::runAutoGame(Chess& chess, int depth, int numThreads) {
 
         positionCount[positionHash]++;
         if (positionCount[positionHash] >= 3) {
-            std::cout << "Draw detected due to threefold repetition." << std::endl;
+            std::cout << "Draw detected due to three repetition." << std::endl;
             break;
         }
 
