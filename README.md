@@ -186,6 +186,15 @@ The time complexity of the algorithm is **O(b^d)**, where:
 - **b** = the average number of possible moves (approximately 30–40 in chess)
 - **d** = the search depth (i.e., how many turns ahead the algorithm evaluates)
 
+## Multithreading Optimization
+To improve performance and reduce computation time, the algorithm implements multithreading at the top
+level of the move search:
+Each thread evaluates the possible moves for a single piece independently by simulating those moves and running the Minimax evaluation.
+A thread pool manages a fixed number of worker threads to avoid overhead from excessive thread creation.
+Each thread works on a local copy of the game board to prevent data races and maintain thread safety.
+Results from all threads are collected concurrently, using mutexes to synchronize access to shared data structures.
+The main thread waits until all worker threads complete their tasks and then selects the best overall move based on the aggregated results.
+This parallelization allows the program to utilize multiple CPU cores effectively, significantly speeding up the computation, especially on machines with many cores.
 
 <!-- Center Excellenteam image -->
 <p align="center">
