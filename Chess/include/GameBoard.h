@@ -15,6 +15,7 @@ class GameBoard {
 
 public:
     GameBoard(); 
+    GameBoard(const GameBoard& other);
     ~GameBoard();
 
     Piece* getPiece(int row, int col) const;
@@ -42,8 +43,7 @@ public:
     //third part
 
     std::vector<std::pair<int, int>> getPlayerPieces(bool isWhite) const;
-    MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads);
-    std::vector<std::pair<int,int>> getLegalMovesForPiece(int row, int col);
+    MoveScore getBestMoveMultithreaded(int depth, int numThreads);
     
 
     

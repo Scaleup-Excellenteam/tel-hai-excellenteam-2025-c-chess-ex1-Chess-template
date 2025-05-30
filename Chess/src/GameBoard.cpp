@@ -55,6 +55,20 @@ GameBoard::GameBoard() : isWhiteTurn(true) {
     }
 }
 
+GameBoard::GameBoard(const GameBoard& other) {
+    isWhiteTurn = other.isWhiteTurn;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if (other.board[i][j] != nullptr) {
+                board[i][j] = other.board[i][j]->clone();  // קריאה לפונקציה וירטואלית clone()
+            } else {
+                board[i][j] = nullptr;
+            }
+        }
+    }
+}
+
 
 GameBoard::~GameBoard() {
     for (int i = 0; i < 8; ++i)
@@ -174,7 +188,7 @@ bool GameBoard::isOwnKingInCheckAfterMove(int fromRow, int fromCol, int toRow, i
     }
 
     if (kingRow == -1 || kingCol == -1) {
-        std::cerr << "[ERROR] King not found on board after move!\n";
+        // std::cerr << "[ERROR] King not found on board after move!\n";
         return false;  
     }
 
@@ -498,7 +512,7 @@ MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
     std::condition_variable allDone;
     std::mutex cvMutex;
 
-    ThreadPool pool(numThreads);  // יוצרים ThreadPool בגודל הרצוי
+    ThreadPool pool(numThreads); 
 
     for (const auto& [row, col] : pieces) {
         pool.enqueue([&, row, col]() {
@@ -512,9 +526,9 @@ MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
                 return;
             }
 
-            std::vector<std::pair<int, int>> moves = piece->getLegalMoves(row, col, localBoard);
+            std::vector<std::pair<int, int>> moves = piece->getLegalMoves(row, col, localBoard.board);
+            MoveScore bestMove = { { -1, -1, -1, -1 }, std::numeric_limits<int>::min() };
 
-            MoveScore bestMove;
             for (const auto& [toRow, toCol] : moves) {
                 if (localBoard.isOwnKingInCheckAfterMove(row, col, toRow, toCol)) {
                     continue;
@@ -534,7 +548,9 @@ MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
 
             {
                 std::lock_guard<std::mutex> lock(resultsMutex);
-                allMoves.push_back(bestMove);
+                if (bestMove.move.fromRow != -1) {
+                    allMoves.push_back(bestMove);
+                }
             }
 
             if (--tasksRemaining == 0) {
@@ -549,7 +565,11 @@ MoveScore GameBoard::getBestMoveMultithreaded(int depth, int numThreads) {
         allDone.wait(lock, [&]() { return tasksRemaining == 0; });
     }
 
-    MoveScore bestOverall;
+    if (allMoves.empty()) {
+        return { { -1, -1, -1, -1 }, isWhiteTurn ? -10000 : 10000 };
+    }
+
+    MoveScore bestOverall = allMoves[0];
     for (const auto& move : allMoves) {
         if (move.score > bestOverall.score) {
             bestOverall = move;

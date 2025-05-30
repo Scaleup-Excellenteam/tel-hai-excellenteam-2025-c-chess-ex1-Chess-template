@@ -47,3 +47,37 @@ bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, const Piece* con
     // תנועה לא חוקית
     return false;
 }
+
+std::vector<std::pair<int, int>> Queen::getLegalMoves(int fromX, int fromY, const Piece* const board[8][8]) const {
+    std::vector<std::pair<int, int>> moves;
+
+    const int directions[8][2] = {
+        {1, 0}, {-1, 0}, {0, 1}, {0, -1},   // ישרים
+        {1, 1}, {-1, -1}, {1, -1}, {-1, 1}  // אלכסונים
+    };
+
+    for (auto [dx, dy] : directions) {
+        int x = fromX + dx;
+        int y = fromY + dy;
+
+        while (x >= 0 && x < 8 && y >= 0 && y < 8) {
+            const Piece* target = board[x][y];
+            if (target == nullptr) {
+                moves.emplace_back(x, y);
+            } else {
+                if (target->getIsWhite() != this->getIsWhite())
+                    moves.emplace_back(x, y);
+                break;  // אי אפשר להמשיך מעבר לחייל
+            }
+
+            x += dx;
+            y += dy;
+        }
+    }
+
+    return moves;
+}
+
+Piece* Queen::clone() const {
+    return new Queen(*this);
+}

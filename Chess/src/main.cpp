@@ -13,6 +13,7 @@ int main()
 
 	Chess a(board);
 	int depth = 0;
+	int numThreads = 4;
 	
 
 	 while (true) {
@@ -30,7 +31,7 @@ int main()
     }
 
 	static GameBoard gameBoard;
-	MoveScore best = gameBoard.minimax( depth, gameBoard.getisWhiteTurn());
+	MoveScore best = gameBoard.getBestMoveMultithreaded(depth, numThreads);
 
 	int codeResponse = 0;
 	string res = a.getInput(best.move);
