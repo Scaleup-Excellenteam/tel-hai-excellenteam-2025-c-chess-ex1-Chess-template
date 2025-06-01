@@ -25,6 +25,8 @@ public:
     std::vector<std::pair<std::string,int>>
     recommendMoves(int maxDepth = 2, int topN = 3);
     friend std::ostream& operator<<(std::ostream& os, Board& board);
+    void autoPlayBenchmark(int numThreads, int maxDepth);
+
 };
 
 #endif //CHESS_BOARD_H

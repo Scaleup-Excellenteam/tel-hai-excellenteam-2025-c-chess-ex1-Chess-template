@@ -8,6 +8,9 @@
 #include "Exception_chess.h"
 #include <algorithm>
 #include <cctype>
+#include <thread>
+#include <mutex>
+#include <atomic>
 
 Board::Board(std::string& boardStr)
         : sharedBoardString(boardStr), isWhiteTurn(true) {
@@ -165,47 +168,56 @@ int Board::minimax(int depth) {
 }
 
 
-std::vector<std::pair<std::string,int>>
+std::vector<std::pair<std::string, int>>
 Board::recommendMoves(int maxDepth, int topN) {
     bestMoves.clear();
     std::string oldBoard = sharedBoardString;
-    bool        oldTurn  = isWhiteTurn;
-    int legalCount = 0;
-    for (int r = 0; r < 8; ++r) {
-        for (int c = 0; c < 8; ++c) {
+    bool oldTurn = isWhiteTurn;
+    const int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads;
+    std::atomic<bool> stopFlag = false;
+    const int SCORE_THRESHOLD = 90;
+    auto worker = [&](int start, int end) {
+        for (int idx = start; idx < end && !stopFlag; ++idx) {
+            int r = idx / 8;
+            int c = idx % 8;
             Piece* p = board_game[r][c];
-            if (!p) continue;
-            if (std::isupper(p->get_type()) != isWhiteTurn) continue;
+            if (!p || std::isupper(p->get_type()) != isWhiteTurn) continue;
             char sr = char('a' + r);
             char sf = char('1' + c);
-            for (int rr = 0; rr < 8; ++rr) {
-                for (int cc = 0; cc < 8; ++cc) {
+            for (int rr = 0; rr < 8 && !stopFlag; ++rr) {
+                for (int cc = 0; cc < 8 && !stopFlag; ++cc) {
                     char dr = char('a' + rr);
                     char df = char('1' + cc);
                     std::string mv{ sr, sf, dr, df };
-
+                    Board localBoard(sharedBoardString);
+                    localBoard.isWhiteTurn = this->isWhiteTurn;
                     int code;
-                    if (movePiece(mv, code)) {
-                        ++legalCount;
-                        int sc = minimax(maxDepth);
-                        bestMoves.push({mv, sc});
-                        if (bestMoves.size() > 5)
-                            bestMoves.popWorst();
+                    if (localBoard.movePiece(mv, code)) {
+                        int sc = localBoard.minimax(maxDepth);
+                        if (sc >= SCORE_THRESHOLD)
+                            stopFlag = true;
+                        if (!stopFlag)
+                            bestMoves.push({ mv, sc });
                     }
-                    sharedBoardString = oldBoard;
-                    isWhiteTurn       = oldTurn;
-                    rebuildBoard();
                 }
             }
         }
+    };
+    int chunk = 64 / numThreads + 1;
+    for (int i = 0; i < 64; i += chunk) {
+        int end = std::min(i + chunk, 64);
+        threads.emplace_back(worker, i, end);
     }
-    std::vector<std::pair<std::string,int>> all;
+    for (auto& t : threads)
+        t.join();
+    std::vector<std::pair<std::string, int>> all;
     while (!bestMoves.empty()) {
         all.emplace_back(bestMoves.pull());
         bestMoves.poll();
     }
     std::reverse(all.begin(), all.end());
-    std::vector<std::pair<std::string,int>> out;
+    std::vector<std::pair<std::string, int>> out;
     for (int i = 0; i < topN && i < (int)all.size(); ++i)
         out.push_back(all[i]);
     return out;
@@ -222,4 +234,28 @@ std::ostream& operator<<(std::ostream& os, Board& board) {
         os << "\n";
     }
     return os;
+}
+
+void Board::autoPlayBenchmark(int numThreads, int maxDepth) {
+    auto original = sharedBoardString;
+    bool originalTurn = isWhiteTurn;
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int moveCount = 0; moveCount < 8; ++moveCount) {
+        auto best = recommendMoves(maxDepth, 1);
+        if (best.empty()) {
+            std::cout << "No move found. Game over.\n";
+            break;
+        }
+        std::string mv = best[0].first;
+        int code;
+        movePiece(mv, code);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    double elapsed = std::chrono::duration<double>(end - start).count();
+    std::cout << "Threads: " << numThreads
+              << ", Depth: " << maxDepth
+              << ", Time: " << elapsed << " sec\n";
+    sharedBoardString = original;
+    isWhiteTurn = originalTurn;
+    rebuildBoard();
 }
