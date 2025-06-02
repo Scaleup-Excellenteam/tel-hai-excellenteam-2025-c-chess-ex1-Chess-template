@@ -1,47 +1,102 @@
+// main.cpp
+#include <iostream>
+#include <thread>
+#include <chrono>
+
 #include "Chess.h"
-#include "BoardManager.h"
+#include "Board.h"
+#include "ThreadPool.h"
+
+// Forward‐declare runBenchmarks (defined in bench.cpp):
+extern void runBenchmarks();
 
 int main() {
-	std::string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-	std::string boardCopy = board;
+    // 1) Build a single shared 64‐char string
+    std::string startBoard =
+            "RNBQKBNR"
+            "########"
+            "########"
+            "########"
+            "########"
+            "########"
+            "########"
+            "rnbqkbnr";
 
-	BoardManager manager;
-	Chess* gui = new Chess(boardCopy);
-	bool isWhiteTurn = true;
+    // 2) Construct GUI and logic each with their own copy (Option A)
+    Chess* gui   = new Chess(startBoard);
+    Board  logic = Board(startBoard);
 
-	std::string res = gui->getInput();
-	while (res != "exit") {
-		int code = manager.validateMove(boardCopy, res);
+    // 3) Ask how many threads to use
+    std::cout << "Enter number of threads to use (0 = none, options: 1, 2, 4, 8): ";
+    size_t numThreads;
+    std::cin >> numThreads;
 
-		// Manually check turn legality (since validateMove doesn't do it)
-		int srcRow = res[0] - 'a';
-		int srcCol = res[1] - '1';
-		char piece = boardCopy[srcRow * 8 + srcCol];
+    ThreadPool* poolPtr = nullptr;
+    if (numThreads > 0) {
+        poolPtr = new ThreadPool(numThreads);
+    }
 
-		bool pieceIsWhite = isupper(piece);
-		if (piece == '#' || pieceIsWhite != isWhiteTurn) {
-			code = 12; // Wrong turn or empty square
-		}
+    // 4) Ask whether to run benchmarks or play
+    std::cout << "Select option: (1) Run Benchmarks, (2) Play (Manual/Automatic)\n";
+    int mode;
+    std::cin >> mode;
+    if (mode == 1) {
+        // Now that runBenchmarks is declared above, this compiles:
+        runBenchmarks();
+        delete gui;
+        delete poolPtr;
+        return 0;
+    }
 
-		if (code == 41 || code == 42) {
-			// Apply move
-			int dstRow = res[2] - 'a';
-			int dstCol = res[3] - '1';
-			int srcIndex = srcRow * 8 + srcCol;
-			int dstIndex = dstRow * 8 + dstCol;
+    // 5) Main game loop: manual vs. automatic
+    while (true) {
+        // Always show the engine’s internal board first
+        std::cout << logic << std::endl;
 
-			boardCopy[dstIndex] = boardCopy[srcIndex];
-			boardCopy[srcIndex] = '#';
+        std::cout << "Select mode: (1) Manual, (2) Automatic, (3) Exit\n";
+        int submode;
+        std::cin >> submode;
+        if (submode == 3) break;
 
-			isWhiteTurn = !isWhiteTurn;  // Flip turn only on legal move
-		}
+        if (submode == 2) {
+            // Automatic: play 8 half‐moves
+            for (int i = 0; i < 8; ++i) {
+                auto recs = logic.recommendMoves(2, 1, poolPtr);
+                if (recs.empty()) break;
 
-		gui = new Chess(boardCopy);
-		gui->setCodeResponse(code);
-		res = gui->getInput();
-	}
+                int code;
+                logic.movePiece(recs[0].first, code);
 
-	delete gui;
-	std::cout << "\nExiting\n";
-	return 0;
+                // Copy logic’s updated 64‐char string into gui
+                std::string newBoard = logic.getRawString();
+                gui->setBoardString(newBoard);
+                gui->setCodeResponse(code);
+                gui->setPieces();
+
+                std::cout << logic << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            }
+        } else {
+            // Manual: prompt and read one move
+            std::cout << (logic.isWhiteTurn() ? "White (enter move): " : "Black (enter move): ");
+            std::string mv;
+            std::cin >> mv;
+            if (mv == "exit" || mv == "quit") break;
+
+            int codeResponse;
+            logic.movePiece(mv, codeResponse);
+
+            // Copy the updated board string into gui
+            std::string newBoard = logic.getRawString();
+            gui->setBoardString(newBoard);
+            gui->setCodeResponse(codeResponse);
+            gui->setPieces();
+
+            std::cout << logic << std::endl;
+        }
+    }
+
+    delete gui;
+    delete poolPtr;
+    return 0;
 }

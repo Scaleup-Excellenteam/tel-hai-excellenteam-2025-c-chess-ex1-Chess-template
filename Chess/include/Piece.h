@@ -1,21 +1,17 @@
-//
-// Created by mohamamdlahwani on 4/7/25.
-//
-
-#ifndef PIECE_H
-#define PIECE_H
-// Piece.h
-#pragma once
-
+#ifndef CHESS_PIECE_H
+#define CHESS_PIECE_H
+#include <string>
+#include <iostream>
+using std::string;
 
 class Piece {
 public:
-    bool isWhite;
-
-    Piece(bool isWhite) : isWhite(isWhite) {}
     virtual ~Piece() = default;
-
-    virtual bool isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) = 0;
-    virtual char getSymbol() const = 0;
+    virtual bool is_legel_movement(const std::string& input,
+                                   const std::string& board,
+                                   bool isWhiteTurn) = 0;
+    virtual char get_type() = 0;
 };
-#endif //PIECE_H
+
+
+#endif //CHESS_PIECE_H

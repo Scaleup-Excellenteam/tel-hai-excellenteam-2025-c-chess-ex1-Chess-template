@@ -1,20 +1,19 @@
-// Rook.cpp
 #include "Rook.h"
 
-bool Rook::isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) {
-    if (srcRow != dstRow && srcCol != dstCol)
-        return false; // must move in straight line
+bool Rook::is_legel_movement(const std::string& input,
+                             const std::string& board,
+                             bool isWhiteTurn)
+{
+    int srcCol = input[0] - 'a';
+    int srcRow = '8' - input[1];
+    int dstCol = input[2] - 'a';
+    int dstRow = '8' - input[3];
 
-    int rowStep = (dstRow > srcRow) - (dstRow < srcRow);
-    int colStep = (dstCol > srcCol) - (dstCol < srcCol);
+    // Rook moves straight (either same row or same column), and distance > 0
+    return ( (srcCol == dstCol && srcRow != dstRow) ||
+             (srcRow == dstRow && srcCol != dstCol) );
+}
 
-    int row = srcRow + rowStep, col = srcCol + colStep;
-    while (row != dstRow || col != dstCol) {
-        if (board[row][col] != nullptr)
-            return false; // path blocked
-        row += rowStep;
-        col += colStep;
-    }
-
-    return (board[dstRow][dstCol] == nullptr || board[dstRow][dstCol]->isWhite != isWhite);
+char Rook::get_type() {
+    return type;
 }

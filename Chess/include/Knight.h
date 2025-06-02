@@ -1,20 +1,17 @@
-//
-// Created by mohamamdlahwani on 4/12/25.
-//
+#ifndef CHESS_KNIGHT_H
+#define CHESS_KNIGHT_H
 
-#ifndef KNIGHT_H
-#define KNIGHT_H
-#pragma once
 #include "Piece.h"
+class Knight : public Piece{
 
-class knight : public Piece {
+private:
+    char type;
 public:
-    knight(bool isWhite) : Piece(isWhite) {}
+    Knight(char t) : type(t) {}
+    bool is_legel_movement(const string &input, const string &board, bool isWhiteTurn) override;
+    char get_type() override;
 
-    bool isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) override;
-    char getSymbol() const override {
-        return isWhite ? 'N' : 'n';
-    }
 };
 
-#endif //KNIGHT_H
+
+#endif //CHESS_KNIGHT_H

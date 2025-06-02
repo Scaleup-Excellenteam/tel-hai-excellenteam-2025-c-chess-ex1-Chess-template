@@ -1,44 +1,17 @@
-//
-// Created by mohamamdlahwani on 4/12/25.
-//
+#ifndef CHESS_PAWN_H
+#define CHESS_PAWN_H
 
-// Pawn.h
-#ifndef PAWN_H
-#define PAWN_H
 
 #include "Piece.h"
+#include <string>
 
 class Pawn : public Piece {
+private:
+    char type;
 public:
-    Pawn(bool isWhite) : Piece(isWhite) {}
-
-    bool isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) override {
-        int startRow = isWhite ? 1 : 6;
-        int direction = isWhite ? 1 : -1;
-
-
-        // Move forward
-        if (srcCol == dstCol) {
-            // One step forward
-            if (dstRow - srcRow == direction && board[dstRow][dstCol] == nullptr)
-                return true;
-            // Two steps from starting position
-            if (srcRow == startRow && dstRow - srcRow == 2 * direction &&
-                board[srcRow + direction][dstCol] == nullptr && board[dstRow][dstCol] == nullptr)
-                return true;
-        }
-        // Diagonal capture
-        if (abs(srcCol - dstCol) == 1 && dstRow - srcRow == direction && board[dstRow][dstCol] != nullptr) {
-            if (board[dstRow][dstCol]->isWhite != this->isWhite)
-                return true;
-        }
-
-        return false;
-    }
-
-    char getSymbol() const override {
-        return isWhite ? 'P' : 'p';
-    }
+    explicit Pawn(char t) : type(t) {}
+    bool is_legel_movement(const std::string &input,const std::string &board,bool isWhiteTurn) override;
+    char get_type() override ;
 };
 
-#endif // PAWN_H
+#endif //CHESS_PAWN_H

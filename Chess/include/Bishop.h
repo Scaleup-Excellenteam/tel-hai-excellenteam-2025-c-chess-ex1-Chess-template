@@ -1,20 +1,17 @@
-//
-// Created by mohamamdlahwani on 4/7/25.
-//
+#ifndef CHESS_BISHOP_H
+#define CHESS_BISHOP_H
 
-#ifndef BISHOP_H
-#define BISHOP_H
-// Bishop.h
-#pragma once
 #include "Piece.h"
-
-class Bishop : public Piece {
+class Bishop : public Piece{
+private :
+    char type;
 public:
-    Bishop(bool isWhite) : Piece(isWhite) {}
+    Bishop(char t) : type(t) {}
+    bool is_legel_movement(const std::string &input, const std::string &board, bool isWhiteTurn) override;
+    char get_type() override;
 
-    bool isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) override;
-    char getSymbol() const override {
-        return isWhite ? 'B' : 'b';
-    }
+
 };
-#endif //BISHOP_H
+
+
+#endif //CHESS_BISHOP_H

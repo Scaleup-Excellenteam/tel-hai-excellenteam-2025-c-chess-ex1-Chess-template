@@ -1,24 +1,22 @@
-//
-// Created by mohamamdlahwani on 4/7/25.
-//
-// Bishop.cpp
 #include "Bishop.h"
 #include <cmath>
 
-bool Bishop::isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) {
-    if (std::abs(dstRow - srcRow) != std::abs(dstCol - srcCol))
-        return false; // must move diagonally
+bool Bishop::is_legel_movement(const std::string& input,
+                               const std::string& board,
+                               bool isWhiteTurn)
+{
+    int srcCol = input[0] - 'a';
+    int srcRow = '8' - input[1];
+    int dstCol = input[2] - 'a';
+    int dstRow = '8' - input[3];
 
-    int rowStep = (dstRow > srcRow) - (dstRow < srcRow);
-    int colStep = (dstCol > srcCol) - (dstCol < srcCol);
+    int dr = std::abs(dstRow - srcRow);
+    int dc = std::abs(dstCol - srcCol);
 
-    int row = srcRow + rowStep, col = srcCol + colStep;
-    while (row != dstRow && col != dstCol) {
-        if (board[row][col] != nullptr)
-            return false;
-        row += rowStep;
-        col += colStep;
-    }
+    // Must move diagonally any positive distance (dr == dc && dr>0)
+    return (dr == dc && dr > 0);
+}
 
-    return (board[dstRow][dstCol] == nullptr || board[dstRow][dstCol]->isWhite != isWhite);
+char Bishop::get_type() {
+    return type;
 }

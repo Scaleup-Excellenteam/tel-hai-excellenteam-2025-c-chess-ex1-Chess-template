@@ -1,14 +1,26 @@
-//
-// Created by mohamamdlahwani on 4/7/25.
-//
-// Queen.cpp
 #include "Queen.h"
-#include "Rook.h"
-#include "Bishop.h"
+#include <cmath>
 
-bool Queen::isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) {
-    Rook tempR(isWhite);
-    Bishop tempB(isWhite);
-    return tempR.isLegalMove(srcRow, srcCol, dstRow, dstCol, board) ||
-           tempB.isLegalMove(srcRow, srcCol, dstRow, dstCol, board);
+bool Queen::is_legel_movement(const std::string& input,
+                              const std::string& board,
+                              bool isWhiteTurn)
+{
+    int srcCol = input[0] - 'a';
+    int srcRow = '8' - input[1];
+    int dstCol = input[2] - 'a';
+    int dstRow = '8' - input[3];
+
+    int dr = std::abs(dstRow - srcRow);
+    int dc = std::abs(dstCol - srcCol);
+
+    // Queen moves like Rook OR Bishop:
+    bool straight = (srcCol == dstCol && srcRow != dstRow) ||
+                    (srcRow == dstRow && srcCol != dstCol);
+    bool diagonal = (dr == dc && dr > 0);
+
+    return straight || diagonal;
+}
+
+char Queen::get_type() {
+    return type;
 }

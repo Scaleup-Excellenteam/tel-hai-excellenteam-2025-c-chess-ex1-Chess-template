@@ -1,26 +1,22 @@
-//
-// Created by mohamamdlahwani on 4/7/25.
-//
-
-#ifndef ROOK_H
-#define ROOK_H
+#ifndef CHESS_ROOK_H
+#define CHESS_ROOK_H
 
 
-
-// Rook.h
-#pragma once
 #include "Piece.h"
+#include "Chess.h"
+using namespace std;
 
-class Rook : public Piece {
+class Rook  : public Piece {
+private:
+    char type;
 public:
-    Rook(bool isWhite) : Piece(isWhite) {}
+    explicit Rook(char t) : type(t) {}
+    bool is_legel_movement(const string& input, const string& board, bool isWhiteTurn) override;
+    char get_type() override;
 
-    bool isLegalMove(int srcRow, int srcCol, int dstRow, int dstCol, Piece* board[8][8]) override;
-    char getSymbol() const override {
-        return isWhite ? 'R' : 'r';
-    }
+
+
 };
 
 
-
-#endif //ROOK_H
+#endif //CHESS_ROOK_H
