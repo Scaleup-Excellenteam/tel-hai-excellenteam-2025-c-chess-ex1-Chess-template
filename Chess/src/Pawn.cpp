@@ -8,8 +8,8 @@ bool Pawn::is_legel_movement(const std::string& input,const std::string& board,b
     int srcCol = input[1] - '1';
     int dstRow = input[2] - 'a';
     int dstCol = input[3] - '1';
-    int direction = isWhiteTurn ? +1 : -1;
-    int startRow  = isWhiteTurn ? 1  : 6;
+    int direction = isWhiteTurn ? -1 : +1;
+    int startRow  = isWhiteTurn ? 6  : 1;
     auto at = [&](int r, int c) {
         int topRow = 7 - r;
         return board[topRow * 8 + c];

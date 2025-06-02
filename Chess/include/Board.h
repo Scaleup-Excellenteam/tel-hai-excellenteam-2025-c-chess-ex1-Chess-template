@@ -23,7 +23,7 @@ public:
     bool movePiece(const std::string& input, int& responseCode);
     [[nodiscard]] std::string toString() const;
     std::vector<std::pair<std::string,int>>
-    recommendMoves(int maxDepth = 2, int topN = 3);
+    recommendMoves(int maxDepth, int topN, int numThreads);
     friend std::ostream& operator<<(std::ostream& os, Board& board);
     void autoPlayBenchmark(int numThreads, int maxDepth);
 

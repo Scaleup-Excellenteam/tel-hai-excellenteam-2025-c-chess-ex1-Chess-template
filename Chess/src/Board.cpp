@@ -11,12 +11,14 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <iostream>
+#include <chrono>
 
 Board::Board(std::string& boardStr)
         : sharedBoardString(boardStr), isWhiteTurn(true) {
     board_game.resize(8, std::vector<Piece*>(8, nullptr));
     for (int i = 0; i < 64; ++i) {
-        int row = i / 8;
+        int row = 7 - (i / 8);
         int col = i % 8;
         char pieceChar = boardStr[i];
         board_game[row][col] = createPiece(pieceChar);
@@ -74,6 +76,7 @@ bool Board::movePiece(const string& input, int& responseCode) {
         board_game[row_dest][col_dest]   = board_game[row_source][col_source];
         board_game[row_source][col_source] = nullptr;
         isWhiteTurn = !isWhiteTurn;
+        rebuildBoard();
         responseCode = 42;
         return true;
     } catch (const Exception_chess& ex) {
@@ -132,14 +135,14 @@ bool Board::isPathClear(int rowSrc, int colSrc, int rowDst, int colDst) const {
 
 
 void Board::rebuildBoard() {
-    for (int r = 0; r < 8; ++r)
+    for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             delete board_game[r][c];
-            char ch = sharedBoardString[r * 8 + c];
+            char ch = sharedBoardString[(7 - r) * 8 + c];
             board_game[r][c] = createPiece(ch);
         }
+    }
 }
-
 
 int Board::scorePosition(const std::string& flatBoard) const {
     int score = 0;
@@ -163,32 +166,34 @@ int Board::scorePosition(const std::string& flatBoard) const {
 int Board::minimax(int depth) {
     int myScore = scorePosition(sharedBoardString);
     if (depth == 0) return myScore;
-    auto next = recommendMoves(depth-1, /*topN=*/1);
+    auto next = recommendMoves(depth-1, 1, 1);
     return myScore - ( next.empty() ? 0 : next[0].second );
 }
 
 
 std::vector<std::pair<std::string, int>>
-Board::recommendMoves(int maxDepth, int topN) {
+Board::recommendMoves(int maxDepth, int topN, int numThreads) {
     bestMoves.clear();
     std::string oldBoard = sharedBoardString;
     bool oldTurn = isWhiteTurn;
-    const int numThreads = std::thread::hardware_concurrency();
+    const int threadsToUse = (numThreads > 0) ? numThreads : std::thread::hardware_concurrency();
     std::vector<std::thread> threads;
     std::atomic<bool> stopFlag = false;
     const int SCORE_THRESHOLD = 90;
     auto worker = [&](int start, int end) {
         for (int idx = start; idx < end && !stopFlag; ++idx) {
-            int r = idx / 8;
-            int c = idx % 8;
-            Piece* p = board_game[r][c];
-            if (!p || std::isupper(p->get_type()) != isWhiteTurn) continue;
-            char sr = char('a' + r);
-            char sf = char('1' + c);
-            for (int rr = 0; rr < 8 && !stopFlag; ++rr) {
-                for (int cc = 0; cc < 8 && !stopFlag; ++cc) {
-                    char dr = char('a' + rr);
-                    char df = char('1' + cc);
+            int row = 7 - (idx / 8);
+            int col = idx % 8;
+            Piece* p = board_game[row][col];
+            if (!p) continue;
+            char type = p->get_type();
+            if (std::isupper(type) != isWhiteTurn) continue;
+            char sr = 'a' + col;
+            char sf = '1' + (7-row);
+            for (int destRow = 0; destRow < 8 && !stopFlag; ++destRow) {
+                for (int destCol = 0; destCol < 8 && !stopFlag; ++destCol) {
+                    char dr = 'a' + destCol;
+                    char df = '1' + (7 - destRow);
                     std::string mv{ sr, sf, dr, df };
                     Board localBoard(sharedBoardString);
                     localBoard.isWhiteTurn = this->isWhiteTurn;
@@ -204,26 +209,26 @@ Board::recommendMoves(int maxDepth, int topN) {
             }
         }
     };
-    int chunk = 64 / numThreads + 1;
-    for (int i = 0; i < 64; i += chunk) {
-        int end = std::min(i + chunk, 64);
-        threads.emplace_back(worker, i, end);
+    if (threadsToUse <= 1) {
+        worker(0, 64);
+    } else {
+        int chunk = 64 / threadsToUse + 1;
+        for (int i = 0; i < 64; i += chunk) {
+            int end = std::min(i + chunk, 64);
+            threads.emplace_back(worker, i, end);
+        }
+        for (auto& t : threads)
+            t.join();
     }
-    for (auto& t : threads)
-        t.join();
-    std::vector<std::pair<std::string, int>> all;
-    while (!bestMoves.empty()) {
-        all.emplace_back(bestMoves.pull());
-        bestMoves.poll();
-    }
-    std::reverse(all.begin(), all.end());
     std::vector<std::pair<std::string, int>> out;
-    for (int i = 0; i < topN && i < (int)all.size(); ++i)
-        out.push_back(all[i]);
+    while (!bestMoves.empty() && out.size() < (size_t)topN) {
+        out.push_back(bestMoves.poll());
+    }
+
     return out;
 }
 std::ostream& operator<<(std::ostream& os, Board& board) {
-    auto rec = board.recommendMoves(2,3);
+    auto rec = board.recommendMoves(2, 3, 2);
     if (rec.empty()) {
         os << "No recommended moves available.\n";
     } else {
@@ -239,20 +244,22 @@ std::ostream& operator<<(std::ostream& os, Board& board) {
 void Board::autoPlayBenchmark(int numThreads, int maxDepth) {
     auto original = sharedBoardString;
     bool originalTurn = isWhiteTurn;
+    isWhiteTurn = true;
     auto start = std::chrono::high_resolution_clock::now();
     for (int moveCount = 0; moveCount < 8; ++moveCount) {
-        auto best = recommendMoves(maxDepth, 1);
+        auto best = recommendMoves(maxDepth, 1, numThreads);
         if (best.empty()) {
             std::cout << "No move found. Game over.\n";
             break;
         }
         std::string mv = best[0].first;
+        std::cout << "  Move " << moveCount + 1 << " (" << (isWhiteTurn ? "White" : "Black") << "): " << mv << std::endl;
         int code;
         movePiece(mv, code);
     }
     auto end = std::chrono::high_resolution_clock::now();
     double elapsed = std::chrono::duration<double>(end - start).count();
-    std::cout << "Threads: " << numThreads
+    std::cout << "Threads: " << (numThreads == 0 ? 1 : numThreads)
               << ", Depth: " << maxDepth
               << ", Time: " << elapsed << " sec\n";
     sharedBoardString = original;
