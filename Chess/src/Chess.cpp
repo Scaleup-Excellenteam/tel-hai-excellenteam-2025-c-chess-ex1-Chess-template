@@ -1,4 +1,6 @@
 #include "Chess.h"
+
+#include "Board.h"
 #include <iostream>
 #include <string>
 
@@ -178,10 +180,11 @@ void Chess::show() const
 // clear screen and print the board and the relevant msg 
 void Chess::displayBoard() const
 {
-	clear();
-	show();
-	cout << m_msg<< m_errorMsg;
-	
+    clear();
+    show();
+    cout << m_msg<< m_errorMsg;
+    cout << m_best << endl;
+
 }
 // print the who is turn before getting input 
 void Chess::showAskInput() const 
@@ -230,39 +233,39 @@ void Chess::doTurn()
 	m_errorMsg = "\n"; 
 	switch (m_codeResponse)
 	{
-	case 11:
+	case CR_NO_PIECE:
 	{
 		m_msg = "there is not piece at the source \n";
 		break;
 	}
-	case 12:
+	case CR_WRONG_TURN:
 	{
 		m_msg = "the piece in the source is piece of your opponent \n";
 		break;
 	}
-	case 13:
+	case CR_SAME_COLOR:
 	{
 		m_msg = "there one of your pieces at the destination \n";
 		break;
 	}
-	case 21:
+	case CR_INVALID_MOVE:
 	{
 		m_msg = "illegal movement of that piece \n";
 		break;
 	}
-	case 31:
+	case CR_SELF_CHECK:
 	{
 		m_msg = "this movement will cause you checkmate \n";
 		break;
 	}
-	case 41:
+	case CR_OPPONENT_CHECK:
 	{
 		excute();
 		m_turn = !m_turn;
 		m_msg = "the last movement was legal and cause check \n";
 		break;
 	}
-	case 42:
+	case CR_MOVE_OK:
 	{
 		excute();
 		m_turn = !m_turn;
@@ -322,8 +325,12 @@ string Chess::getInput()
 
 void Chess::setCodeResponse(int codeResponse)
 {
-	if (((11 <= codeResponse) && (codeResponse <= 13)) ||
-		((21 == codeResponse) || (codeResponse == 31)) ||
-		((41 == codeResponse) || (codeResponse == 42)))
+	if (((CR_NO_PIECE <= codeResponse) && (codeResponse <= CR_SAME_COLOR)) ||
+		((CR_INVALID_MOVE == codeResponse) || (codeResponse == CR_SELF_CHECK)) ||
+		((CR_OPPONENT_CHECK == codeResponse) || (codeResponse == CR_MOVE_OK)))
 		m_codeResponse = codeResponse;
+}
+void Chess::bestMove(const string& recommendations)
+{
+    m_best = recommendations;
 }
