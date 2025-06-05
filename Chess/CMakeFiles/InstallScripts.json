@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/cmake_install.cmake",
-		"/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include/cmake_install.cmake",
-		"/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

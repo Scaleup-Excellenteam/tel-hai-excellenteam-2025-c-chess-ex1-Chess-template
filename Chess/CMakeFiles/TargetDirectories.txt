@@ -1,7 +1,0 @@
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/CMakeFiles/Chess.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/CMakeFiles/edit_cache.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/CMakeFiles/rebuild_cache.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include/CMakeFiles/edit_cache.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/include/CMakeFiles/rebuild_cache.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/CMakeFiles/edit_cache.dir
-/home/daniku/Desktop/Programming/Tel-Hai/Excelentim/CPP/chess/chess-ex1-dannightmare/Chess/src/CMakeFiles/rebuild_cache.dir

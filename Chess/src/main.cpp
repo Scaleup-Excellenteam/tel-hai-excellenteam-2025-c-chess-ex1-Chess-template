@@ -79,7 +79,7 @@ void parseInput(const string &res, Position &pos1, Position &pos2)
 
 void parseMove(const Position &pos1, const Position &pos2, string &res)
 {
-    res += pos1.y + 'a';
+    res = pos1.y + 'a';
     res += pos1.x + '1';
     res += " ";
     res += pos2.y + 'a';

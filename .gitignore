@@ -30,32 +30,16 @@ img/cache/
 Chess/.cache/
 Chess/build/
 
-*/CMakeFiles/*
+**/CMakeFiles/**
+**/CMake*
+!Chess/CmakeLists.txt
 
-# modified:   CMakeFiles/CMakeConfigureLog.yaml
-#         modified:   CMakeFiles/Chess.dir/DependInfo.cmake
-#         modified:   CMakeFiles/Chess.dir/build.make
-#         modified:   CMakeFiles/Chess.dir/cmake_clean.cmake
-#         modified:   CMakeFiles/Chess.dir/flags.make
-#         modified:   CMakeFiles/Chess.dir/link.txt
-#         modified:   CMakeFiles/Chess.dir/progress.make
-#         modified:   CMakeFiles/InstallScripts.json
-#         modified:   CMakeFiles/Makefile2
-#         modified:   CMakeFiles/TargetDirectories.txt
-#         modified:   CMakeFiles/progress.marks
-#         modified:   Makefile
-#         modified:   cmake_install.cmake
-#         typechange: compile_commands.json
-#         modified:   include/CMakeFiles/CMakeDirectoryInformation.cmake
-#         modified:   include/Makefile
-#         modified:   include/cmake_install.cmake
-#         modified:   src/CMakeFiles/CMakeDirectoryInformation.cmake
-#         modified:   src/Makefile
-#         modified:   src/cmake_install.cmake
-#
-# Untracked files:
-#   (use "git add <file>..." to include in what will be committed)
-#         CMakeCache.txt
-#         CMakeFiles/4.0.2-dirty/
-#         CMakeFiles/CMakeDirectoryInformation.cmake
-#         CMakeFiles/Makefile.cmake
+Chess/Chess
+Chess/Makefile
+Chess/cmake_install.cmake
+
+Chess/compile_commands.json
+Chess/include/Makefile
+Chess/include/a.out
+Chess/include/main.cpp
+Chess/src/Makefile
