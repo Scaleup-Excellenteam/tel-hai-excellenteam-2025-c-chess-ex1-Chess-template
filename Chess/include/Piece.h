@@ -7,6 +7,7 @@
 
 
 class Piece {
+    bool hasMoved = false;
 public:
     enum Color { WHITE, BLACK };
 
@@ -18,6 +19,11 @@ public:
 
     virtual bool isMoveLegal(int srcRow, int srcCol, int destRow, int destCol,
                              Piece* board[8][8]) const = 0;
+
+    virtual Piece* clone() const = 0;
+
+    bool getHasMoved() const { return hasMoved; }
+    void setHasMoved() { hasMoved = true; }
 
 protected:
     Color _color;

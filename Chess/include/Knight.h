@@ -13,6 +13,10 @@ public:
 
     bool isMoveLegal(int srcRow, int srcCol, int destRow, int destCol,
                      Piece* board[8][8]) const override;
+
+    Knight* clone() const override {
+        return new Knight(_symbol);
+    }
 };
 
 

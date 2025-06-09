@@ -13,6 +13,10 @@ public:
 
     bool isMoveLegal(int srcRow, int srcCol, int destRow, int destCol,
                      Piece* board[8][8]) const override;
+
+    Rook* clone() const override {
+        return new Rook(_symbol);
+    }
 };
 
 

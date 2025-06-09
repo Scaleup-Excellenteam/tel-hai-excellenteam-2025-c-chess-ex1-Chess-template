@@ -36,6 +36,7 @@ class Chess {
 
 	int depth = 0;
 	ChessAI m_ai;
+	int winner = -1;
 
 	void clear() const;
 	void setFrames();
@@ -57,6 +58,9 @@ public:
 
 	void displayBoard() const;
 
+	bool isCheck(bool whiteTurnAfterMove, Piece* board[8][8]) const;
+	bool isCheckmate(bool whiteKing, Piece* board[8][8]) const;
+	int getWinner() { return winner; }
 
 	void createBoardFromString(const std::string& boardStr, Piece* board[8][8]);
 	void calculateResponseCode();
@@ -72,6 +76,14 @@ public:
 	std::string getBestMoveForPiece(const std::string& piecePos);
 	bool playMove(const std::string& move);
 
-
+	enum ResponseCode {
+		NO_PIECE = 11,
+		WRONG_TURN = 12,
+		SAME_COLOR = 13,
+		ILLEGAL_MOVE = 21,
+		CHECK = 41,
+		VALID_MOVE = 42,
+		CHECKMATE = 43
+	};
 };
 

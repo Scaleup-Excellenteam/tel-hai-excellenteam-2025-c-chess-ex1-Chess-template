@@ -14,6 +14,7 @@ int main() {
     string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     Chess game(board);
     int res;
+    int winner = -1;
 
     int depth, numThreads, mode;
     cout << "Enter depth: ";

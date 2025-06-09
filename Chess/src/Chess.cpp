@@ -228,47 +228,55 @@ void Chess::excute()
 void Chess::doTurn()
 {
 	m_errorMsg = "\n"; 
-	switch (m_codeResponse)
-	{
-	case 11:
-	{
-		m_msg = "there is not piece at the source \n";
-		break;
-	}
-	case 12:
-	{
-		m_msg = "the piece in the source is piece of your opponent \n";
-		break;
-	}
-	case 13:
-	{
-		m_msg = "there one of your pieces at the destination \n";
-		break;
-	}
-	case 21:
-	{
-		m_msg = "illegal movement of that piece \n";
-		break;
-	}
-	case 31:
-	{
-		m_msg = "this movement will cause you checkmate \n";
-		break;
-	}
-	case 41:
-	{
-		excute();
-		m_turn = !m_turn;
-		m_msg = "the last movement was legal and cause check \n";
-		break;
-	}
-	case 42:
-	{
-		excute();
-		m_turn = !m_turn;
-		m_msg = "the last movement was legal \n";
-		break;
-	}
+	switch (m_codeResponse) {
+		case 11:
+		{
+			m_msg = "there is not piece at the source \n";
+			break;
+		}
+		case 12:
+		{
+			m_msg = "the piece in the source is piece of your opponent \n";
+			break;
+		}
+		case 13:
+		{
+			m_msg = "there one of your pieces at the destination \n";
+			break;
+		}
+		case 21:
+		{
+			m_msg = "illegal movement of that piece \n";
+			break;
+		}
+		case 31:
+		{
+			m_msg = "this movement will cause you checkmate \n";
+			break;
+		}
+		case 41:
+		{
+			excute();
+			m_turn = !m_turn;
+			m_msg = "the last movement was legal and cause check \n";
+			break;
+		}
+		case 42:
+		{
+			excute();
+			m_turn = !m_turn;
+			m_msg = "the last movement was legal \n";
+			break;
+		}
+		case 43:
+		{
+			excute();
+			if (m_turn)
+				m_msg = "White checkmate black \n";
+			else
+				m_msg = "Black checkmate white \n";
+			break;
+		}
 	}
 }
 
@@ -357,13 +365,76 @@ void Chess::createBoardFromString(const std::string& boardStr, Piece* board[8][8
 	}
 }
 
-enum ResponseCode {
-	NO_PIECE = 11,
-	WRONG_TURN = 12,
-	SAME_COLOR = 13,
-	ILLEGAL_MOVE = 21,
-	VALID_MOVE = 42
-};
+
+bool Chess::isCheck(bool whiteTurnAfterMove, Piece* board[8][8]) const {
+	char kingSymbol = whiteTurnAfterMove ? 'K' : 'k';
+	int kingRow = -1, kingCol = -1;
+
+	for (int row = 0; row < 8; ++row) {
+		for (int col = 0; col < 8; ++col) {
+			if (board[row][col] && board[row][col]->getSymbol() == kingSymbol) {
+				kingRow = row;
+				kingCol = col;
+			}
+		}
+	}
+
+	if (kingRow == -1 || kingCol == -1)
+		return false;
+
+	for (int row = 0; row < 8; ++row) {
+		for (int col = 0; col < 8; ++col) {
+			Piece* p = board[row][col];
+			if (p && p->getColor() != (whiteTurnAfterMove ? Piece::WHITE : Piece::BLACK)) {
+				if (p->isMoveLegal(row, col, kingRow, kingCol, board)) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+bool Chess::isCheckmate(bool whiteKing, Piece* board[8][8]) const {
+    if (!isCheck(whiteKing, board)) {
+        return false;
+    }
+    for (int srcRow = 0; srcRow < 8; ++srcRow) {
+        for (int srcCol = 0; srcCol < 8; ++srcCol) {
+            Piece* piece = board[srcRow][srcCol];
+            if (piece && piece->getColor() == (whiteKing ? Piece::WHITE : Piece::BLACK)) {
+                for (int destRow = 0; destRow < 8; ++destRow) {
+                    for (int destCol = 0; destCol < 8; ++destCol) {
+                        if (piece->isMoveLegal(srcRow, srcCol, destRow, destCol, board)) {
+                            Piece* tempBoard[8][8];
+                            for (int i = 0; i < 8; ++i) {
+                                for (int j = 0; j < 8; ++j) {
+                                    tempBoard[i][j] = board[i][j] ? board[i][j]->clone() : nullptr;
+                                }
+                            }
+                            delete tempBoard[destRow][destCol];
+                            tempBoard[destRow][destCol] = tempBoard[srcRow][srcCol];
+                            tempBoard[srcRow][srcCol] = nullptr;
+
+                            if (!isCheck(whiteKing, tempBoard)) {
+                                for (int i = 0; i < 8; ++i)
+                                    for (int j = 0; j < 8; ++j)
+                                        delete tempBoard[i][j];
+                                return false;
+                            }
+
+                            for (int i = 0; i < 8; ++i)
+                                for (int j = 0; j < 8; ++j)
+                                    delete tempBoard[i][j];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+}
 
 
 void Chess::calculateResponseCode() {
@@ -373,8 +444,6 @@ void Chess::calculateResponseCode() {
 	int srcCol = m_input[1] - '1';
 	int destRow = m_input[2] - 'a';
 	int destCol = m_input[3] - '1';
-
-
 
 	Piece* srcPiece = board[srcRow][srcCol];
 	Piece* destPiece = board[destRow][destCol];
@@ -388,8 +457,27 @@ void Chess::calculateResponseCode() {
 		m_codeResponse = SAME_COLOR;
 	else if (!srcPiece->isMoveLegal(srcRow, srcCol, destRow, destCol, board))
 		m_codeResponse = ILLEGAL_MOVE;
-	else
-		m_codeResponse = VALID_MOVE;
+	else {
+		Piece* captured = board[destRow][destCol];
+		Piece* moved = board[srcRow][srcCol];
+
+		board[destRow][destCol] = moved;
+		board[srcRow][srcCol] = nullptr;
+
+		if (isCheck(!m_turn, board)) {
+			if (isCheckmate(!m_turn, board)) {
+				m_codeResponse = CHECKMATE;
+			} else {
+				m_codeResponse = CHECK;
+			}
+		} else {
+			m_codeResponse = VALID_MOVE;
+		}
+		board[srcRow][srcCol] = moved;
+		board[destRow][destCol] = captured;
+
+		srcPiece->setHasMoved();
+	}
 
 	std::cout << srcRow << srcCol << std::endl;
 
@@ -429,7 +517,7 @@ bool Chess::playMove(const std::string& move) {
 	if (move.size() != 4) return false;
 	m_input = move;
 	calculateResponseCode();
-	if (m_codeResponse == 42 || m_codeResponse == 41) {
+	if (m_codeResponse == VALID_MOVE || m_codeResponse == CHECK) {
 		doTurn();
 		return true;
 	}
