@@ -15,16 +15,15 @@ int main() {
     Chess game(board);
     int res;
     int winner = -1;
+    int count = 0;
+    int numThreads = 8;
 
-    int depth, numThreads, mode;
+    int depth, mode;
     cout << "Enter depth: ";
     cin >> depth;
     game.setDepth(depth);
 
-    cout << "Enter number of threads: ";
-    cin >> numThreads;
-
-    cout << "Choose mode (1 = manual, 2 = automatic): ";
+    cout << "Choose mode (1 = 1 player (vs computer), 2 = 2 players): ";
     cin >> mode;
 
     game.setDepth(depth);
@@ -32,8 +31,6 @@ int main() {
     ThreadPool pool(numThreads);
     mutex pq_mutex;
 
-    int moveCount = 0;
-    const int maxAutoMoves = 8;
 
     while (mode == 1 || mode == 2 || game.getInput() != "exit") {
         bool turn = game.getTurn();
@@ -73,22 +70,32 @@ int main() {
         auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
 
 
-        if (mode == 2) {
-            // game.displayBoard();
-            cout << "Best move suggested: " << bestMove << " (computed in " << duration << " ms)" << endl;
-            cout << "Auto-playing move: " << bestMove << endl;
-            game.playMove(bestMove);
-            moveCount++;
-            if (moveCount >= maxAutoMoves) break;
-        } else {
+        if (mode == 1) {
+            while(true) {
+                if (!(count%2)) { //human player
+                    game.displayBoard();
+                    cout << "Best move suggested: " << bestMove << endl;
+                    res = game.playMove(game.getInput());
+
+                }
+                else { //computer
+                    cout << "Auto-playing move: " << bestMove << endl;
+                    res = game.playMove(bestMove);
+                }
+                if(res)
+                    break;
+            }
+        }
+        else {
             while(true) {
                 game.displayBoard();
-                cout << "Best move suggested: " << bestMove << " (computed in " << duration << " ms)" << endl;
+                cout << "Best move suggested: " << bestMove << endl;
                 res = game.playMove(game.getInput());
                 if(res)
                     break;
             }
         }
+        count ++;
     }
 
     cout << "Game ended." << endl;

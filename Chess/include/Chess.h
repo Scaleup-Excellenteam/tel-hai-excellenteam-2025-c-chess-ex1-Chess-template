@@ -81,9 +81,21 @@ public:
 		WRONG_TURN = 12,
 		SAME_COLOR = 13,
 		ILLEGAL_MOVE = 21,
+		ILLEGAL_CASTLING = 22,
 		CHECK = 41,
 		VALID_MOVE = 42,
 		CHECKMATE = 43
 	};
+
+private:
+	struct CastlingState {
+		bool kingMoved = false;
+		bool rookLeftMoved = false;
+		bool rookRightMoved = false;
+	};
+	CastlingState whiteCastling;
+	CastlingState blackCastling;
+
+
 };
 

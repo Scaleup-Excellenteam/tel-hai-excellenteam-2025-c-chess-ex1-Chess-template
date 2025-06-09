@@ -179,9 +179,9 @@ void Chess::show() const
 void Chess::displayBoard() const
 {
 	clear();
-		show();
+	show();
 	cout << m_msg<< m_errorMsg;
-	
+	cout.flush();
 }
 // print the who is turn before getting input 
 void Chess::showAskInput() const 
@@ -222,11 +222,45 @@ void Chess::excute()
 	col = (m_input[3] - '1');
 	m_boardString[(row * 8) + col] = pieceInSource;
 
+	switch (pieceInSource) { // tells if king or rook has moved for castling
+		case 'K':
+		{
+			whiteCastling.kingMoved = true;
+			break;
+		}
+		case 'R':
+		{
+			if (col == 0)
+				whiteCastling.rookLeftMoved = true;
+			else
+				whiteCastling.rookRightMoved = true;
+			break;
+		}
+		case 'k':
+		{
+			blackCastling.kingMoved = true;
+			break;
+		}
+		case 'r':
+		{
+			if (col == 0)
+				blackCastling.rookLeftMoved = true;
+			else
+				blackCastling.rookRightMoved = true;
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
 	setPieces();
 }
 // check the response code and switch turn if needed 
 void Chess::doTurn()
 {
+	m_msg = "";
 	m_errorMsg = "\n"; 
 	switch (m_codeResponse) {
 		case 11:
@@ -247,6 +281,11 @@ void Chess::doTurn()
 		case 21:
 		{
 			m_msg = "illegal movement of that piece \n";
+			break;
+		}
+		case 22:
+		{
+			m_msg = "illegal castling \n";
 			break;
 		}
 		case 31:
@@ -291,45 +330,8 @@ Chess::Chess(const string& start)
 // get the source and destination 
 string Chess::getInput()
 {
-	// static bool isFirst = true;
-	//
-	// if (isFirst)
-	// 	isFirst = false;
-	// else
-	// 	doTurn();
-
-	// displayBoard();
-
-	// The suggested move
-	// std::string bestMove = getBestMove(depth);
-	// std::cout << "Recommended move: " << bestMove << std::endl;
-
 	showAskInput();
-
 	cin >> m_input;
-	// if (isExit())
-	// 	return "exit";
-	// while (!isValid() || isSame())
-	// {
-	// 	if (!isValid())
-	// 		m_errorMsg = "Invalid input !! \n";
-	// 	else
-	// 		m_errorMsg = "The source and the destination are the same !! \n";
-	// 	displayBoard();
-	// 	showAskInput();
-	// 	cin >> m_input;
-	// 	if (isExit())
-	// 		return "exit";
-	// }
-
-	// if (m_input != "exit")
-	// {
-	// 	if (('A' <= m_input[0]) && (m_input[0] <= 'H'))
-	// 		m_input[0] = (m_input[0] - 'A' + 'a');
-	// 	if (('A' <= m_input[2]) && (m_input[2] <= 'H'))
-	// 		m_input[2] = (m_input[2] - 'A' + 'a');
-	// }
-
 	return m_input;
 }
 
@@ -464,6 +466,38 @@ void Chess::calculateResponseCode() {
 		board[destRow][destCol] = moved;
 		board[srcRow][srcCol] = nullptr;
 
+		// castling check
+			if (dynamic_cast<King*>(srcPiece) && std::abs(destCol - srcCol) == 2) {
+				if ((m_turn && whiteCastling.kingMoved) || (!m_turn && blackCastling.kingMoved)) {
+					m_codeResponse = ILLEGAL_CASTLING;
+					return;
+				}
+				if (m_turn && destCol > srcCol && whiteCastling.rookRightMoved) {
+					m_codeResponse = ILLEGAL_CASTLING;
+					return;
+				}
+				if (m_turn && destCol < srcCol && whiteCastling.rookLeftMoved) {
+					m_codeResponse = ILLEGAL_CASTLING;
+					return;
+				}
+				if (!m_turn && destCol > srcCol && blackCastling.rookRightMoved) {
+					m_codeResponse = ILLEGAL_CASTLING;
+					return;
+				}
+				if (!m_turn && destCol < srcCol && blackCastling.rookLeftMoved) {
+					m_codeResponse = ILLEGAL_CASTLING;
+					return;
+				}
+			if (destCol > srcCol) {
+				board[destRow][5] = board[destRow][7];  // צריח למקום חדש
+				board[destRow][7] = nullptr;
+			}
+			else {
+				board[destRow][3] = board[destRow][0];  // צריח למקום חדש
+				board[destRow][0] = nullptr;
+			}
+		} // done castling check
+
 		if (isCheck(!m_turn, board)) {
 			if (isCheckmate(!m_turn, board)) {
 				m_codeResponse = CHECKMATE;
@@ -476,7 +510,27 @@ void Chess::calculateResponseCode() {
 		board[srcRow][srcCol] = moved;
 		board[destRow][destCol] = captured;
 
-		srcPiece->setHasMoved();
+
+		if (dynamic_cast<King*>(srcPiece) && std::abs(destCol - srcCol) == 2) {
+			if (destCol > srcCol) {
+				board[destRow][7] = board[destRow][5];
+				board[destRow][5] = nullptr;
+
+				int rookSrc = destRow * 8 + 7;
+				int rookDest = destRow * 8 + 5;
+				m_boardString[rookDest] = m_boardString[rookSrc];
+				m_boardString[rookSrc] = '#';
+			} else {
+				board[destRow][0] = board[destRow][3];
+				board[destRow][3] = nullptr;
+
+				int rookSrc = destRow * 8 + 0;
+				int rookDest = destRow * 8 + 3;
+				m_boardString[rookDest] = m_boardString[rookSrc];
+				m_boardString[rookSrc] = '#';
+			}
+		}
+		
 	}
 
 	std::cout << srcRow << srcCol << std::endl;
@@ -517,8 +571,8 @@ bool Chess::playMove(const std::string& move) {
 	if (move.size() != 4) return false;
 	m_input = move;
 	calculateResponseCode();
+	doTurn();
 	if (m_codeResponse == VALID_MOVE || m_codeResponse == CHECK) {
-		doTurn();
 		return true;
 	}
 	return false;
