@@ -1,0 +1,185 @@
+#include "GameManager.h"
+
+// ——— constructor ———
+GameManager::GameManager()
+  : board(nullptr),
+    codeResponse(-1),
+    isWhiteTurn_(true)
+{
+    initGame();
+}
+
+// ——— initGame ———
+void GameManager::initGame()
+{
+
+    /* 1. fresh board ------------------------------------------- */
+    board = std::make_unique<Board>();
+
+    /* helper: create piece and pass ownership directly to the Board */
+    auto put = [this](int row, int col, Piece* raw)
+    {
+        board->setPiece(row, col, std::unique_ptr<Piece>(raw));
+    };
+
+    /* 3. Black back rank (row 0) – UPPER-case symbols ----------- */
+    put(0, 0, new Rook  (false));   // A8
+    put(0, 1, new Knight(false));   // B8
+    put(0, 2, new Bishop(false));   // C8
+    put(0, 3, new Queen (false));   // D8
+    put(0, 4, new King  (false));   // E8
+    put(0, 5, new Bishop(false));   // F8
+    put(0, 6, new Knight(false));   // G8
+    put(0, 7, new Rook  (false));   // H8
+
+    /* 4. Black pawns (row 1) ----------------------------------- */
+    for (int c = 0; c < 8; ++c)
+        put(1, c, new Pawn(false));           // A7 .. H7
+
+    /* 5. White pawns (row 6) – lower-case symbols -------------- */
+    for (int c = 0; c < 8; ++c)
+        put(6, c, new Pawn(true));            // A2 .. H2
+
+    /* 6. White back rank (row 7) ------------------------------- */
+    put(7, 0, new Rook  (true));    // A1
+    put(7, 1, new Knight(true));    // B1
+    put(7, 2, new Bishop(true));    // C1
+    put(7, 3, new Queen (true));    // D1
+    put(7, 4, new King  (true));    // E1
+    put(7, 5, new Bishop(true));    // F1
+    put(7, 6, new Knight(true));    // G1
+    put(7, 7, new Rook  (true));    // H1
+}
+
+
+GameManager::~GameManager()
+{
+    // The board's unique_ptr automatically handles cleanup. No code needed.
+}
+
+void GameManager::setCodeResponse(int code)
+{
+    codeResponse = code;
+}
+
+int GameManager::getCodeResponse() const
+{
+    return codeResponse;
+}
+
+
+// ——— isCheck ———
+// return true if the current player's king is in check
+bool GameManager::isCheck() const
+{
+    bool whiteToMove = isWhiteTurn_;
+    return board->inCheck(whiteToMove);
+}
+
+// ——— getInput ———
+// simple wrapper to read a move string
+std::string GameManager::getInput()
+{
+    std::string input;
+    std::cin >> input;
+    return input;
+}
+
+// ——— displayBoard ———
+// print the board (rank 8 down to 1) using each piece's symbol or “. ”
+void GameManager::displayBoard() const
+{
+    for (int r = 7; r >= 0; --r) {
+        for (int c = 0; c < 8; ++c) {
+            Piece* p = board->getPiece(r, c);
+            if (p)
+                std::cout << p->getSymbol() << ' ';
+            else
+                std::cout << ". ";
+        }
+        std::cout << "\n";
+    }
+}
+
+// ——— makeMove ———
+// validate & apply a move, set the codeResponse, and swap turns on success
+void GameManager::makeMove(const std::string& move)
+{
+    int code = validateMove(move);
+    setCodeResponse(code);
+    if (code == 42 || code == 41) {
+        isWhiteTurn_ = !isWhiteTurn_; // switch turn only on legal moves
+    }
+}
+
+bool GameManager::makeMove(int srcRow, int srcCol, int destRow, int destCol)
+{
+    if (!board) return false;
+
+    Piece* moving = board->getPiece(srcRow, srcCol);
+    if (!moving) return false;
+
+    /* Take ownership of the source square’s unique_ptr */
+    std::unique_ptr<Piece> tmp = board->removePiece(srcRow, srcCol);
+
+    /* If destination holds an opponent piece, it is automatically deleted
+       when we overwrite the unique_ptr in that square. */
+    board->setPiece(destRow, destCol, std::move(tmp));
+    isWhiteTurn_ = !isWhiteTurn_; // switch turn
+
+    return true;
+
+}
+
+// ——— isValidMove ———
+// check move legality without mutating the board by looking at generateLegalMoves
+int GameManager::validateMove(const std::string& mv) const
+{
+    if (mv.size()!=4) return 11;
+
+    int sR = mv[0]-'a', sC = mv[1]-'1';
+    int dR = mv[2]-'a', dC = mv[3]-'1';
+    if (sR<0||sR>=8||sC<0||sC>=8||dR<0||dR>=8||dC<0||dC>=8) return 11;
+
+    Piece* src = board->getPiece(sR,sC);
+    if (!src) return 11;                           // no piece
+    if (src->getIsWhite()!=isWhiteTurn_) return 12; // opponent’s piece
+
+    if (auto dst = board->getPiece(dR,dC);
+        dst && dst->getIsWhite()==src->getIsWhite()) return 13; // own piece
+
+    if (!src->isValidMove(sR,sC,dR,dC,*board)) return 21; // piece-specific rule
+
+    // Create a temporary board to check for self-check
+    Board temp_board = *board;
+    temp_board.applyMove({sR, sC, dR, dC});
+    if (temp_board.inCheck(isWhiteTurn_)) {
+        return 31; // this movement will cause you check
+    }
+
+    if (board->inCheck(!isWhiteTurn_)) {
+        return 41; // the last movement was legal and causes check
+    }
+
+    return 42;
+}
+
+// ——— isCheckmate ———
+// checkmate: side to move is in check and has no legal replies
+bool GameManager::isCheckmate() const
+{
+    bool whiteToMove = isWhiteTurn_;
+    if (!board->inCheck(whiteToMove)) return false;
+    auto legal = board->generateLegalMoves(whiteToMove);
+    return legal.empty();
+}
+
+// ——— isStalemate ———
+// stalemate: side to move is not in check but has no legal replies
+bool GameManager::isStalemate() const
+{
+    bool whiteToMove = isWhiteTurn_;
+    if (board->inCheck(whiteToMove)) return false;
+    auto legal = board->generateLegalMoves(whiteToMove);
+    return legal.empty();
+}

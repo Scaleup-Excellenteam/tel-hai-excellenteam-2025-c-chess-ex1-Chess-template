@@ -1,27 +1,35 @@
-﻿cmake_minimum_required (VERSION 3.15)
+﻿cmake_minimum_required(VERSION 3.10)
+project(ChessProject)
 
-project (Chess)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# New CMake versions map C++20 to /std:c++20 instead of c++latest, so <format>
-# and other unstable ABI features aren't supported. Use C++23 for such versions
-if (MSVC AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
-    set(CMAKE_CXX_STANDARD 23)
-else ()
-    set(CMAKE_CXX_STANDARD 20)
-endif ()
+# ─── All .cpp sources for core game (including Chess.cpp!) ────────────────
+set(SRC_FILES
+    src/Chess.cpp
+    src/main.cpp
+    src/Board.cpp
+    src/GameManager.cpp
+    src/Utils/ThreadPool.cpp
+    src/AI/BestMoveFinder.cpp
+    src/Pieces/Bishop.cpp
+    src/Pieces/King.cpp
+    src/Pieces/Knight.cpp
+    src/Pieces/Queen.cpp
+    src/Pieces/Rook.cpp
+    src/Pieces/Pawn.cpp
+)
 
-set (CMAKE_CXX_STANDARD_REQUIRED ON)
-set (CMAKE_CXX_EXTENSIONS OFF)
+# ─── Build library target from those sources ──────────────────────────────
+add_library(ChessLib STATIC ${SRC_FILES})
+target_include_directories(ChessLib PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+)
+find_package(Threads REQUIRED)
+target_link_libraries(ChessLib PRIVATE Threads::Threads)
 
-if (MSVC)
-    add_compile_options (/W4 /permissive- /Zc:externConstexpr /Zc:inline)
-endif ()
-
-add_executable (Chess "")
-
-
-add_subdirectory (include)
-add_subdirectory (src)
-
-
-
+# ─── Build the actual executable (linking against ChessLib) ──────────────
+add_executable(Chess
+    src/main.cpp
+)
+target_link_libraries(Chess PRIVATE ChessLib)

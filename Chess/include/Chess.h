@@ -5,6 +5,7 @@
 #endif
 
 #include <string>
+#include "GameManager.h"
 
 using std::cout;
 using std::cin; 
@@ -20,19 +21,27 @@ class Chess {
 	string m_input;
 	string m_msg = "\n";
 	string m_errorMsg = "\n";
+	string m_hint = "\n";
 	int m_codeResponse;
+	GameManager manager_;
+
+
 
 	void clear() const;
 	void setFrames();
 	void setPieces();
-	void show() const;
-	void displayBoard() const;
+    void syncBoardStringWithBoard();
+    void show() const;
+    void displayBoard() const;
 	void showAskInput() const;
 	bool isSame() const;
 	bool isValid() const;
 	bool isExit() const;
 	void excute();
 	void doTurn();
+	// return game manager instance
+	GameManager& getGameManager() { return manager_; }
+
 
 public:
 	Chess(const string& start = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr");
@@ -40,4 +49,5 @@ public:
 	Chess& operator=(const Chess&) = delete;
 	string getInput();
 	void setCodeResponse(int codeResponse);
+    int validateMoveViaManager(const std::string &mv) const;
 };
