@@ -59,6 +59,7 @@ public:
    
     //forth part
     int tryCastling(bool isWhite, bool isKingside);
+    void runHumanVsComputerGame(Chess& chess, int depth, int numThreads);
     
 
     

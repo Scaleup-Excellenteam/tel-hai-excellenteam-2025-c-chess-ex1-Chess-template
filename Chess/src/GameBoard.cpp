@@ -685,3 +685,34 @@ int GameBoard::tryCastling(bool isWhite, bool isKingside) {
     switchTurn();
     return 77;
 }
+
+
+void GameBoard::runHumanVsComputerGame(Chess& chess, int depth, int numThreads) {
+    bool playerIsWhite;
+    int playerColorChoice;
+    while (true) {
+        std::cout << "Do you want to play as white (1) or black (0)? ";
+        std::cin >> playerColorChoice;
+        if (playerColorChoice == 0 || playerColorChoice == 1) {
+            playerIsWhite = static_cast<bool>(playerColorChoice);
+            break;
+        } else {
+            std::cerr << "Invalid choice. Please enter 1 for white or 0 for black.\n";
+        }
+    }
+
+    int codeResponse = 0;
+    std::string input; 
+
+    while (input != "exit") {
+        bool isWhiteTurn = getisWhiteTurn();
+        MoveScore best = getBestMoveMultithreaded(depth, numThreads);
+        if (playerIsWhite != isWhiteTurn) {
+            input = chess.getInput(best.move, true); 
+        } else {
+            input = chess.getInput(best.move, false);
+        }
+        codeResponse = handleMove(input);
+        chess.setCodeResponse(codeResponse);
+    }
+}

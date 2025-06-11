@@ -16,8 +16,17 @@ int main()
 	int numThreads = 0;
 	bool isAuto = false;
 	int autoChoice = -1;
+	int gameMode = 0;
 
-	
+	while (true) {
+		std::cout << "Choose game mode:\n1. Player vs Player\n2. Player vs Computer\nEnter choice: ";
+		std::cin >> gameMode;
+
+		if (gameMode == 1 || gameMode == 2)
+			break;
+		else
+			std::cerr << "Invalid input. Please enter 1 or 2.\n";
+	}
 
 	while (true) {
 		 std::cout << "Please select the depth of the recommendation moves (digit > 0): ";
@@ -32,32 +41,41 @@ int main()
             std::cerr << e.what() << std::endl;
         }
     }
+	if(gameMode == 1){
 
-	while (true) {
-        std::cout << "Please select the number of threads to use (digit > 0): ";
-        std::cin >> numThreads;
+		while (true) {
+			std::cout << "Please select the number of threads to use (digit > 0): ";
+			std::cin >> numThreads;
 
-        if (numThreads <= 0) {
-            std::cerr << "Invalid number of threads. Please enter a number greater than zero." << std::endl;
-        } else {
-            break;
-        }
-    }
+			if (numThreads <= 0) {
+				std::cerr << "Invalid number of threads. Please enter a number greater than zero." << std::endl;
+			} else {
+				break;
+			}
+		}
+		while (true) {
+			std::cout << "Do you want the game to run in auto mode? (1 for Yes, 0 for No): ";
+			std::cin >> autoChoice;
 	
-    while (true) {
-        std::cout << "Do you want the game to run in auto mode? (1 for Yes, 0 for No): ";
-        std::cin >> autoChoice;
-
-        if (autoChoice == 0 || autoChoice == 1) {
-            isAuto = static_cast<bool>(autoChoice);
-            break;
-        } else {
-            std::cerr << "Invalid choice. Please enter 1 for Yes or 0 for No." << std::endl;
-        }
-    }
+			if (autoChoice == 0 || autoChoice == 1) {
+				isAuto = static_cast<bool>(autoChoice);
+				break;
+			} else {
+				std::cerr << "Invalid choice. Please enter 1 for Yes or 0 for No." << std::endl;
+			}
+		}
+	}
+	else{
+		numThreads = 8;
+		isAuto = false;
+	}
+		
 	static GameBoard gameBoard;
 	if(isAuto){
 		gameBoard.runAutoGame(a, depth, numThreads);
+	}
+	else if(gameMode == 2){
+		gameBoard.runHumanVsComputerGame(a, depth, numThreads);
 	}
 	else{
 
