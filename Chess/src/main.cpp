@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-// Chess 
-#include "Chess.h"
-#include "Board.h"
-#include "Piece.h"
-#include "Rook.h"
-#include <cctype>
-=======
 // Chess
 #include "Chess.h"
 #include "Board.h"
@@ -16,80 +8,115 @@
 #include "InvalidMoveBaseException.h"
 #include "InvalidSuicideException.h"
 #include "InvalidPromotionException.h"
+#include <chrono>
+#include <random>
 
 
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 using namespace std;
 
-int main()
-{
-<<<<<<< HEAD
-	string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr"; 
-//	string board = "##########K###############################R#############r#r#####";
-	Chess a(board);
-	int codeResponse = 0;
-	string res = a.getInput();
-	while (res != "exit")
-	{
-		/* 
-		codeResponse value : 
-		Illegal movements : 
-		11 - there is not piece at the source  
-		12 - the piece in the source is piece of your opponent
-		13 - there one of your pieces at the destination 
-		21 - illegal movement of that piece 
-		31 - this movement will cause you checkmate
+// Auto-play benchmark function (8 moves total)
+void autoPlayBenchmark(int numThreads, bool useRandom, int depth, int const thresholdScore) {
+    cout << "\nStarting auto-play benchmark with " << numThreads << " threads...\n";
+    string initialBoard = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+    Chess a(initialBoard);
+    Board& board = Board::getInstance();
 
-		legal movements : 
-		41 - the last movement was legal and cause check 
-		42 - the last movement was legal, next turn 
-		*/
+    auto start = chrono::high_resolution_clock::now();
 
-		/**/ 
-		{ // put your code here instead that code
+    bool isWhiteTurn = true;
+    int turn = 0;
+    for (; turn < 8; ++turn) {
+        cout << "\nTurn " << (turn + 1) << ": Player " << (isWhiteTurn ? "White" : "Black") << "'s move\n";
 
-                  Board& selfMadeBoard = Board::getInstance();
+        auto moves = Model::suggestMovesDepth(board, isWhiteTurn, numThreads, depth, thresholdScore);
 
-                  int from_x = res[0] - 'a';
-                  int from_y = res[1] - '0' - 1;
-                  int to_x = res[2] - 'a';
-                  int to_y = res[3] - '0' - 1;
+        if (!moves.empty() && moves[0].score >= thresholdScore) {
+            std::cout << "Threshold reached with score " << moves[0].score << " – exiting benchmark early\n";
+            break;
+        }
+        cout << "Got " << moves.size() << " moves.\n";
 
-                  codeResponse =  selfMadeBoard.movePiece(from_x , from_y, to_x , to_y);
+        if (moves.empty()) {
+            cout << "No legal moves for " << (isWhiteTurn ? "White" : "Black") << "!\n";
+            break;
+        }
 
+        // Choose move: either best or random
+        Move chosen;
+        if (useRandom) {
+            random_device rd;
+            mt19937 gen(rd());
+            uniform_int_distribution<> dis(0, moves.size() - 1);
+            chosen = moves[dis(gen)];
+        } else {
+            chosen = moves[0]; // Best move
+        }
 
-		}
-		a.setCodeResponse(codeResponse);
-		res = a.getInput();
-	
-		}/**/
+        try {
+            board.movePiece(chosen.fromX, chosen.fromY, chosen.toX, chosen.toY);
+        } catch (const InvalidMoveBaseException& e) {
+            cout << "Invalid move skipped: " << e.what() << "\n";
+            continue; // ננסה מהלך אחר
+        }
 
+        a.syncWithBoard(board);
+        a.show();
+        isWhiteTurn = !isWhiteTurn;
+    }
 
-	cout << endl << "Exiting " << endl; 
-	return 0;
+    auto end = chrono::high_resolution_clock::now();
+    double elapsed = chrono::duration<double>(end - start).count();
+
+    cout << "Finished auto-play benchmark in " << elapsed << " seconds\n";
+    cout << "============================\n";
 }
-=======
-    // Initial board setup (standard position in 1D string)
+
+
+int main() {
+    int numThreads = 4;
+    int depth = 2;
+    bool autoMode = false;
+    bool useRandom = false;
+    const int thresholdScore = 500; //BOUNOS
+
+    // Prompt for settings
+    cout << "Enter depth: ";
+    cin >> depth;
+
+    cout << "Enter mode: (0) Manual play, (1) Auto-play benchmark: ";
+    int mode;
+    cin >> mode;
+    autoMode = (mode == 1);
+
+    if (autoMode) {
+        cout << "Enter number of threads (0, 2, 4, or 8): ";
+        cin >> numThreads;
+
+        cout << "Auto-play mode: choose move selection (0 = best move, 1 = random): ";
+        int selection;
+        cin >> selection;
+        useRandom = (selection == 1);
+        autoPlayBenchmark(numThreads, useRandom, depth,thresholdScore);
+        return 0;
+    }
+
+    // Manual mode
     string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-    Chess a(board); // Chess UI/engine wrapper
+    Chess a(board);
     int codeResponse = 0;
 
-    // Get board instance and whose turn it is
     Board& selfMadeBoard = Board::getInstance();
     bool isWhiteTurn = selfMadeBoard.getTurn();
 
-    // Show move suggestions before the first input
-    auto bestMoves = Model::suggestMovesDepth2(selfMadeBoard, isWhiteTurn);
+    auto bestMoves = Model::suggestMovesDepth(selfMadeBoard, isWhiteTurn, numThreads, depth,thresholdScore);
     cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
-    for (int i = 0; i < std::min(3, (int)bestMoves.size()); ++i) {
-        cout << "Recommended step: ";
-        cout << "  " << moveToNotation(bestMoves[i]) + "\n";
+    for (int i = 0; i < min(3, (int)bestMoves.size()); ++i) {
+        cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
     }
 
-    string res = a.getInput(); // First input from user
+    string res = a.getInput();
 
-    while (res != "exit")
-    {
+    while (res != "exit") {
         int from_x = res[0] - 'a';
         int from_y = res[1] - '0' - 1;
         int to_x = res[2] - 'a';
@@ -98,33 +125,28 @@ int main()
         try {
             codeResponse = selfMadeBoard.movePiece(from_x, from_y, to_x, to_y);
         } catch (const InvalidMoveBaseException& e) {
-            std::cerr << "Invalid move: " << e.what() << std::endl;
+            cerr << "Invalid move: " << e.what() << endl;
             codeResponse = 12;
         } catch (const InvalidSuicideException& e) {
-            std::cerr << "Suicide move: " << e.what() << std::endl;
+            cerr << "Suicide move: " << e.what() << endl;
             codeResponse = 31;
         } catch (const InvalidPromotionException& e) {
-            std::cerr << "Invalid promotion: " << e.what() << std::endl;
+            cerr << "Invalid promotion: " << e.what() << endl;
             codeResponse = 32;
         }
 
-        // Update the UI or log with result code
         a.setCodeResponse(codeResponse);
-
-        //  Show move suggestions for the next turn
         isWhiteTurn = selfMadeBoard.getTurn();
-        bestMoves = Model::suggestMovesDepth2(selfMadeBoard, isWhiteTurn);
-        std::cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
-        for (int i = 0; i < std::min(3, (int)bestMoves.size()); ++i) {
-            std::cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
+
+        bestMoves = Model::suggestMovesDepth(selfMadeBoard, isWhiteTurn, numThreads, depth,thresholdScore);
+        cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
+        for (int i = 0; i < min(3, (int)bestMoves.size()); ++i) {
+            cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
         }
 
-        // Read next input
         res = a.getInput();
     }
 
-    cout << endl << "Exiting " << endl;
+    cout << "\nExiting game.\n";
     return 0;
 }
-
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)

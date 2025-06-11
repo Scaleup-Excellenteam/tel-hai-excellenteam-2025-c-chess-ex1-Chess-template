@@ -6,12 +6,10 @@
 #include "Queen.h"
 #include "King.h"
 #include "Piece.h"
-<<<<<<< HEAD
-=======
+
 #include "InvalidSuicideException.h"
 #include "InvalidMoveBaseException.h"
 #include "InvalidPromotionException.h"
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 #include <iostream>
 
 using namespace std;
@@ -67,39 +65,7 @@ void Board::initializeBoard() {
     }
 }
 
-<<<<<<< HEAD
-int Board::movePiece(int from_x,int from_y,int to_x,int to_y)
-{
-    Piece* currentPiece = getPieceAt(from_x,from_y);
-    if(currentPiece == nullptr)
-        return 11;
-    if(currentPiece->isWhite() != iswhiteturn)
-        return 12;
-    Piece* dest = getPieceAt(to_x,to_y);
-    if(dest && currentPiece->isWhite() == dest->isWhite())
-        return 13;
-    if(currentPiece->isValidMove(from_x, from_y , to_x,to_y, *this))
-    {
-        setPieceAt(to_x,to_y,currentPiece);
-        setPieceAt(from_x,from_y, nullptr);
-        if(isKingInCheck(currentPiece->isWhite()))
-        {
-            setPieceAt(from_x, from_y, currentPiece);
-            setPieceAt(to_x, to_y, dest);
-            return 31;
-        }
-        else if (isKingInCheck(!iswhiteturn)) {
-            iswhiteturn = !iswhiteturn;
-            return 41;
-        }
-        iswhiteturn = !iswhiteturn;
-        printBoard();
-        return 42;
-    }
-    return 21;
-}
 
-=======
 int Board::movePiece(int from_x, int from_y, int to_x, int to_y)
 {
     Piece* currentPiece = getPieceAt(from_x, from_y);
@@ -167,7 +133,7 @@ int Board::movePiece(int from_x, int from_y, int to_x, int to_y)
         if (dest) delete dest;
 
         iswhiteturn = !iswhiteturn;
-        printBoard();
+        //++printBoard();
         return 42; // successful move
     }
 
@@ -176,7 +142,6 @@ int Board::movePiece(int from_x, int from_y, int to_x, int to_y)
 
 
 
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 bool Board::isKingInCheck(bool white) {
     // Find the position of the king
     Piece* kingSquare = nullptr;
@@ -209,11 +174,9 @@ bool Board::isKingInCheck(bool white) {
 }
 //getters
 Piece* Board::getPieceAt(int row, int col) const {
-<<<<<<< HEAD
-=======
+
     if (row < 0 || row >= 8 || col < 0 || col >= 8)
         return nullptr;
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
     return board[row][col];
 }
 
@@ -225,18 +188,6 @@ void Board::setPieceAt(int row , int col , Piece* piece) {
 void Board::printBoard() {
     using namespace std;
     cout << "   y: 0  1  2  3  4  5  6  7 " << endl << "x:" << endl;
-<<<<<<< HEAD
-    for (int i = 0; i < 8; i++)
-    {
-        cout << " " << i << "   ";
-        for (int j = 0; j < 8; j++)
-        {
-            Piece* p = board[i][j];
-            if(p!= nullptr)
-                cout << " " <<p->getName()<<" ";
-            else
-                cout<<" "<<" "<<" ";
-=======
     for (int i = 0; i < 8; i++) {
         cout << " " << i << "   ";
         for (int j = 0; j < 8; j++) {
@@ -244,15 +195,11 @@ void Board::printBoard() {
             if (p != nullptr)
                 cout << " " << p->getName() << " ";
             else
-                cout << " " << " " << " ";
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
+                cout << "   ";
         }
         cout << endl;
     }
 }
-
-<<<<<<< HEAD
-=======
 Board* Board::createSimulatedCopy() const {
     Board* newBoard = new Board();
     newBoard->initializeBoard();
@@ -275,4 +222,3 @@ Board* Board::createSimulatedCopy() const {
     newBoard->iswhiteturn = this->getTurn();
     return newBoard;
 }
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)

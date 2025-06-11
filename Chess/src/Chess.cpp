@@ -91,243 +91,209 @@ void Chess::setPieces()
 
 #else // non-Windows
 
-void Chess::clear() const
-{
-	cout << "\033[2J\033[3J\033[H";
+void Chess::clear() const {
+    cout << "\033[2J\033[3J\033[H";
 }
 
-void Chess::setFrames()
-{
-	for (size_t row = 0; row < _SIZE; ++row)
-		for (size_t col = 0; col < _SIZE; ++col)
-			m_board[row][col] = ' ';
+void Chess::setFrames() {
+    for (size_t row = 0; row < _SIZE; ++row)
+        for (size_t col = 0; col < _SIZE; ++col)
+            m_board[row][col] = ' ';
 
-	m_board[0][0] = '+';
-	m_board[0][20] = '+';
-	m_board[20][0] = '+';
-	m_board[20][20] = '+';
+    m_board[0][0] = '+';
+    m_board[0][20] = '+';
+    m_board[20][0] = '+';
+    m_board[20][20] = '+';
 
-	for (size_t i = 1; i < 20; ++i)
-	{
-		m_board[0][i] = '-';
-		m_board[20][i] = '-';
-		m_board[i][0] = '|';
-		m_board[i][20] = '|';
-	}
+    for (size_t i = 1; i < 20; ++i) {
+        m_board[0][i] = '-';
+        m_board[20][i] = '-';
+        m_board[i][0] = '|';
+        m_board[i][20] = '|';
+    }
 
-	m_board[2][2] = '+';
-	m_board[2][18] = '+';
-	m_board[18][2] = '+';
-	m_board[18][18] = '+';
+    m_board[2][2] = '+';
+    m_board[2][18] = '+';
+    m_board[18][2] = '+';
+    m_board[18][18] = '+';
 
-	for (size_t i = 4; i < 17; i += 2)
-	{
-		m_board[2][i] = '+';
-		m_board[18][i] = '+';
-		m_board[i][2] = '+';
-		m_board[i][18] = '+';
-	}
+    for (size_t i = 4; i < 17; i += 2) {
+        m_board[2][i] = '+';
+        m_board[18][i] = '+';
+        m_board[i][2] = '+';
+        m_board[i][18] = '+';
+    }
 
-	for (size_t i = 2; i < 19; i += 2)
-		for (size_t j = 3; j < 19; j += 2)
-			m_board[i][j] = '-';
+    for (size_t i = 2; i < 19; i += 2)
+        for (size_t j = 3; j < 19; j += 2)
+            m_board[i][j] = '-';
 
-	for (size_t i = 3; i < 18; i += 2)
-		for (size_t j = 2; j < 19; j += 2)
-			m_board[i][j] = '|';
+    for (size_t i = 3; i < 18; i += 2)
+        for (size_t j = 2; j < 19; j += 2)
+            m_board[i][j] = '|';
 
-	for (size_t i = 4; i < 17; i += 2)
-		for (size_t j = 4; j < 17; j += 2)
-			m_board[i][j] = '+';
+    for (size_t i = 4; i < 17; i += 2)
+        for (size_t j = 4; j < 17; j += 2)
+            m_board[i][j] = '+';
 
-	for (size_t i = 4; i < 17; i += 2)
-		m_board[2][i] = '+';
-	for (size_t i = 4; i < 17; i += 2)
-		m_board[18][i] = '+';
-	for (size_t i = 4; i < 17; i += 2)
-		m_board[i][2] = '+';
-	for (size_t i = 4; i < 17; i += 2)
-		m_board[i][18] = '+';
+    for (size_t i = 4; i < 17; i += 2)
+        m_board[2][i] = '+';
+    for (size_t i = 4; i < 17; i += 2)
+        m_board[18][i] = '+';
+    for (size_t i = 4; i < 17; i += 2)
+        m_board[i][2] = '+';
+    for (size_t i = 4; i < 17; i += 2)
+        m_board[i][18] = '+';
 
-	for (size_t i = 3, t = 0; i < 19; i += 2, ++t)
-		m_board[1][i] = m_board[19][i] = ('1' + t);
+    for (size_t i = 3, t = 0; i < 19; i += 2, ++t)
+        m_board[1][i] = m_board[19][i] = ('1' + t);
 
-	for (size_t i = 3, t = 0; i < 19; i += 2, ++t)
-		m_board[i][1] = m_board[i][19] = ('A' + t);
+    for (size_t i = 3, t = 0; i < 19; i += 2, ++t)
+        m_board[i][1] = m_board[i][19] = ('A' + t);
 }
 
-void Chess::setPieces()
-{
-	for (size_t row = 0, t = 0; row < 8; ++row)
-		for (size_t col = 0; col < 8; ++col, ++t)
-			m_board[(3 + (row * 2))][(3 + (col * 2))] = ((m_boardString[t] == '#') ? ' ' : m_boardString[t]);
+void Chess::setPieces() {
+    for (size_t row = 0, t = 0; row < 8; ++row)
+        for (size_t col = 0; col < 8; ++col, ++t)
+            m_board[(3 + (row * 2))][(3 + (col * 2))] = ((m_boardString[t] == '#') ? ' ' : m_boardString[t]);
 }
 
-#endif // WINDOWS
+void Chess::show() const {
+    for (size_t row = 0; row < _SIZE; ++row) {
+        for (size_t col = 0; col < _SIZE; ++col)
+            cout << m_board[row][col];
+        cout << endl;
+    }
+}
 
-// print the only the board to screen 
-void Chess::show() const 
-{
-	for (size_t row = 0; row < _SIZE; ++row)
-	{
-		for (size_t col = 0; col < _SIZE; ++col)
-			cout << m_board[row][col];
-		cout << endl;
-	}
+void Chess::displayBoard() const {
+    clear();
+    show();
+    cout << m_msg << m_errorMsg;
 }
-// clear screen and print the board and the relevant msg 
-void Chess::displayBoard() const
-{
-	clear();
-	show();
-	cout << m_msg<< m_errorMsg;
-	
-}
-// print the who is turn before getting input 
-void Chess::showAskInput() const 
-{
-<<<<<<< HEAD
-	if (m_turn)
-=======
+
+void Chess::showAskInput() const {
     if (m_turn)
->>>>>>> 9c9a558 (Initial commit from new project chess-part2)
-		cout << "Player 1 (White - Capital letters) >> ";
-	else
-		cout << "Player 2 (Black - Small letters)   >> ";
-}
-// check if the source and dest are the same 
-bool Chess::isSame() const 
-{
-	return ((m_input[0] == m_input[2]) && (m_input[1] == m_input[3]));
-} 
-// check if the input is lockations at board
-bool Chess::isValid() const
-{
-	return ((('A' <= m_input[0]) && (m_input[0] <= 'H')) || (('a' <= m_input[0]) && (m_input[0] <= 'h')) &&
-		(('1' <= m_input[1]) && (m_input[1] <= '8')) &&
-		(('A' <= m_input[2]) && (m_input[2] <= 'H')) || (('a' <= m_input[2]) && (m_input[2] <= 'h')) &&
-		(('1' <= m_input[3]) && (m_input[3] <= '8')));
-}
-	
-// check if the input is exit or quit  
-bool Chess::isExit() const 
-{
-	return ((m_input == "exit") || (m_input == "quit") || (m_input == "EXIT") || (m_input == "QUIT"));
-}
-// execute the movement on board 
-void Chess::excute()
-{
-	int row = (m_input[0] - 'a');
-	int col = (m_input[1] - '1');
-	char pieceInSource = m_boardString[(row * 8) + col]; 
-	m_boardString[(row * 8) + col] = '#'; 
-
-	row = (m_input[2] - 'a');
-	col = (m_input[3] - '1');
-	m_boardString[(row * 8) + col] = pieceInSource; 
-
-	setPieces(); 
-}
-// check the response code and switch turn if needed 
-void Chess::doTurn()
-{
-	m_errorMsg = "\n"; 
-	switch (m_codeResponse)
-	{
-	case 11:
-	{
-		m_msg = "there is not piece at the source \n";
-		break;
-	}
-	case 12:
-	{
-		m_msg = "the piece in the source is piece of your opponent \n";
-		break;
-	}
-	case 13:
-	{
-		m_msg = "there one of your pieces at the destination \n";
-		break;
-	}
-	case 21:
-	{
-		m_msg = "illegal movement of that piece \n";
-		break;
-	}
-	case 31:
-	{
-		m_msg = "this movement will cause you checkmate \n";
-		break;
-	}
-	case 41:
-	{
-		excute();
-		m_turn = !m_turn;
-		m_msg = "the last movement was legal and cause check \n";
-		break;
-	}
-	case 42:
-	{
-		excute();
-		m_turn = !m_turn;
-		m_msg = "the last movement was legal \n";
-		break;
-	}
-	}
+        cout << "Player 1 (White - Capital letters) >> ";
+    else
+        cout << "Player 2 (Black - Small letters)   >> ";
 }
 
-// C'tor
+bool Chess::isSame() const {
+    return ((m_input[0] == m_input[2]) && (m_input[1] == m_input[3]));
+}
+
+bool Chess::isValid() const {
+    return ((('A' <= m_input[0]) && (m_input[0] <= 'H')) || (('a' <= m_input[0]) && (m_input[0] <= 'h'))) &&
+           (('1' <= m_input[1]) && (m_input[1] <= '8')) &&
+           ((('A' <= m_input[2]) && (m_input[2] <= 'H')) || (('a' <= m_input[2]) && (m_input[2] <= 'h'))) &&
+           (('1' <= m_input[3]) && (m_input[3] <= '8'));
+}
+
+bool Chess::isExit() const {
+    return ((m_input == "exit") || (m_input == "quit") || (m_input == "EXIT") || (m_input == "QUIT"));
+}
+
+void Chess::excute() {
+    int row = (m_input[0] - 'a');
+    int col = (m_input[1] - '1');
+    char pieceInSource = m_boardString[(row * 8) + col];
+    m_boardString[(row * 8) + col] = '#';
+
+    row = (m_input[2] - 'a');
+    col = (m_input[3] - '1');
+    m_boardString[(row * 8) + col] = pieceInSource;
+
+    setPieces();
+}
+
+void Chess::doTurn() {
+    m_errorMsg = "\n";
+    switch (m_codeResponse) {
+        case 11:
+            m_msg = "there is not piece at the source \n";
+            break;
+        case 12:
+            m_msg = "the piece in the source is piece of your opponent \n";
+            break;
+        case 13:
+            m_msg = "there one of your pieces at the destination \n";
+            break;
+        case 21:
+            m_msg = "illegal movement of that piece \n";
+            break;
+        case 31:
+            m_msg = "this movement will cause you checkmate \n";
+            break;
+        case 41:
+            excute();
+            m_turn = !m_turn;
+            m_msg = "the last movement was legal and cause check \n";
+            break;
+        case 42:
+            excute();
+            m_turn = !m_turn;
+            m_msg = "the last movement was legal \n";
+            break;
+    }
+}
+
 Chess::Chess(const string& start)
-	: m_boardString(start),m_codeResponse(-1)
-{
-	setFrames();
-	setPieces();
+        : m_boardString(start), m_codeResponse(-1) {
+    setFrames();
+    setPieces();
 }
 
-// get the source and destination 
-string Chess::getInput()
-{
-	static bool isFirst = true;
+string Chess::getInput() {
+    static bool isFirst = true;
 
-	if (isFirst)
-		isFirst = false;
-	else
-		doTurn(); 
+    if (isFirst)
+        isFirst = false;
+    else
+        doTurn();
 
-	displayBoard();
-	showAskInput();
+    displayBoard();
+    showAskInput();
 
-	cin >> m_input;
-	if (isExit())
-		return "exit";
-	while (!isValid() || isSame())
-	{
-		if (!isValid())
-			m_errorMsg = "Invalid input !! \n";
-		else
-			m_errorMsg = "The source and the destination are the same !! \n";
-		displayBoard();
-		showAskInput();
-		cin >> m_input;
-		if (isExit())
-			return "exit";
-	}
+    cin >> m_input;
+    if (isExit())
+        return "exit";
+    while (!isValid() || isSame()) {
+        if (!isValid())
+            m_errorMsg = "Invalid input !! \n";
+        else
+            m_errorMsg = "The source and the destination are the same !! \n";
+        displayBoard();
+        showAskInput();
+        cin >> m_input;
+        if (isExit())
+            return "exit";
+    }
 
-	if (m_input != "exit")
-	{
-		if (('A' <= m_input[0]) && (m_input[0] <= 'H'))
-			m_input[0] = (m_input[0] - 'A' + 'a');
-		if (('A' <= m_input[2]) && (m_input[2] <= 'H'))
-			m_input[2] = (m_input[2] - 'A' + 'a');
-	}
+    if (m_input != "exit") {
+        if (('A' <= m_input[0]) && (m_input[0] <= 'H'))
+            m_input[0] = (m_input[0] - 'A' + 'a');
+        if (('A' <= m_input[2]) && (m_input[2] <= 'H'))
+            m_input[2] = (m_input[2] - 'A' + 'a');
+    }
 
-	return m_input;
+    return m_input;
 }
 
-void Chess::setCodeResponse(int codeResponse)
-{
-	if (((11 <= codeResponse) && (codeResponse <= 13)) ||
-		((21 == codeResponse) || (codeResponse == 31)) ||
-		((41 == codeResponse) || (codeResponse == 42)))
-		m_codeResponse = codeResponse;
+void Chess::setCodeResponse(int codeResponse) {
+    if (((11 <= codeResponse) && (codeResponse <= 13)) ||
+        ((21 == codeResponse) || (codeResponse == 31)) ||
+        ((41 == codeResponse) || (codeResponse == 42)))
+        m_codeResponse = codeResponse;
 }
+void Chess::syncWithBoard(const Board& board){
+    m_boardString.clear();
+    for (int i = 0; i < 8; ++i)
+        for (int j = 0; j < 8; ++j) {
+            Piece* p = board.getPieceAt(i, j);
+            m_boardString += (p ? p->getName()[0] : '#');
+        }
+    setPieces();
+}
+#endif // _WIN32
+

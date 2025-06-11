@@ -4,6 +4,7 @@
 #include "Model.h"
 #include "PriorityQueue.h"
 #include "MyComparator.h"
+#include "ThreadPool.h"
 
 
 int Model::evaluateMove(int fromX, int fromY, int toX, int toY, const Board& board) {
@@ -110,89 +111,158 @@ int Model::getPieceValue(const std::string& name) {
     return 0;
 }
 
-std::vector<Move> Model::suggestMoves(const Board& board, bool isWhiteTurn) {
+std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn, int numThreads, int depth, int const thresholdScore) {
     PriorityQueue<Move, MyComparator<Move>> moveQueue;
+    std::mutex queue_mutex;
+    std::atomic<bool> stopFlag = false;
 
-    // Loop over all board squares to find pieces of the current player
-    for (int fromX = 0; fromX < 8; ++fromX) {
-        for (int fromY = 0; fromY < 8; ++fromY) {
-            Piece* piece = board.getPieceAt(fromX, fromY);
-            if (!piece || piece->isWhite() != isWhiteTurn) continue;
+    auto evaluateWithDepth = [&](int fromX, int fromY, int toX, int toY) -> int {
+        int myScore = evaluateMove(fromX, fromY, toX, toY, board);
+        if (depth <= 1)
+            return myScore;
 
-            // Try all possible destination squares for this piece
-            for (int toX = 0; toX < 8; ++toX) {
-                for (int toY = 0; toY < 8; ++toY) {
-                    if (fromX == toX && fromY == toY) continue; // skip move to same square
+        Board* simulated = board.createSimulatedCopy();
+        try {
+            simulated->movePiece(fromX, fromY, toX, toY);
+        } catch (...) {
+            delete simulated;
+            return INT_MIN;
+        }
 
-                    if (piece->isValidMove(fromX, fromY, toX, toY, board)) {
-                        int score = evaluateMove(fromX, fromY, toX, toY, board);
-                        if (score > -500) {
-                            moveQueue.insert({fromX, fromY, toX, toY, score});
+        int worstEnemyScore = 0;
+        auto enemyMoves = suggestMovesDepth(*simulated, !isWhiteTurn, 0, depth - 1, thresholdScore);
+        if (!enemyMoves.empty()) {
+            worstEnemyScore = enemyMoves[0].score;
+        }
+
+        delete simulated;
+        return myScore - worstEnemyScore;
+    };
+
+    if (numThreads == 0) {
+        for (int fromX = 0; fromX < 8; ++fromX) {
+            for (int fromY = 0; fromY < 8; ++fromY) {
+                Piece* piece = board.getPieceAt(fromX, fromY);
+                if (!piece || piece->isWhite() != isWhiteTurn) continue;
+
+                for (int toX = 0; toX < 8; ++toX) {
+                    for (int toY = 0; toY < 8; ++toY) {
+                        if (fromX == toX && fromY == toY) continue;
+                        if (!piece->isValidMove(fromX, fromY, toX, toY, board)) continue;
+
+                        int finalScore = evaluateWithDepth(fromX, fromY, toX, toY);
+                        if (finalScore != INT_MIN) {
+                            if (finalScore >= thresholdScore) {
+                                stopFlag = true;
+                            }
+                            moveQueue.insert({fromX, fromY, toX, toY, finalScore});
                         }
+                        if (stopFlag) break;
                     }
+                    if (stopFlag) break;
                 }
+                if (stopFlag) break;
             }
+            if (stopFlag) break;
         }
+    } else {
+        ThreadPool pool(numThreads);
+        std::atomic<int> completedTasks(0);
+        std::condition_variable cv;
+        std::mutex done_mutex;
+        int totalPieces = 0;
+
+        for (int fromX = 0; fromX < 8; ++fromX) {
+            for (int fromY = 0; fromY < 8; ++fromY) {
+                if (stopFlag) break;
+
+                Piece *piece = board.getPieceAt(fromX, fromY);
+                if (!piece || piece->isWhite() != isWhiteTurn) continue;
+
+                ++totalPieces;
+                Piece *myPiece = piece;
+
+                pool.enqueue(
+                        [fromX, fromY, myPiece, &board, &moveQueue, &queue_mutex, &completedTasks, &done_mutex, &cv, isWhiteTurn, depth, &stopFlag, thresholdScore]() {
+                            for (int toX = 0; toX < 8; ++toX) {
+                                for (int toY = 0; toY < 8; ++toY) {
+                                    if (stopFlag) {
+                                        std::cout << "[Thread for " << fromX << "," << fromY << "] Stopped early\n";
+                                        {
+                                            std::lock_guard<std::mutex> lock(done_mutex);
+                                            ++completedTasks;
+                                            cv.notify_one();
+                                        }
+                                        return;
+                                    }
+
+                                    if (fromX == toX && fromY == toY) continue;
+                                    if (!myPiece->isValidMove(fromX, fromY, toX, toY, board)) continue;
+
+                                    int finalScore = evaluateMove(fromX, fromY, toX, toY, board);
+
+                                    if (depth > 1) {
+                                        Board* simulated = board.createSimulatedCopy();
+                                        try {
+                                            simulated->movePiece(fromX, fromY, toX, toY);
+                                        } catch (...) {
+                                            delete simulated;
+                                            continue;
+                                        }
+
+                                        int worstEnemyScore = 0;
+                                        auto enemyMoves = suggestMovesDepth(*simulated, !isWhiteTurn, 0, depth - 1, thresholdScore);
+                                        if (!enemyMoves.empty()) {
+                                            worstEnemyScore = enemyMoves[0].score;
+                                        }
+
+                                        delete simulated;
+                                        finalScore -= worstEnemyScore;
+                                    }
+
+                                    if (finalScore >= thresholdScore) {
+                                        {
+                                            std::lock_guard<std::mutex> lock(queue_mutex);
+                                            moveQueue.insert({fromX, fromY, toX, toY, finalScore});
+                                        }
+                                        std::cout << "[Thread for " << fromX << "," << fromY
+                                                  << "] High scoring move: " << finalScore
+                                                  << " >= " << thresholdScore << " → setting stopFlag\n";
+                                        stopFlag = true;
+                                        return;
+                                    }
+
+                                    {
+                                        std::lock_guard<std::mutex> lock(queue_mutex);
+                                        moveQueue.insert({fromX, fromY, toX, toY, finalScore});
+                                    }
+                                }
+                            }
+
+                            {
+                                std::lock_guard<std::mutex> lock(done_mutex);
+                                ++completedTasks;
+                                cv.notify_one();
+                            }
+                        });
+            }
+            if (stopFlag) break;
+        }
+
+        std::unique_lock<std::mutex> lock(done_mutex);
+        cv.wait(lock, [&]() { return completedTasks == totalPieces || stopFlag; });
     }
 
-    // Extract all moves from priority queue (sorted by best score)
     std::vector<Move> bestMoves;
     while (!moveQueue.isEmpty()) {
         bestMoves.push_back(moveQueue.popMax());
     }
-
     return bestMoves;
 }
 
-std::vector<Move> Model::suggestMovesDepth2(const Board& board, bool isWhiteTurn) {
-    PriorityQueue<Move, MyComparator<Move>> moveQueue;
-
-    for (int fromX = 0; fromX < 8; ++fromX) {
-        for (int fromY = 0; fromY < 8; ++fromY) {
-            Piece* piece = board.getPieceAt(fromX, fromY);
-            if (!piece || piece->isWhite() != isWhiteTurn) continue;
-
-            for (int toX = 0; toX < 8; ++toX) {
-                for (int toY = 0; toY < 8; ++toY) {
-                    if (fromX == toX && fromY == toY) continue;
-                    if (!piece->isValidMove(fromX, fromY, toX, toY, board)) continue;
-
-                    //  Initial score for my step
-                    int myScore = evaluateMove(fromX, fromY, toX, toY, board);
-
-                    //  Create a mock board
-                    Board* simulated = board.createSimulatedCopy();
-                    try {
-                        simulated->movePiece(fromX, fromY, toX, toY);
-                    } catch (...) {
-                        delete simulated;
-                        continue;
-                    }
 
 
-                    //  Calculate what the best the opponent can do after my move
-                    int worstEnemyScore = 0;
-                    auto enemyMoves = suggestMoves(*simulated, !isWhiteTurn);
-                    if (!enemyMoves.empty()) {
-                        worstEnemyScore = enemyMoves[0].score; // The worst for me
-                    }
 
-                    delete simulated; // Releasing the dummy copy
-
-                    int finalScore = myScore - worstEnemyScore;
-                    moveQueue.insert({fromX, fromY, toX, toY, finalScore});
-                }
-            }
-        }
-    }
-
-    std::vector<Move> bestMoves;
-    while (!moveQueue.isEmpty()) {
-        bestMoves.push_back(moveQueue.popMax());
-    }
-
-    return bestMoves;
-}
 
 
 
