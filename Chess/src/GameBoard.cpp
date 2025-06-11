@@ -118,6 +118,16 @@ int GameBoard::handleMove(const std::string& move) {
         return 12;  // Not your turn
        
 
+    if (piece && piece->getSymbol() == 'K' && !piece->getHasMoved()) {
+            if (isWhiteTurn) {
+                if (move == "a5a7") return tryCastling(true, true);  
+                if (move == "a5a3") return tryCastling(true, false); 
+            } else {
+                if (move == "h5h7") return tryCastling(false, true);  
+                if (move == "h5h3") return tryCastling(false, false); 
+            }
+    }
+
     // Check if the move is valid for the piece
     if (!piece->isValidMove(fromRow, fromCol, toRow, toCol, getRawBoard()))
         return 21;  // Invalid move for the piece
@@ -126,6 +136,7 @@ int GameBoard::handleMove(const std::string& move) {
     Piece* destinationPiece = getPiece(toRow, toCol);
     if (destinationPiece && Piece::isSameColor(destinationPiece,piece))
         return 13;  // Can't capture your own piece
+
 
     // move for check if checkmate
     movePiece(fromRow, fromCol, toRow, toCol);
@@ -645,3 +656,32 @@ std::string GameBoard::getCurrentPositionHash() {
     return hash;
 }
 
+int GameBoard::tryCastling(bool isWhite, bool isKingside) {
+    std::cout << "Trying castling: isWhite=" << isWhite << ", isKingside=" << isKingside << std::endl;
+
+    int row = isWhite ? 0 : 7;
+    int kingCol = 4;
+
+    int rookCol = isKingside ? 7 : 0;
+    int newKingCol = isKingside ? 6 : 2;
+    int newRookCol = isKingside ? 5 : 3;
+
+    Piece* king = getPiece(row, kingCol);
+    Piece* rook = getPiece(row, rookCol);
+
+    if (!king || !rook) {
+        std::cout << "King or rook not found." << std::endl;
+        return 21;
+    }
+
+
+    movePiece(row, kingCol, row, newKingCol);
+    movePiece(row, rookCol, row, newRookCol);
+
+    king->setHasMoved(true);
+    rook->setHasMoved(true);
+
+
+    switchTurn();
+    return 77;
+}

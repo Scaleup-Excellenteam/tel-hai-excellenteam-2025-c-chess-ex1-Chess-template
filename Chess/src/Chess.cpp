@@ -279,6 +279,18 @@ void Chess::doTurn()
 		}
 			
 	}
+	case 77:
+	{
+		excute(); //move for the king        
+		if (m_input == "a5a7") m_input = "a8a6";       
+		else if (m_input == "a5a3") m_input = "a1a4";  
+		else if (m_input == "h5h7") m_input = "h8h6"; 
+		else if (m_input == "h5h3") m_input = "h1h4"; 
+		excute(); // move the rock
+		m_turn = !m_turn;     
+		m_msg = "Castling performed successfully\n";
+		break;	
+	}
 	}
 }
 
@@ -352,6 +364,6 @@ void Chess::setCodeResponse(int codeResponse)
 {
 	if (((11 <= codeResponse) && (codeResponse <= 13)) ||
 		((21 == codeResponse) || (codeResponse == 31)) ||
-		((41 == codeResponse) || (codeResponse == 42) || (codeResponse == 99))) 
+		((41 == codeResponse) || (codeResponse == 42) || (codeResponse == 99) || (codeResponse == 77))) 
 		m_codeResponse = codeResponse;
 }

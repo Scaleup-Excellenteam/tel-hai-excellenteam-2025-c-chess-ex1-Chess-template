@@ -57,6 +57,8 @@ public:
     void runAutoGame(Chess& chess, int depth, int numThreads);
     std::string getCurrentPositionHash();
    
+    //forth part
+    int tryCastling(bool isWhite, bool isKingside);
     
 
     
