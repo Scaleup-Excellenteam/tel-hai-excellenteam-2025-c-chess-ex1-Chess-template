@@ -1,0 +1,7 @@
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/CMakeFiles/Chess.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/CMakeFiles/edit_cache.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/CMakeFiles/rebuild_cache.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/include/CMakeFiles/edit_cache.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/include/CMakeFiles/rebuild_cache.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/src/CMakeFiles/edit_cache.dir
+/home/yazanhaib/chess-ex-YazanHeib/Chess/build/src/CMakeFiles/rebuild_cache.dir
