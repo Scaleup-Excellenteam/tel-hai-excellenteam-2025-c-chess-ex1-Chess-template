@@ -12,8 +12,8 @@ class Model {
 public:
     static int evaluateMove(int fromX, int fromY, int toX, int toY, const Board& board);
     static int getPieceValue(const std::string& name);
-    static std::vector<Move> suggestMoves(const Board& board, bool isWhiteTurn);
-    static std::vector<Move> suggestMovesDepth2(const Board& board, bool isWhiteTurn);
+    static std::vector<Move> suggestMovesDepth(const Board& board, bool isWhiteTurn, int numThreads, int depth, int const thresholdScore);
+    static int countPlayerPieces(const Board& board, bool isWhiteTurn);
 
 };
 

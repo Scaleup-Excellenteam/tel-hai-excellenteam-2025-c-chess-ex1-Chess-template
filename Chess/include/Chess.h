@@ -8,6 +8,7 @@
 #endif
 
 #include <string>
+#include "Board.h"
 
 using std::cout;
 using std::cin; 
@@ -28,7 +29,6 @@ class Chess {
 	void clear() const;
 	void setFrames();
 	void setPieces();
-	void show() const;
 	void displayBoard() const;
 	void showAskInput() const;
 	bool isSame() const;
@@ -43,4 +43,7 @@ public:
 	Chess& operator=(const Chess&) = delete;
 	string getInput();
 	void setCodeResponse(int codeResponse);
+    void show() const;
+    void syncWithBoard(const Board& board);
+
 };
