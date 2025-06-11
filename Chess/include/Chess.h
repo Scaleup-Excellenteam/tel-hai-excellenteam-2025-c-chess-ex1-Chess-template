@@ -5,6 +5,7 @@
 #endif
 
 #include <string>
+#include "GameBoard.h"
 
 using std::cout;
 using std::cin; 
@@ -33,11 +34,12 @@ class Chess {
 	bool isExit() const;
 	void excute();
 	void doTurn();
-
-public:
+	
+	public:
 	Chess(const string& start = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr");
 	Chess(const Chess&)=delete;
 	Chess& operator=(const Chess&) = delete;
-	string getInput();
+	string getInput(Move move, bool isAuto);
 	void setCodeResponse(int codeResponse);
+	void showRecomendedMove(Move move);
 };

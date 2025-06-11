@@ -149,6 +149,82 @@ You are required to submit each exercise using "GitHub Classroom". To do this, y
 8. Upload the repository link to Moodle.  
 9. Good luck :)
 
+
+# Chess Move Recommendation Algorithm
+
+This project implements an algorithm that recommends the optimal next move for a player based on an analysis of the board states, using three main parameters. The algorithm scans the board up to a user-defined depth (i.e., how many moves ahead to check) and evaluates the quality of each possible move.
+
+## Parameters Evaluated for Each Move
+
+### 1. **Threatening a Weaker Piece**
+If the player's move leads to a situation where their piece is threatened by a weaker opponent's piece, this is considered a poor move. The player is risking a more valuable piece for an unprofitable move, so points are subtracted from the score for such a move.
+
+### 2. **Threatening a Stronger Piece**
+If the player's move results in threatening an opponent's piece that is stronger than the player's attacking piece, this is considered a beneficial move and adds points to the score. For example, if a bishop threatens a queen, this is valued higher due to the strategic advantage it offers.
+
+### 3. **Capturing an Opponent's Piece**
+If an opponent's piece is captured during a move, the algorithm adds the value of the captured piece to the score. More valuable pieces (e.g., queen, rook) are worth more points.
+
+## How the Algorithm Chooses a Move
+
+- **Minimax Algorithm**: The algorithm uses the Minimax method, which simulates every possible option (player's and opponent's moves alternately) up to a given depth.
+- **Simulation**: The algorithm simulates the move by moving the pieces on the board and evaluates what will happen as a result of choosing that move.
+- **Evaluation**: The state of the board is evaluated based on the parameters mentioned above.
+- **Move Selection**: Finally, the move with the highest score is selected, assuming the opponent also plays optimally.
+
+## Value of Pieces
+
+- Pawn: 10 points
+- Knight/Bishop: 30 points
+- Rook: 50 points
+- Queen: 100 points
+- King: 1000 points (for evaluation purposes only)
+
+## Time Complexity
+
+The time complexity of the algorithm is **O(b^d)**, where:
+- **b** = the average number of possible moves (approximately 30–40 in chess)
+- **d** = the search depth (i.e., how many turns ahead the algorithm evaluates)
+
+## Multithreading Optimization
+To improve performance and reduce computation time, the algorithm implements multithreading at the top
+level of the move search:
+Each thread evaluates the possible moves for a single piece independently by simulating those moves and running the Minimax evaluation.
+A thread pool manages a fixed number of worker threads to avoid overhead from excessive thread creation.
+Each thread works on a local copy of the game board to prevent data races and maintain thread safety.
+Results from all threads are collected concurrently, using mutexes to synchronize access to shared data structures.
+The main thread waits until all worker threads complete their tasks and then selects the best overall move based on the aggregated results.
+This parallelization allows the program to utilize multiple CPU cores effectively, significantly speeding up the computation, especially on machines with many cores.
+
+## Rules Implemented
+
+1. **Checkmate** – The game correctly identifies when a player is in checkmate, ending the game accordingly.
+2. **Castling** – Castling is implemented, including all the required conditions (e.g., no pieces between the king and rook, neither has moved, the king is not in check, etc.).
+
+## Human vs Player Game Mode
+
+In this mode, the human player receives a recommended move (based on the evaluation algorithm) but is free to input any legal move.  
+The computer does not make decisions or moves — it simply provides a suggestion to assist the human player.
+
+## Testing
+
+The code was tested by playing multiple games in both Player vs Player and Player vs Computer modes.  
+I verified the correctness of the game logic, including move validation, checkmate detection, and special rules like castling, by playing full games against myself and against the computer.
+
+## Biggest Challenge Faced
+
+The hardest part of the project was that I kept thinking I was finally done—but then more things were added.
+Every time I finished a part and thought I could move on, a new feature or rule needed to be added.
+It was sometimes frustrating, but it helped me learn how to keep my code organized and be ready to make changes when needed.
+
+## What I Would Improve If I Had More Time
+
+If I had more time, I would replace the current simplified Minimax implementation with a full Minimax algorithm using Alpha-Beta pruning.
+This optimization significantly reduces the number of game states evaluated, making the algorithm much faster and more efficient, especially at deeper search levels.
+It would allow the computer player to make smarter decisions in less time.
+
+
+
 <!-- Center Excellenteam image -->
 <p align="center">
   <img src="./img/excellenteam.png" alt="Excellenteam">
