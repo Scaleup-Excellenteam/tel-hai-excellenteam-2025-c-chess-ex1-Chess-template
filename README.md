@@ -196,6 +196,35 @@ Results from all threads are collected concurrently, using mutexes to synchroniz
 The main thread waits until all worker threads complete their tasks and then selects the best overall move based on the aggregated results.
 This parallelization allows the program to utilize multiple CPU cores effectively, significantly speeding up the computation, especially on machines with many cores.
 
+## Rules Implemented
+
+1. **Checkmate** – The game correctly identifies when a player is in checkmate, ending the game accordingly.
+2. **Castling** – Castling is implemented, including all the required conditions (e.g., no pieces between the king and rook, neither has moved, the king is not in check, etc.).
+
+## Human vs Player Game Mode
+
+In this mode, the human player receives a recommended move (based on the evaluation algorithm) but is free to input any legal move.  
+The computer does not make decisions or moves — it simply provides a suggestion to assist the human player.
+
+## Testing
+
+The code was tested by playing multiple games in both Player vs Player and Player vs Computer modes.  
+I verified the correctness of the game logic, including move validation, checkmate detection, and special rules like castling, by playing full games against myself and against the computer.
+
+## Biggest Challenge Faced
+
+The hardest part of the project was that I kept thinking I was finally done—but then more things were added.
+Every time I finished a part and thought I could move on, a new feature or rule needed to be added.
+It was sometimes frustrating, but it helped me learn how to keep my code organized and be ready to make changes when needed.
+
+## What I Would Improve If I Had More Time
+
+If I had more time, I would replace the current simplified Minimax implementation with a full Minimax algorithm using Alpha-Beta pruning.
+This optimization significantly reduces the number of game states evaluated, making the algorithm much faster and more efficient, especially at deeper search levels.
+It would allow the computer player to make smarter decisions in less time.
+
+
+
 <!-- Center Excellenteam image -->
 <p align="center">
   <img src="./img/excellenteam.png" alt="Excellenteam">

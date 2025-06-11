@@ -27,3 +27,6 @@
 img/cache/
 
 Chess/src/main
+
+# Ignore build folder
+Chess/build
