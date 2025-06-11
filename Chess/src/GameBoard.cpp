@@ -142,6 +142,7 @@ int GameBoard::handleMove(const std::string& move) {
 
     if (doesMoveCauseCheckToOpponent(fromRow, fromCol, toRow, toCol)){
         movePiece(fromRow, fromCol, toRow, toCol);
+        piece->setHasMoved(true);
         switchTurn();
         return 41;
     }
@@ -149,7 +150,7 @@ int GameBoard::handleMove(const std::string& move) {
 
     // Perform the move
     movePiece(fromRow, fromCol, toRow, toCol);
-
+    piece->setHasMoved(true);
     switchTurn();
 
 
