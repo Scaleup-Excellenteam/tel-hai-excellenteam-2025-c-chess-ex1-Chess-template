@@ -530,7 +530,7 @@ void Chess::calculateResponseCode() {
 				m_boardString[rookSrc] = '#';
 			}
 		}
-		
+
 	}
 
 	std::cout << srcRow << srcCol << std::endl;
