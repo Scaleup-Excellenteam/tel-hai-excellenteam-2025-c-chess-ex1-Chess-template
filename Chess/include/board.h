@@ -25,6 +25,10 @@ private:
 
     shared_ptr<Piece> findLowestValueAttackerOn(Position dst, bool turn);
 
+    // This function has no side effects. Useful for proper reuse of move
+    // checking. if 0 then the piece can move; otherwise, it cannot move
+    int canMove(Position src, Position dst);
+
 public:
     Board();
     Board(string init);

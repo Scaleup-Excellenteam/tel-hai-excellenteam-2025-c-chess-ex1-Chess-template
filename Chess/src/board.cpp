@@ -120,7 +120,10 @@ bool Board::isCheck(bool target_player) const
     return false;
 }
 
-int Board::move(Position src, Position dst)
+// This function has no side effects. Useful for proper reuse of move checking
+// if 0 then the piece can move
+// otherwise, it cannot move
+int Board::canMove(Position src, Position dst)
 {
     auto piece = _board[src.y * SIZE + src.x];
     if (!piece) {
@@ -150,6 +153,23 @@ int Board::move(Position src, Position dst)
         _board[dst.y * SIZE + dst.x] = dst_piece;
         return 31;
     }
+
+    _board[src.y * SIZE + src.x] = piece;
+    _board[dst.y * SIZE + dst.x] = dst_piece;
+    return 0;
+}
+
+int Board::move(Position src, Position dst)
+{
+    int canMoveRet = canMove(src, dst);
+    if (canMoveRet != 0) {
+        return canMoveRet;
+    }
+
+    auto piece = _board[src.y * SIZE + src.x];
+
+    _board[dst.y * SIZE + dst.x] = piece;
+    _board[src.y * SIZE + src.x] = nullptr;
 
     _turn_color = !_turn_color;
 
