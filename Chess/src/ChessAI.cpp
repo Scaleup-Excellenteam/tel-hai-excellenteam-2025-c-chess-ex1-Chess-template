@@ -33,7 +33,15 @@ std::vector<std::string> ChessAI::getAllPossibleMoves(Chess* game, Piece* board[
                 for (int destRow = 0; destRow < 8; ++destRow) {
                     for (int destCol = 0; destCol < 8; ++destCol) {
                         if (board[row][col]->isMoveLegal(row, col, destRow, destCol, board)) {
-                            moves.push_back(convertCoordinatesToInput(row, col) + convertCoordinatesToInput(destRow, destCol));
+                            Piece* tempBoard[8][8];
+                            for (int i = 0; i < 8; ++i)
+                                for (int j = 0; j < 8; ++j)
+                                    tempBoard[i][j] = board[i][j];
+                            tempBoard[destRow][destCol] = tempBoard[row][col];
+                            tempBoard[row][col] = nullptr;
+                            if (!game->isCheck(isPlayerTurn, tempBoard)) {
+                                moves.push_back(convertCoordinatesToInput(row, col) + convertCoordinatesToInput(destRow, destCol));
+                            }
                         }
                     }
                 }
@@ -134,11 +142,28 @@ std::string ChessAI::getBestMoveForPiece(Chess* game, const std::string& piecePo
     for (int destRow = 0; destRow < 8; ++destRow) {
         for (int destCol = 0; destCol < 8; ++destCol) {
             if (piece->isMoveLegal(src.first, src.second, destRow, destCol, board)) {
+                Piece* testBoard[8][8] = {nullptr};
+                game->createBoardFromString(game->m_boardString, testBoard);
+
+                testBoard[destRow][destCol] = testBoard[src.first][src.second];
+                testBoard[src.first][src.second] = nullptr;
+
+                if (game->isCheck(game->m_turn, testBoard)) {
+                    for (int i = 0; i < 8; ++i)
+                        for (int j = 0; j < 8; ++j)
+                            delete testBoard[i][j];
+                    continue;
+                }
+
                 std::string move = piecePos + convertCoordinatesToInput(destRow, destCol);
-                int score = evaluateMove(game, board, move, game->m_turn, depth);
+                int score = evaluateMove(game, testBoard, move, game->m_turn, depth);
                 bestMoves.push({move, score});
                 if (bestMoves.size() > 5)
                     bestMoves.pull();
+
+                for (int i = 0; i < 8; ++i)
+                    for (int j = 0; j < 8; ++j)
+                        delete testBoard[i][j];
             }
         }
     }

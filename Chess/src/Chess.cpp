@@ -567,14 +567,17 @@ std::string Chess::getBestMoveForPiece(const std::string& piecePos) {
 
 }
 
-bool Chess::playMove(const std::string& move) {
+int Chess::playMove(const std::string& move) {
 	if (move.size() != 4) return false;
 	m_input = move;
 	calculateResponseCode();
 	doTurn();
 	if (m_codeResponse == VALID_MOVE || m_codeResponse == CHECK) {
-		return true;
+		return 1;
 	}
-	return false;
+	if (m_codeResponse == CHECKMATE) {
+		return 2;
+	}
+	return 0;
 }
 

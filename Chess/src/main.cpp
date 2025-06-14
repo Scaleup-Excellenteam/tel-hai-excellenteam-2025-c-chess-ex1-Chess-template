@@ -38,6 +38,7 @@ int main() {
 
         PriorityQueue<string> globalPQ;
         vector<future<void>> futures;
+        string move;
 
         int totalPieces = pieces.size();
         int piecesPerThread = totalPieces / numThreads;
@@ -53,7 +54,7 @@ int main() {
 
             futures.emplace_back(pool.enqueue([&, subset]() {
                 for (const auto& pos : subset) {
-                    string move = game.getBestMoveForPiece(pos);
+                    move = game.getBestMoveForPiece(pos);
                     if (!move.empty()) {
                         lock_guard<mutex> lock(pq_mutex);
                         globalPQ.push(move);
@@ -69,18 +70,17 @@ int main() {
         auto endTime = chrono::high_resolution_clock::now();
         auto duration = chrono::duration_cast<chrono::milliseconds>(endTime - startTime).count();
 
+        game.displayBoard();
 
         if (mode == 1) {
             while(true) {
                 if (!(count%2)) { //human player
-                    game.displayBoard();
-                    cout << "Best move suggested: " << bestMove << endl;
+                    cout << "Best move suggested: " << move << endl;
                     res = game.playMove(game.getInput());
-
                 }
                 else { //computer
-                    cout << "Auto-playing move: " << bestMove << endl;
-                    res = game.playMove(bestMove);
+                    cout << "Auto-playing move: " << move << endl;
+                    res = game.playMove(move);
                 }
                 if(res)
                     break;
@@ -88,16 +88,23 @@ int main() {
         }
         else {
             while(true) {
-                game.displayBoard();
                 cout << "Best move suggested: " << bestMove << endl;
                 res = game.playMove(game.getInput());
                 if(res)
                     break;
             }
         }
+
+        if (res == 2) {
+            break;
+        }
         count ++;
     }
-
-    cout << "Game ended." << endl;
+    if (count%2) {
+        cout << "Game ended. Black wins" << endl;
+    }
+    else {
+        cout << "Game ended. White wins" << endl;
+    }
     return 0;
 }
