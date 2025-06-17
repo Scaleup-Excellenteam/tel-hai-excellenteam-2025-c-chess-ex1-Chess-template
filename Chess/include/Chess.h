@@ -1,10 +1,14 @@
 #pragma once
 #include <iostream>
 #ifdef _WIN32
+<<<<<<< HEAD
 #include <Windows.h>
+=======
+>>>>>>> 9c9a558 (Initial commit from new project chess-part2)
 #endif
 
 #include <string>
+#include "Board.h"
 
 using std::cout;
 using std::cin; 
@@ -16,7 +20,8 @@ const int _SIZE = 21;
 class Chess {
 	unsigned char m_board[_SIZE][_SIZE] = { 0 };
 	bool m_turn = true;
-	string m_boardString;
+    bool m_isHumanTurn = true;
+    string m_boardString;
 	string m_input;
 	string m_msg = "\n";
 	string m_errorMsg = "\n";
@@ -25,7 +30,6 @@ class Chess {
 	void clear() const;
 	void setFrames();
 	void setPieces();
-	void show() const;
 	void displayBoard() const;
 	void showAskInput() const;
 	bool isSame() const;
@@ -40,4 +44,8 @@ public:
 	Chess& operator=(const Chess&) = delete;
 	string getInput();
 	void setCodeResponse(int codeResponse);
+    void show() const;
+    void syncWithBoard(const Board& board);
+    void setTurnForDisplay(bool isWhiteTurn);
+
 };

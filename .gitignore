@@ -1,28 +1,65 @@
-# Ignore build files and compiled binaries
-/build/
-/CMakeCache.txt
-/CMakeFiles/
-/*.o
-/*.a
-/*.so
-/*.exe
-/*.out
+build/
+cmake-build-debug/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
 
-# Ignore IDE and editor configuration files
-.vscode/
+# Object & binary files
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.out
+
+# ===============================
+# 🧠 IDE / ENV FILES
+# ===============================
 .idea/
+.vscode/
+*.iml
+*.suo
+*.user
 *.swp
 *.swo
 
-# Ignore GitHub Actions temporary files
-.github/workflows/*.log
-.github/workflows/*.cache
-
-# Ignore debugging and log files
+# ===============================
+# 🧪 LOGS / TEMP FILES
+# ===============================
 *.log
 *.tmp
 *.bak
+*.trace
 
-# Ignore temporary image cache
+# ===============================
+# 🌐 GITHUB ACTIONS / CI
+# ===============================
+.github/workflows/*.log
+.github/workflows/*.cache
+
+# ===============================
+# 🖼️ IMAGE / ASSET CACHE
+# ===============================
 img/cache/
 
+# ===============================
+# 🧼 MISC WINDOWS
+# ===============================
+*:Zone.Identifier
+Thumbs.db
+Desktop.ini
+
+# ===============================
+# 🧪 TEST BINARIES / OUTPUT
+# ===============================
+test_*
+*.test
+
+# ===============================
+# 💡 BACKUP FILES
+# ===============================
+*~
+*.orig
+*.rej
