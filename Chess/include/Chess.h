@@ -20,7 +20,8 @@ const int _SIZE = 21;
 class Chess {
 	unsigned char m_board[_SIZE][_SIZE] = { 0 };
 	bool m_turn = true;
-	string m_boardString;
+    bool m_isHumanTurn = true;
+    string m_boardString;
 	string m_input;
 	string m_msg = "\n";
 	string m_errorMsg = "\n";
@@ -45,5 +46,6 @@ public:
 	void setCodeResponse(int codeResponse);
     void show() const;
     void syncWithBoard(const Board& board);
+    void setTurnForDisplay(bool isWhiteTurn);
 
 };

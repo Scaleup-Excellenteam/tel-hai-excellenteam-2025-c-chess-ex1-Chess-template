@@ -62,6 +62,21 @@ void autoPlayBenchmark(int numThreads, bool useRandom, int depth, int const thre
         a.syncWithBoard(board);
         a.show();
         isWhiteTurn = !isWhiteTurn;
+        if (Model().isCheckmate(board, isWhiteTurn)) {
+            std::cout << "CHECKMATE! " << (isWhiteTurn ? "White" : "Black") << " loses.\n";
+            break;
+        }
+
+        if (Model().isStalemate(board, isWhiteTurn)) {
+            std::cout << "DRAW! Stalemate – no legal moves and not in check.\n";
+            break;
+        }
+
+        if (Model().isInsufficientMaterial(board)) {
+            std::cout << "DRAW! Insufficient material to checkmate.\n";
+            break;
+        }
+
     }
 
     auto end = chrono::high_resolution_clock::now();
@@ -71,80 +86,137 @@ void autoPlayBenchmark(int numThreads, bool useRandom, int depth, int const thre
     cout << "============================\n";
 }
 
-
 int main() {
     int numThreads = 4;
     int depth = 2;
-    bool autoMode = false;
     bool useRandom = false;
-    const int thresholdScore = 500; //BOUNOS
+    const int thresholdScore = 500; // BONUS
 
-    // Prompt for settings
     cout << "Enter depth: ";
     cin >> depth;
 
-    cout << "Enter mode: (0) Manual play, (1) Auto-play benchmark: ";
+    cout << "Choose game mode:\n";
+    cout << "0 = Human vs Human\n";
+    cout << "1 = Human vs Computer\n";
+    cout << "2 = Computer vs Computer (Auto-play benchmark)\n";
     int mode;
     cin >> mode;
-    autoMode = (mode == 1);
 
-    if (autoMode) {
+    if (mode == 2) {
         cout << "Enter number of threads (0, 2, 4, or 8): ";
         cin >> numThreads;
-
         cout << "Auto-play mode: choose move selection (0 = best move, 1 = random): ";
         int selection;
         cin >> selection;
         useRandom = (selection == 1);
-        autoPlayBenchmark(numThreads, useRandom, depth,thresholdScore);
+        autoPlayBenchmark(numThreads, useRandom, depth, thresholdScore);
         return 0;
     }
 
-    // Manual mode
+    bool vsComputer = (mode == 1);
     string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     Chess a(board);
-    int codeResponse = 0;
-
     Board& selfMadeBoard = Board::getInstance();
-    bool isWhiteTurn = selfMadeBoard.getTurn();
+    int codeResponse = 0;
+    bool isWhiteTurn = true;
+    string res = "";
 
-    auto bestMoves = Model::suggestMovesDepth(selfMadeBoard, isWhiteTurn, numThreads, depth,thresholdScore);
-    cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
-    for (int i = 0; i < min(3, (int)bestMoves.size()); ++i) {
-        cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
-    }
+    Model model;
 
-    string res = a.getInput();
+    a.syncWithBoard(selfMadeBoard);
+    a.show();
 
-    while (res != "exit") {
-        int from_x = res[0] - 'a';
-        int from_y = res[1] - '0' - 1;
-        int to_x = res[2] - 'a';
-        int to_y = res[3] - '0' - 1;
+    while (true) {
+        auto bestMoves = Model::suggestMovesDepth(selfMadeBoard, isWhiteTurn, numThreads, depth, thresholdScore);
 
-        try {
-            codeResponse = selfMadeBoard.movePiece(from_x, from_y, to_x, to_y);
-        } catch (const InvalidMoveBaseException& e) {
-            cerr << "Invalid move: " << e.what() << endl;
-            codeResponse = 12;
-        } catch (const InvalidSuicideException& e) {
-            cerr << "Suicide move: " << e.what() << endl;
-            codeResponse = 31;
-        } catch (const InvalidPromotionException& e) {
-            cerr << "Invalid promotion: " << e.what() << endl;
-            codeResponse = 32;
+        cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
+        for (int i = 0; i < min(3, (int)bestMoves.size()); ++i)
+            cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
+
+        a.setTurnForDisplay(isWhiteTurn);  // Set display turn explicitly
+
+        if (!vsComputer) {
+            res = a.getInput();
+
+            if (res == "exit") break;
+
+            int from_x = res[0] - 'a';
+            int from_y = res[1] - '0' - 1;
+            int to_x = res[2] - 'a';
+            int to_y = res[3] - '0' - 1;
+
+            try {
+                codeResponse = selfMadeBoard.movePiece(from_x, from_y, to_x, to_y);
+            } catch (const InvalidMoveBaseException& e) {
+                cerr << "Invalid move: " << e.what() << endl;
+                codeResponse = 12;
+                continue;
+            } catch (const InvalidSuicideException& e) {
+                cerr << "Suicide move: " << e.what() << endl;
+                codeResponse = 31;
+                continue;
+            } catch (const InvalidPromotionException& e) {
+                cerr << "Invalid promotion: " << e.what() << endl;
+                codeResponse = 32;
+                continue;
+            }
+        } else {
+            if (isWhiteTurn) {
+                res = a.getInput();
+
+                if (res == "exit") break;
+
+                int from_x = res[0] - 'a';
+                int from_y = res[1] - '0' - 1;
+                int to_x = res[2] - 'a';
+                int to_y = res[3] - '0' - 1;
+
+                try {
+                    codeResponse = selfMadeBoard.movePiece(from_x, from_y, to_x, to_y);
+                } catch (const InvalidMoveBaseException& e) {
+                    cerr << "Invalid move: " << e.what() << endl;
+                    codeResponse = 12;
+                    continue;
+                } catch (const InvalidSuicideException& e) {
+                    cerr << "Suicide move: " << e.what() << endl;
+                    codeResponse = 31;
+                    continue;
+                } catch (const InvalidPromotionException& e) {
+                    cerr << "Invalid promotion: " << e.what() << endl;
+                    codeResponse = 32;
+                    continue;
+                }
+            } else {
+                cout << "\nPlayer 2 (Black - Computer) >> ";
+                //a.setIsHumanTurn(false);
+                if (!bestMoves.empty()) {
+                    Move chosen = bestMoves[0];
+                    cout << moveToNotation(chosen) << endl;
+                    selfMadeBoard.movePiece(chosen.fromX, chosen.fromY, chosen.toX, chosen.toY);
+                } else {
+                    cout << "Computer has no legal moves.\n";
+                    break;
+                }
+            }
         }
 
         a.setCodeResponse(codeResponse);
+        a.syncWithBoard(selfMadeBoard);
+        a.show();
         isWhiteTurn = selfMadeBoard.getTurn();
 
-        bestMoves = Model::suggestMovesDepth(selfMadeBoard, isWhiteTurn, numThreads, depth,thresholdScore);
-        cout << "Suggested moves for " << (isWhiteTurn ? "White" : "Black") << ":\n";
-        for (int i = 0; i < min(3, (int)bestMoves.size()); ++i) {
-            cout << "  " << moveToNotation(bestMoves[i]) << " (Score: " << bestMoves[i].score << ")\n";
+        if (model.isCheckmate(selfMadeBoard, isWhiteTurn)) {
+            cout << "CHECKMATE! " << (isWhiteTurn ? "White" : "Black") << " loses.\n";
+            break;
         }
-
-        res = a.getInput();
+        if (model.isStalemate(selfMadeBoard, isWhiteTurn)) {
+            cout << "DRAW! Stalemate – no legal moves and not in check.\n";
+            break;
+        }
+        if (model.isInsufficientMaterial(selfMadeBoard)) {
+            cout << "DRAW! Insufficient material to checkmate.\n";
+            break;
+        }
     }
 
     cout << "\nExiting game.\n";

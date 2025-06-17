@@ -121,13 +121,13 @@ std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn,
         if (depth <= 1)
             return myScore;
 
-        Board* simulated = board.createSimulatedCopy();
+        std::unique_ptr<Board> simulated = board.createSimulatedCopy();
         try {
             simulated->movePiece(fromX, fromY, toX, toY);
         } catch (...) {
-            delete simulated;
-            return INT_MIN;
+            return INT_MIN;  // בלי delete!
         }
+
 
         int worstEnemyScore = 0;
         auto enemyMoves = suggestMovesDepth(*simulated, !isWhiteTurn, 0, depth - 1, thresholdScore);
@@ -135,7 +135,6 @@ std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn,
             worstEnemyScore = enemyMoves[0].score;
         }
 
-        delete simulated;
         return myScore - worstEnemyScore;
     };
 
@@ -202,11 +201,10 @@ std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn,
                                     int finalScore = evaluateMove(fromX, fromY, toX, toY, board);
 
                                     if (depth > 1) {
-                                        Board* simulated = board.createSimulatedCopy();
+                                        unique_ptr<Board> simulated = board.createSimulatedCopy();
                                         try {
                                             simulated->movePiece(fromX, fromY, toX, toY);
                                         } catch (...) {
-                                            delete simulated;
                                             continue;
                                         }
 
@@ -216,7 +214,6 @@ std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn,
                                             worstEnemyScore = enemyMoves[0].score;
                                         }
 
-                                        delete simulated;
                                         finalScore -= worstEnemyScore;
                                     }
 
@@ -259,6 +256,125 @@ std::vector<Move> Model::suggestMovesDepth(const Board& board, bool isWhiteTurn,
     }
     return bestMoves;
 }
+
+bool Model::isCheckmate(const Board& board, bool isWhiteTurn) {
+    // אם אין שח – זה לא שחמט
+    if (!board.isKingInCheck(isWhiteTurn)) {
+        return false;
+    }
+
+    // עבור כל כלי של השחקן הנוכחי
+    for (int fromX = 0; fromX < 8; ++fromX) {
+        for (int fromY = 0; fromY < 8; ++fromY) {
+            Piece* piece = board.getPieceAt(fromX, fromY);
+            if (!piece || piece->isWhite() != isWhiteTurn)
+                continue;
+
+            // נבדוק כל תא אפשרי שאליו אפשר לזוז
+            for (int toX = 0; toX < 8; ++toX) {
+                for (int toY = 0; toY < 8; ++toY) {
+                    if (fromX == toX && fromY == toY)
+                        continue;
+
+                    if (!piece->isValidMove(fromX, fromY, toX, toY, board))
+                        continue;
+
+                    // ננסה לבצע את המהלך על העתק
+                    std::unique_ptr<Board> simulated = board.createSimulatedCopy();
+                    try {
+                        simulated->movePiece(fromX, fromY, toX, toY);
+                        if (!simulated->isKingInCheck(isWhiteTurn)) {
+                            return false;  // יש תנועה חוקית שמונעת שח
+                        }
+                    } catch (...) {
+                        continue;  // תנועה לא חוקית בפועל – נמשיך לבדוק
+                    }
+                }
+            }
+        }
+    }
+
+    return true;  // אין אף מהלך שמוציא מהשח ⇒ שחמט
+}
+
+bool Model::isStalemate(const Board& board, bool isWhiteTurn) const {
+    // אם השחקן בשח – זה לא תיקו אלא אולי שחמט
+    if (board.isKingInCheck(isWhiteTurn)) {
+        return false;
+    }
+
+    // עבור כל הכלים של השחקן
+    for (int fromX = 0; fromX < 8; ++fromX) {
+        for (int fromY = 0; fromY < 8; ++fromY) {
+            Piece* piece = board.getPieceAt(fromX, fromY);
+            if (!piece || piece->isWhite() != isWhiteTurn)
+                continue;
+
+            for (int toX = 0; toX < 8; ++toX) {
+                for (int toY = 0; toY < 8; ++toY) {
+                    if (fromX == toX && fromY == toY)
+                        continue;
+
+                    if (!piece->isValidMove(fromX, fromY, toX, toY, board))
+                        continue;
+
+                    std::unique_ptr<Board> simulated = board.createSimulatedCopy();
+                    try {
+                        simulated->movePiece(fromX, fromY, toX, toY);
+                        // אם המהלך לא גרם לשח – זה מהלך חוקי ⇒ לא תיקו
+                        return false;
+                    } catch (...) {
+                        continue;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;  // אין אף מהלך חוקי ⇒ תיקו
+}
+
+bool Model::isInsufficientMaterial(const Board& board) const {
+    int whiteBishops = 0, blackBishops = 0;
+    int whiteKnights = 0, blackKnights = 0;
+    int whiteOther = 0, blackOther = 0;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            Piece* piece = board.getPieceAt(i, j);
+            if (!piece) continue;
+
+            std::string name = piece->getName();
+            bool isWhite = piece->isWhite();
+
+            if (name == "K" || name == "k") continue;  // המלך לא נחשב ככלי נוסף
+            if (name == "N" || name == "n") {
+                if (isWhite) whiteKnights++; else blackKnights++;
+            } else if (name == "B" || name == "b") {
+                if (isWhite) whiteBishops++; else blackBishops++;
+            } else {
+                if (isWhite) whiteOther++; else blackOther++;
+            }
+        }
+    }
+
+    // מלך בלבד
+    if (whiteBishops + whiteKnights + whiteOther == 0 &&
+        blackBishops + blackKnights + blackOther == 0) {
+        return true;
+    }
+
+    // מלך + רץ או פרש מול מלך
+    if ((whiteOther == 0 && blackOther == 0) &&
+        ((whiteBishops + whiteKnights <= 1 && blackBishops + blackKnights == 0) ||
+         (blackBishops + blackKnights <= 1 && whiteBishops + whiteKnights == 0))) {
+        return true;
+    }
+
+    return false;  // יש מספיק כלים לבצע מט
+}
+
+
 
 
 

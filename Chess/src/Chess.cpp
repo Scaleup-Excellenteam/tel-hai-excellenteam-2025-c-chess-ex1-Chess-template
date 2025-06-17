@@ -232,7 +232,6 @@ void Chess::doTurn() {
             break;
         case 42:
             excute();
-            m_turn = !m_turn;
             m_msg = "the last movement was legal \n";
             break;
     }
@@ -252,12 +251,15 @@ string Chess::getInput() {
     else
         doTurn();
 
+
     displayBoard();
     showAskInput();
+
 
     cin >> m_input;
     if (isExit())
         return "exit";
+
     while (!isValid() || isSame()) {
         if (!isValid())
             m_errorMsg = "Invalid input !! \n";
@@ -280,6 +282,7 @@ string Chess::getInput() {
     return m_input;
 }
 
+
 void Chess::setCodeResponse(int codeResponse) {
     if (((11 <= codeResponse) && (codeResponse <= 13)) ||
         ((21 == codeResponse) || (codeResponse == 31)) ||
@@ -295,5 +298,10 @@ void Chess::syncWithBoard(const Board& board){
         }
     setPieces();
 }
+
+void Chess::setTurnForDisplay(bool isWhiteTurn) {
+    m_turn = isWhiteTurn;
+}
+
 #endif // _WIN32
 

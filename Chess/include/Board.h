@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "Piece.h"
 
 class Piece;
@@ -10,7 +11,6 @@ class Board {
 private:
     bool iswhiteturn = true;
     Piece* board[BOARD_SIZE][BOARD_SIZE];
-    Board();
 
     // Private copy constructor and assignment operator to prevent copying
     Board(const Board&) = delete;
@@ -34,14 +34,14 @@ public:
     void setPieceAt(int row , int col , Piece*);
 
     // Logic
-    bool isKingInCheck(bool white);
+    bool isKingInCheck(bool white) const;
     int movePiece(int from_x, int from_y, int to_x, int to_y);
-    void printBoard();
 
     // Deep copy for simulation
-    Board* createSimulatedCopy() const;
-
+    std::unique_ptr<Board> createSimulatedCopy() const;
     ~Board();
+
+    Board();
 };
 
 

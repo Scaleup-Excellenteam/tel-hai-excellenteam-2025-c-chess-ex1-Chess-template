@@ -142,7 +142,7 @@ int Board::movePiece(int from_x, int from_y, int to_x, int to_y)
 
 
 
-bool Board::isKingInCheck(bool white) {
+bool Board::isKingInCheck(bool white) const{
     // Find the position of the king
     Piece* kingSquare = nullptr;
     int kingLocationX , kingLocationY;
@@ -185,24 +185,11 @@ void Board::setPieceAt(int row , int col , Piece* piece) {
     board[row][col] = piece;
 }
 
-void Board::printBoard() {
-    using namespace std;
-    cout << "   y: 0  1  2  3  4  5  6  7 " << endl << "x:" << endl;
-    for (int i = 0; i < 8; i++) {
-        cout << " " << i << "   ";
-        for (int j = 0; j < 8; j++) {
-            Piece *p = board[i][j];
-            if (p != nullptr)
-                cout << " " << p->getName() << " ";
-            else
-                cout << "   ";
-        }
-        cout << endl;
-    }
-}
-Board* Board::createSimulatedCopy() const {
-    Board* newBoard = new Board();
+
+std::unique_ptr<Board> Board::createSimulatedCopy() const {
+    auto newBoard = std::make_unique<Board>();
     newBoard->initializeBoard();
+
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             Piece* piece = getPieceAt(i, j);
