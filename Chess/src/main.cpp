@@ -2,6 +2,7 @@
 #include "Chess.h"
 #include "Position.h"
 #include "board.h"
+#include <stdexcept>
 
 void parseInput(const string &res, Position &pos1, Position &pos2);
 void parseMove(const Position &pos1, const Position &pos2, string &res);
@@ -9,7 +10,9 @@ void parseMove(const Position &pos1, const Position &pos2, string &res);
 int main()
 {
     string board =
-        "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
+        "K##########rr###################################################";
+    // string board =
+    //     "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     // string board =
     // "Q#####################B########R###########r######b#####q#######";
     // string board =
@@ -21,12 +24,13 @@ int main()
     int codeResponse = 0;
     a.preGetInput();
     string res;
-    {
+    try {
         auto pq       = b.getBestMoves(2, b.get_turn_color());
         Move mov      = pq.poll();
         Position pos1 = mov.src, pos2 = mov.dst;
         parseMove(pos1, pos2, res);
         std::cout << "recommended move: " << res << std::endl;
+    } catch (runtime_error re) {
     }
     res = a.getInput();
     while (res != "exit") {
@@ -55,12 +59,13 @@ int main()
         /**/
 
         a.preGetInput();
-        {
+        try {
             auto pq       = b.getBestMoves(2, b.get_turn_color());
             Move mov      = pq.poll();
             Position pos1 = mov.src, pos2 = mov.dst;
             parseMove(pos1, pos2, res);
             std::cout << "recommended move: " << res << std::endl;
+        } catch (runtime_error re) {
         }
         res = a.getInput();
     }

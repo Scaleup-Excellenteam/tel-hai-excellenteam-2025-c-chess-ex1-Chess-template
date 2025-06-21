@@ -5,6 +5,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace std;
 class Board
@@ -13,6 +14,8 @@ private:
     array<shared_ptr<Piece>, SIZE * SIZE> _board;
     bool isPathClear(Position src, Position dst) const;
     bool isCheck(bool target_player) const;
+    bool canUncheck(bool target_player) const;
+    vector<Move> getAllValidMovesByPlayer(bool this_player) const;
     bool isValidMove(Position src, Position dst) const;
 
     bool _turn_color = true;
@@ -27,7 +30,7 @@ private:
 
     // This function has no side effects. Useful for proper reuse of move
     // checking. if 0 then the piece can move; otherwise, it cannot move
-    int canMove(Position src, Position dst);
+    int canMove(Position src, Position dst) const;
 
 public:
     Board();

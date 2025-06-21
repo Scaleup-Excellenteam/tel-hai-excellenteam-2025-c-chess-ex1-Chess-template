@@ -269,6 +269,10 @@ void Chess::doTurn()
 		m_msg = "the last movement was legal \n";
 		break;
 	}
+    case 51:
+        excute();
+        m_msg = "checkmate, please exit now";
+        break;
 	}
 }
 
@@ -326,6 +330,6 @@ void Chess::setCodeResponse(int codeResponse)
 {
 	if (((11 <= codeResponse) && (codeResponse <= 13)) ||
 		((21 == codeResponse) || (codeResponse == 31)) ||
-		((41 == codeResponse) || (codeResponse == 42)))
+		((41 == codeResponse) || (codeResponse == 42)) || (51 == codeResponse))
 		m_codeResponse = codeResponse;
 }
