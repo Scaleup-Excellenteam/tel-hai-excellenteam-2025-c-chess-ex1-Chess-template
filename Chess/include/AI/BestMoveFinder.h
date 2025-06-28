@@ -1,5 +1,4 @@
-#ifndef AI_BEST_MOVE_FINDER_H
-#define AI_BEST_MOVE_FINDER_H
+#pragma once
 /**
  * @file BestMoveFinder.h
  * @brief A simple material-only evaluator that can pick either
@@ -10,58 +9,45 @@
  */
 
 #include <vector>
-#include <climits>          // INT_MIN
+#include <climits>
 #include <thread>
 #include <mutex>
 #include <atomic>
 #include <vector>
 #include <chrono>
 #include <algorithm>
+#include <string>
 
 #include "Board.h"
 #include "../Utils/CMove.h"
-#include "../Utils/MoveScorePair.h"   // struct MoveScorePair { CMove move; int score; }
+#include "../Utils/MoveScorePair.h"
+#include "../Utils/Colors.h"
 
 namespace AI
 {
-    /*----------------------------------------------------------------------
-     * Bring the global POD into this namespace so declarations and
-     * definitions agree on exactly the same type.
-     *--------------------------------------------------------------------*/
     using ::MoveScorePair;
 
     class BestMoveFinder
     {
     public:
-        BestMoveFinder() = default;                    // trivial ctor
+        BestMoveFinder() = default;
 
-        /** Return the single best move for the side to play. */
         MoveScorePair findBestMove(const Board& board,
                                    bool isWhite) const;
 
-        /** Evaluate one move by the material it would capture (+score). */
         int evaluateMove(const Board& board,
                          const CMove& move) const;
 
-    
-        /** Helper: convert piece symbol to a crude material value. */
-        static int pieceValue(char symbol);
+        static int pieceValue(const std::string& symbol);
     private:
-   
+
         std::mutex pqMutex;
         std::atomic<bool> stopFlag{false};
 
     };
 
-    /*----------------------------------------------------------------------
-     * Helper used by Chess.cpp: return up to @p limit moves, sorted
-     * best-first.  Pass limit == 0 to get *all* ranked moves.
-     *--------------------------------------------------------------------*/
     std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit);
 
     std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit, int threadCount);
 
-
 } // namespace AI
-
-#endif // AI_BEST_MOVE_FINDER_H

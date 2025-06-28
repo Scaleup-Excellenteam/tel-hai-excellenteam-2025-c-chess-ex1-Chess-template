@@ -1,5 +1,5 @@
-#ifndef CHESS_UTILS_EXCEPTION_H
-#define CHESS_UTILS_EXCEPTION_H
+#pragma once
+
 
 #include <exception>
 #include <string>
@@ -84,5 +84,3 @@ public:
 };
 
 } // namespace ChessException
-
-#endif // CHESS_UTILS_EXCEPTION_H

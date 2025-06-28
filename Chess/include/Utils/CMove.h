@@ -1,5 +1,5 @@
-#ifndef UTILS_CMOVE_H
-#define UTILS_CMOVE_H
+#pragma once
+
 
 /**
  * @brief  Minimal, POD-style chess move.
@@ -16,5 +16,3 @@ struct CMove
     constexpr CMove(int sR = 0, int sC = 0, int dR = 0, int dC = 0) noexcept
         : srcRow(sR), srcCol(sC), destRow(dR), destCol(dC) {}
 };
-
-#endif  // UTILS_CMOVE_H

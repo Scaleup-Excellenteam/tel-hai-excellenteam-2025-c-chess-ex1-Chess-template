@@ -1,6 +1,12 @@
 #include "Board.h"
-#include "Pieces/Pawn.h"
-
+#include "Pieces/Pawn.h" // For Pawn specific checks in generateLegalMoves
+// Include all piece types so we can use their legalMoves methods
+#include "Pieces/Bishop.h"
+#include "Pieces/King.h"
+#include "Pieces/Knight.h"
+#include "Pieces/Queen.h"
+#include "Pieces/Rook.h"
+#include "Utils/Colors.h" // <--- ADDED THIS INCLUDE for Colors::Pieces
 
 Board::Board() {
     grid.reserve(8); // optional but avoids reallocations
@@ -49,52 +55,32 @@ Board& Board::operator=(const Board& rhs) {
 
 // --- generate all legal moves for the given side (no self‐checks) ---
 std::vector<CMove> Board::generateLegalMoves(bool whiteToMove) const {
-    std::vector<CMove> moves;
+    std::vector<CMove> legalMoves; // Renamed from 'moves' to 'legalMoves' for clarity
 
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             Piece* p = getPiece(r, c);
             if (!p || p->getIsWhite() != whiteToMove)
-                continue;
+                continue; // Skip empty squares or opponent's pieces
 
-            for (int dr = 0; dr < 8; ++dr) {
-                for (int dc = 0; dc < 8; ++dc) {
-                    if (dr == r && dc == c) 
-                        continue;
+            // Get pseudo-legal moves for this specific piece
+            // Each piece now has its own optimized legalMoves implementation
+            std::vector<CMove> pseudoLegalMoves = p->legalMoves(r, c, *this);
 
-                    Piece* target = getPiece(dr, dc);
-                    bool valid = false;
+            for (const auto& move : pseudoLegalMoves) {
+                // Simulate the move on a temporary board
+                Board temp_board = *this; // Deep copy
+                temp_board.applyMove(move);
 
-                // Simplified logic
-                if (Pawn* pawn = dynamic_cast<Pawn*>(p)) {
-                    // Let the pawn's own `isValidMove` handle everything.
-                    if (pawn->isValidMove(r, c, dr, dc, *this)) {
-                        valid = true;
-                    }
-                }
-                // All other pieces
-                else if (p->isValidMove(r, c, dr, dc, *this)) {
-                    valid = true;
-                }
-                    // all other pieces
-                    else if (p->isValidMove(r, c, dr, dc, *this)) {
-                        valid = true;
-                    }
-
-                    if (!valid) 
-                        continue;
-
-                    // simulate and ensure we don't leave our king in check
-                    Board copy = *this;
-                    copy.applyMove({r, c, dr, dc});
-                    if (!copy.inCheck(whiteToMove))
-                        moves.push_back({r, c, dr, dc});
+                // Check if the move leaves our own king in check
+                if (!temp_board.inCheck(whiteToMove)) {
+                    legalMoves.push_back(move);
                 }
             }
         }
     }
 
-    return moves;
+    return legalMoves;
 }
 
 // --- apply a move (mutates this Board) ---
@@ -103,6 +89,7 @@ void Board::applyMove(CMove m) {
     std::unique_ptr<Piece> moving = removePiece(m.srcRow, m.srcCol);
     // overwrite any captured piece and place the mover
     grid[m.destRow][m.destCol] = std::move(moving);
+    // TODO: Handle Pawn Promotion, Castling, En Passant during applyMove in later phases.
 }
 
 
@@ -110,25 +97,27 @@ void Board::applyMove(CMove m) {
 bool Board::inCheck(bool whiteKing) const {
     // locate the king
     int kingR = -1, kingC = -1;
-    char kingSym = whiteKing ? 'k' : 'K';
+    // Use the actual symbols from Colors namespace for comparison
+    const std::string& kingSymbol = whiteKing ? Colors::Pieces::WHITE_KING : Colors::Pieces::BLACK_KING;
+
     for (int r = 0; r < 8 && kingR < 0; ++r) {
         for (int c = 0; c < 8; ++c) {
             Piece* p = getPiece(r, c);
-            if (p && p->getSymbol() == kingSym) {
+            if (p && p->getSymbol() == kingSymbol) { // Compare with string symbol
                 kingR = r; kingC = c;
                 break;
             }
         }
     }
     if (kingR < 0)
-        return false; // no king found => not in check
+        return false; // no king found => not in check (shouldn't happen in a valid game)
 
     // see if any enemy piece attacks that square
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             Piece* p = getPiece(r, c);
-            if (p && p->getIsWhite() != whiteKing) {
-                // pawn captures are special
+            if (p && p->getIsWhite() != whiteKing) { // If it's an opponent's piece
+                // pawn captures are special for isValidMove checks
                 if (Pawn* pawn = dynamic_cast<Pawn*>(p)) {
                     if (pawn->isValidCapture(r, c, kingR, kingC, *this))
                         return true;
@@ -157,4 +146,3 @@ std::unique_ptr<Piece> Board::removePiece(int row, int col) {
     grid[row][col] = nullptr;
     return old;
 }
-

@@ -1,0 +1,4 @@
+/mnt/c/Users/eb300/OneDrive/Desktop/Exellentim_Cpp/endGame/chess-ex1-EB-WildEye/Chess/src/CMakeFiles/ChessLib.dir
+/mnt/c/Users/eb300/OneDrive/Desktop/Exellentim_Cpp/endGame/chess-ex1-EB-WildEye/Chess/src/CMakeFiles/Chess.dir
+/mnt/c/Users/eb300/OneDrive/Desktop/Exellentim_Cpp/endGame/chess-ex1-EB-WildEye/Chess/src/CMakeFiles/edit_cache.dir
+/mnt/c/Users/eb300/OneDrive/Desktop/Exellentim_Cpp/endGame/chess-ex1-EB-WildEye/Chess/src/CMakeFiles/rebuild_cache.dir

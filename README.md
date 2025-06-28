@@ -153,3 +153,31 @@ You are required to submit each exercise using "GitHub Classroom". To do this, y
 <p align="center">
   <img src="./img/excellenteam.png" alt="Excellenteam">
 </p>
+
+
+## Benchmark Results (2025-06-28 16:38:51)
+
+AI Search Depth: **2**
+
+| Threads | Total Time (ms) | Average Time per Move (ms) |
+|:-------:|:---------------:|:--------------------------:|
+|       1 |            1876 |                        234 |
+|       2 |            1456 |                        182 |
+|       4 |            1197 |                        149 |
+|       8 |             809 |                        101 |
+
+---
+
+
+## Benchmark Results (2025-06-28 18:14:06)
+
+AI Search Depth: **4**
+
+| Threads | Total Time (ms) | Average Time per Move (ms) |
+|:-------:|:---------------:|:--------------------------:|
+|       1 |            1847 |                        230 |
+|       2 |            1068 |                        133 |
+|       4 |             847 |                        105 |
+|       8 |             824 |                        103 |
+
+---
