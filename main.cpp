@@ -1,28 +1,32 @@
-#include "Chess.h"
-#include "Board.h"
+
 #include <iostream>
-using namespace std;
+#include <chrono>
+#include "Board.h"
+#include "ChessMultithread.h"
 
-int main()
-{
-    string board = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
-    Chess a(board);
-    Board logicBoard(board); // נוספה יצירת הלוח ההגיוני
-    int codeResponse = 0;
-    string res = a.getInput();
-    while (res != "exit")
-    {
+int main() {
+    Board board;
 
-        codeResponse = logicBoard.validateAndMove(res);
+    // הדגמה עם לוח פתיחה בסיסי (אפשר לעדכן לפי צורך)
+    board.setInitialPosition();
 
-        a.setCodeResponse(codeResponse);
-        res = a.getInput();
+    int threadCount = 4;
+    int maxMoves = 3;
+
+    ChessMultithread cm(board, true); // true = הלבן בתור
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::vector<Move> moves = cm.getTopMoves(threadCount, maxMoves);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double, std::milli> duration = end - start;
+
+    std::cout << "Top " << maxMoves << " moves (calculated with " << threadCount << " threads):\n";
+    for (const auto& move : moves) {
+        std::cout << move << std::endl;
     }
 
-    cout << endl << "Exiting " << endl;
+    std::cout << "Duration: " << duration.count() << " ms" << std::endl;
+
     return 0;
 }
-// TIP See CLion help at <a
-// href="https://www.jetbrains.com/help/clion/">jetbrains.com/help/clion/</a>.
-//  Also, you can try interactive lessons for CLion by selecting
-//  'Help | Learn IDE Features' from the main menu.
