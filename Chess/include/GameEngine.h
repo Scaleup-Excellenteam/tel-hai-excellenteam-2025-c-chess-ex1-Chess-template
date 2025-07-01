@@ -23,6 +23,7 @@ class Chess;
 class GameEngine {
 private:
     int m_searchDepth;
+    bool isInsufficientMaterial() const;
 
     void displayWelcomeBanner() const;
     void getUserSettings();

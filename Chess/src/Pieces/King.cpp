@@ -1,88 +1,158 @@
 #include "Pieces/King.h"
-#include "Utils/Colors.h" // Include for Unicode symbols
+#include "Pieces/Pawn.h"
 #include "Board.h"
-#include "Pieces/Pawn.h" // Needed for dynamic_cast<Pawn*>
-#include <cmath> // for abs()
+#include "Utils/Colors.h"
+#include <cmath>
+#include "Pieces/Rook.h"
 
-
-King::King(bool isWhite) : Piece(isWhite) {
-    this->setSymbol(isWhite ? Colors::Pieces::WHITE_KING : Colors::Pieces::BLACK_KING); // Set string symbol
+// --- MODIFICATION START ---
+King::King(bool isWhite) : Piece(isWhite), hasMoved_(false) { // Initialize hasMoved_ to false
+    // std::string symbol = isWhite ? "k" : "K"; // Old ASCII symbols
+    this->setSymbol(isWhite ? Colors::Pieces::WHITE_KING : Colors::Pieces::BLACK_KING); // Use Unicode symbols
     this->setIsAlive(true);
     this->setIsWhite(isWhite);
 }
 
-// King's specific legalMoves implementation
-std::vector<CMove> King::legalMoves(int r, int c, const Board& b) const {
-    std::vector<CMove> moves;
-    for (int dr_offset = -1; dr_offset <= 1; ++dr_offset) {
-        for (int dc_offset = -1; dc_offset <= 1; ++dc_offset) {
-            if (dr_offset == 0 && dc_offset == 0) {
-                continue; // King doesn't move to its own square
-            }
-            int destRow = r + dr_offset;
-            int destCol = c + dc_offset;
+// Update clone to copy hasMoved_ state
+std::unique_ptr<Piece> King::clone() const {
+    auto cloned = std::make_unique<King>(this->getIsWhite());
+    cloned->setHasMoved(this->hasMoved_); // Copy the hasMoved_ state
+    cloned->setIsAlive(this->getIsAlive()); // Ensure other state is also copied if not by constructor
+    return cloned;
+}
+// --- MODIFICATION END ---
 
-            // Check if destination is within bounds (0-7)
-            if (destRow >= 0 && destRow < 8 && destCol >= 0 && destCol < 8) {
-                if (isValidMove(r, c, destRow, destCol, b)) { // Use King's isValidMove logic
-                    moves.emplace_back(r, c, destRow, destCol);
-                }
-            }
+
+bool King::isValidMove(int srcRow, int srcCol, int destRow, int destCol, const Board& board) const
+{
+    // Check for castling first (king moves 2 squares horizontally)
+    if (abs(destCol - srcCol) == 2 && srcRow == destRow) {
+        return canCastle(srcRow, srcCol, destRow, destCol, board);
+    }
+
+    // Normal king movement (one square in any direction)
+    if (abs(srcRow - destRow) <= 1 && abs(srcCol - destCol) <= 1) {
+        Piece* destPiece = board.getPiece(destRow, destCol);
+        return destPiece == nullptr || destPiece->getIsWhite() != this->getIsWhite();
+    }
+
+    return false;
+}
+
+bool King::canCastle(int srcRow, int srcCol, int destRow, int destCol, const Board& board) const {
+    // Determine if this is kingside (short) or queenside (long) castling
+    bool isKingside = (destCol > srcCol);
+    int rookCol = isKingside ? 7 : 0;
+
+    // Check if king is in starting position AND has not moved
+    int expectedKingRow = this->getIsWhite() ? 7 : 0;
+    int expectedKingCol = 4;
+
+    if (srcRow != expectedKingRow || srcCol != expectedKingCol || this->getHasMoved()) { // Added this->getHasMoved()
+        return false;
+    }
+
+    // Check if rook exists and is in starting position AND has not moved
+    Piece* rook = board.getPiece(srcRow, rookCol);
+    // std::string expectedRookSymbol = this->getIsWhite() ? "r" : "R"; // Old ASCII symbols
+    if (!rook || rook->getIsWhite() != this->getIsWhite() ||
+        (rook->getSymbol() != Colors::Pieces::WHITE_ROOK && rook->getSymbol() != Colors::Pieces::BLACK_ROOK)) { // Use Unicode symbols for comparison
+        return false;
+    }
+    if (Rook* r_piece = dynamic_cast<Rook*>(rook)) { // Dynamically cast to Rook to check hasMoved_
+        if (r_piece->getHasMoved()) {
+            return false;
+        }
+    } else { // It's not a Rook or dynamic_cast failed
+        return false;
+    }
+
+    // Check if king is currently in check
+    if (isInCheck(srcRow, srcCol, board)) {
+        return false;
+    }
+
+    // Check if path is clear between king and rook
+    int start = std::min(srcCol, rookCol);
+    int end = std::max(srcCol, rookCol);
+    for (int c = start + 1; c < end; c++) {
+        if (board.getPiece(srcRow, c) != nullptr) {
+            return false;
         }
     }
-    // TODO: Add Castling moves here in a later phase.
-    return moves;
-}
 
-bool King::isValidMove(int srcRow,
-                       int srcCol,
-                       int destRow,
-                       int destCol,
-                       const Board& board) const
-{
-    // A king moves at most one square in any direction
-    if (std::abs(srcRow - destRow) <= 1 && std::abs(srcCol - destCol) <= 1)
-    {
-        Piece* destPiece = board.getPiece(destRow, destCol);
-
-        // Legal if the destination is empty or holds an opponent piece
-        return destPiece == nullptr ||
-               destPiece->getIsWhite() != this->getIsWhite();
+    // Check if king passes through or ends in check during castling
+    int direction = isKingside ? 1 : -1;
+    for (int step = 1; step <= 2; step++) {
+        int checkCol = srcCol + (step * direction);
+        if (wouldBeInCheck(srcRow, checkCol, board)) {
+            return false;
+        }
     }
 
-    return false; // Any other displacement is illegal for a king
+    return true;
 }
 
-bool King::isInCheck(int row, int col, const Board& board) const {
-    // This method is correctly implemented here to check if a specific king at (row, col) is attacked.
+bool King::wouldBeInCheck(int row, int col, const Board& board) const {
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             Piece* piece = board.getPiece(r, c);
-            // Ensure the piece exists, is an opponent's, and can attack the king's square
             if (piece != nullptr && piece->getIsWhite() != this->getIsWhite()) {
-                // Pawns have special capture rules for checking
                 if (Pawn* pawn = dynamic_cast<Pawn*>(piece)) {
-                    if (pawn->isValidCapture(r, c, row, col, board)) return true;
-                } else {
-                    if (piece->isValidMove(r, c, row, col, board)) return true;
+                    if (pawn->isValidCapture(r, c, row, col, board)) {
+                        return true;
+                    }
+                } else if (piece->isValidMove(r, c, row, col, board)) {
+                    return true;
                 }
             }
         }
     }
-    return false; // King is not in check
+    return false;
 }
 
-// These methods are indeed redundant for the overall game state
-// as GameEngine uses Board::generateLegalMoves and Board::inCheck.
-// They are kept here for now but will be slated for removal/cleanup.
+bool King::isInCheck(int row, int col, const Board& board) const {
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            Piece* piece = board.getPiece(r, c);
+            if (piece != nullptr && piece->getIsWhite() != this->getIsWhite() && piece->isValidMove(r, c, row, col, board)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool King::isInCheckmate(int row, int col, const Board& board) const {
-    // This function will be removed or made private if needed for very specific King checks
-    // The main checkmate logic is in GameEngine using board->generateLegalMoves()
-    return false; // Placeholder
+    if (!isInCheck(row, col, board)) {
+        return false;
+    }
+
+    for (int r = row - 1; r <= row + 1; ++r) {
+        for (int c = col - 1; c <= col + 1; ++c) {
+            if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+                if (isValidMove(row, col, r, c, board) && !isInCheck(r, c, board)) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 bool King::isInStalemate(int row, int col, const Board& board) const {
-    // This function will be removed or made private
-    // The main stalemate logic is in GameEngine using board->generateLegalMoves()
-    return false; // Placeholder
+    if (isInCheck(row, col, board)) {
+        return false;
+    }
+
+    for (int r = row - 1; r <= row + 1; ++r) {
+        for (int c = col - 1; c <= col + 1; ++c) {
+            if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+                if (isValidMove(row, col, r, c, board) && !isInCheck(r, c, board)) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
