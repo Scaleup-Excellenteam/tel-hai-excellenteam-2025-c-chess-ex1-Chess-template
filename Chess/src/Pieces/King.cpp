@@ -3,11 +3,9 @@
 #include "Board.h"
 #include "Utils/Colors.h"
 #include <cmath>
-#include "Pieces/Rook.h"
+#include "Pieces/Rook.h" // dynamic_cast to Rook
 
-// --- MODIFICATION START ---
-King::King(bool isWhite) : Piece(isWhite), hasMoved_(false) { // Initialize hasMoved_ to false
-    // std::string symbol = isWhite ? "k" : "K"; // Old ASCII symbols
+King::King(bool isWhite) : Piece(isWhite), hasMoved_(false) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_KING : Colors::Pieces::BLACK_KING); // Use Unicode symbols
     this->setIsAlive(true);
     this->setIsWhite(isWhite);
@@ -17,10 +15,9 @@ King::King(bool isWhite) : Piece(isWhite), hasMoved_(false) { // Initialize hasM
 std::unique_ptr<Piece> King::clone() const {
     auto cloned = std::make_unique<King>(this->getIsWhite());
     cloned->setHasMoved(this->hasMoved_); // Copy the hasMoved_ state
-    cloned->setIsAlive(this->getIsAlive()); // Ensure other state is also copied if not by constructor
+    cloned->setIsAlive(this->getIsAlive());
     return cloned;
 }
-// --- MODIFICATION END ---
 
 
 bool King::isValidMove(int srcRow, int srcCol, int destRow, int destCol, const Board& board) const
@@ -47,23 +44,21 @@ bool King::canCastle(int srcRow, int srcCol, int destRow, int destCol, const Boa
     // Check if king is in starting position AND has not moved
     int expectedKingRow = this->getIsWhite() ? 7 : 0;
     int expectedKingCol = 4;
-
-    if (srcRow != expectedKingRow || srcCol != expectedKingCol || this->getHasMoved()) { // Added this->getHasMoved()
+    if (srcRow != expectedKingRow || srcCol != expectedKingCol || this->getHasMoved()) {
         return false;
     }
 
     // Check if rook exists and is in starting position AND has not moved
     Piece* rook = board.getPiece(srcRow, rookCol);
-    // std::string expectedRookSymbol = this->getIsWhite() ? "r" : "R"; // Old ASCII symbols
     if (!rook || rook->getIsWhite() != this->getIsWhite() ||
-        (rook->getSymbol() != Colors::Pieces::WHITE_ROOK && rook->getSymbol() != Colors::Pieces::BLACK_ROOK)) { // Use Unicode symbols for comparison
+        (rook->getSymbol() != Colors::Pieces::WHITE_ROOK && rook->getSymbol() != Colors::Pieces::BLACK_ROOK)) {
         return false;
     }
-    if (Rook* r_piece = dynamic_cast<Rook*>(rook)) { // Dynamically cast to Rook to check hasMoved_
+    if (Rook* r_piece = dynamic_cast<Rook*>(rook)) {
         if (r_piece->getHasMoved()) {
             return false;
         }
-    } else { // It's not a Rook or dynamic_cast failed
+    } else { // It's not a Rook or dynamic_cast failed (e.g., nullptr or wrong type)
         return false;
     }
 
@@ -72,9 +67,11 @@ bool King::canCastle(int srcRow, int srcCol, int destRow, int destCol, const Boa
         return false;
     }
 
-    // Check if path is clear between king and rook
+    // Move these declarations outside the 'if' block that might prevent their declaration
     int start = std::min(srcCol, rookCol);
     int end = std::max(srcCol, rookCol);
+
+    // Check if path is clear between king and rook
     for (int c = start + 1; c < end; c++) {
         if (board.getPiece(srcRow, c) != nullptr) {
             return false;

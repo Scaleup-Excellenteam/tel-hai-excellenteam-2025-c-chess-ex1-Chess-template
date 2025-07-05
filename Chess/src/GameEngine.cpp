@@ -1,6 +1,9 @@
+// Chess/src/GameEngine.cpp
 #include "GameEngine.h"
 #include "Chess.h"
 #include "Utils/Colors.h"
+#include "AI/BestMoveFinder.h"
+#include "Utils/CMove.h"
 
 #include <iostream>
 #include <string>
@@ -10,18 +13,23 @@
 #include <ctime>
 #include <iomanip>
 #include <limits>
+#include <thread>
 #include "Pieces/King.h"
 #include "Pieces/Rook.h"
-
+#include "Pieces/Queen.h"
+#include "Pieces/Bishop.h"
+#include "Pieces/Knight.h"
+#include "Pieces/Pawn.h"
 
 // --- Constructor ---
 GameEngine::GameEngine()
-  : m_searchDepth(3), isWhiteTurn_(true), m_codeResponse(-1)
+  : m_searchDepth(3), isWhiteTurn_(true), m_codeResponse(-1), m_playAgainstAI(false),
+    m_halfMoveClock(0)
 {
     initGame();
 }
 
-// --- Helper for putting pieces ---
+// --- Helper for putting pieces (kept private, test will use setPieceForTest) ---
 void GameEngine::putPiece(int row, int col, Piece* raw) {
     board->setPiece(row, col, std::unique_ptr<Piece>(raw));
 }
@@ -54,6 +62,12 @@ void GameEngine::initGame()
     putPiece(7, 5, new Bishop(true));
     putPiece(7, 6, new Knight(true));
     putPiece(7, 7, new Rook  (true));
+
+    // Clear board history and reset half-move clock for a new game
+    m_boardHistory.clear();
+    m_halfMoveClock = 0;
+    // Add initial state to history for repetition tracking
+    m_boardHistory[getBoardStateString()] = 1;
 }
 
 // --- Set internal code response for UI feedback ---
@@ -74,52 +88,102 @@ bool GameEngine::isCheck() const
     return board->inCheck(isWhiteTurn_);
 }
 
+// --- handlePawnPromotion ---
+void GameEngine::handlePawnPromotion(int row, int col) {
+    Piece* pawnToPromote = board->getPiece(row, col);
+    if (!pawnToPromote || dynamic_cast<Pawn*>(pawnToPromote) == nullptr) {
+        return;
+    }
+
+    bool isWhitePawn = pawnToPromote->getIsWhite();
+    char choiceChar;
+
+    if (m_playAgainstAI && !isWhiteTurn_) { // It was AI's turn (Black AI)
+        board->setPiece(row, col, std::make_unique<Queen>(isWhitePawn));
+        std::cout << Colors::INFO_COLOR << "AI promoted pawn to Queen!" << Colors::RESET << std::endl;
+    } else { // Human player's turn (White human or Black human in PvP)
+        std::cout << Colors::INFO_COLOR << "\nPawn promotion! Choose piece (Q=Queen, R=Rook, B=Bishop, N=Knight): " << Colors::RESET;
+        std::cin >> choiceChar;
+        choiceChar = std::tolower(static_cast<unsigned char>(choiceChar));
+
+        std::unique_ptr<Piece> promotedPiece;
+        switch (choiceChar) {
+            case 'r': promotedPiece = std::make_unique<Rook>(isWhitePawn); break;
+            case 'b': promotedPiece = std::make_unique<Bishop>(isWhitePawn); break;
+            case 'n': promotedPiece = std::make_unique<Knight>(isWhitePawn); break;
+            case 'q':
+            default:
+                promotedPiece = std::make_unique<Queen>(isWhitePawn);
+                if (choiceChar != 'q') {
+                    std::cout << Colors::YELLOW << "Invalid choice. Defaulting to Queen." << Colors::RESET << std::endl;
+                }
+                break;
+        }
+        board->setPiece(row, col, std::move(promotedPiece));
+    }
+}
+
+
 // --- makeMove (string version) - validates & applies a move, sets codeResponse, swaps turns on success ---
 void GameEngine::makeMove(const std::string& moveStr)
 {
+    int srcRow = moveStr[0] - 'a';
+    int srcCol = moveStr[1] - '1';
+    int destRow = moveStr[2] - 'a';
+    int destCol = moveStr[3] - '1';
+
+    Piece* piece_at_src = board->getPiece(srcRow, srcCol);
+    Piece* piece_at_dest_before_move = board->getPiece(destRow, destCol);
+
+    bool isPawnMove = (dynamic_cast<Pawn*>(piece_at_src) != nullptr);
+    bool isCapture = (piece_at_dest_before_move != nullptr);
+    bool isEnPassantCapture = false;
+    if (isPawnMove && std::abs(srcCol - destCol) == 1 && piece_at_dest_before_move == nullptr) {
+        if (Pawn* pawn = dynamic_cast<Pawn*>(piece_at_src)) {
+            if (pawn->isValidEnPassant(srcRow, srcCol, destRow, destCol, *board)) {
+                isEnPassantCapture = true;
+            }
+        }
+    }
+
+
     int code = validateMove(moveStr);
     setCodeResponse(code);
 
     if (code == 42 || code == 41) {
-        int srcRow = moveStr[0] - 'a';
-        int srcCol = moveStr[1] - '1';
-        int destRow = moveStr[2] - 'a';
-        int destCol = moveStr[3] - '1';
-
-        // Get the piece *before* it's moved from src, to update its hasMoved_ flag
-        // and to check if it's a King for castling handling in Board::applyMove
-        // The piece itself (pointed to by Piece*) will be correctly updated.
-        Piece* piece_at_src = board->getPiece(srcRow, srcCol);
-
-        // If it's a King or Rook, directly set its hasMoved_ property
         if (King* k = dynamic_cast<King*>(piece_at_src)) {
-            // k->setHasMoved(true);
-            
+            k->setHasMoved(true);
         } else if (Rook* r = dynamic_cast<Rook*>(piece_at_src)) {
             r->setHasMoved(true);
         }
-        
-        // Apply the move (and potentially the rook's move for castling if it's a king move)
-        // Board::applyMove will internally handle removing from src and placing at dest.
+
         board->applyMove({srcRow, srcCol, destRow, destCol});
 
-        isWhiteTurn_ = !isWhiteTurn_; // Switch turn after a successful move application
+        if (isPawnMove || isCapture || isEnPassantCapture) {
+            m_halfMoveClock = 0;
+        } else {
+            m_halfMoveClock++;
+        }
+
+        if (isPawnMove && board->isPawnPromotionReady(destRow, destCol)) {
+            handlePawnPromotion(destRow, destCol);
+            m_halfMoveClock = 0;
+        }
+
+        isWhiteTurn_ = !isWhiteTurn_;
+
+        m_boardHistory[getBoardStateString()]++;
     }
 }
 
 // --- makeMove (coordinate version) - applies a move, mutates board, switches turns ---
-// Note: This overload is called internally by makeMove(string).
-// The hasMoved_ logic has been consolidated in makeMove(string) before applyMove.
-// This function's role is just to tell the board to apply the move.
 bool GameEngine::makeMove(int srcRow, int srcCol, int destRow, int destCol)
 {
     if (!board) return false;
 
-    // The hasMoved_ update for King/Rook is now done in the `makeMove(string)` overload
-    // before `board->applyMove` is called. This avoids redundant dynamic_casting here.
     board->applyMove({srcRow, srcCol, destRow, destCol});
 
-    isWhiteTurn_ = !isWhiteTurn_; // Switch turn after a successful move application
+    isWhiteTurn_ = !isWhiteTurn_;
 
     return true;
 }
@@ -141,31 +205,29 @@ int GameEngine::validateMove(const std::string& mv) const
     if (Piece* dst = board->getPiece(dR, dC);
         dst && dst->getIsWhite() == src->getIsWhite()) return 13;
 
-    // Check for castling as a special case *before* generic isValidMove
     if (King* king_piece = dynamic_cast<King*>(src)) {
-        if (std::abs(dR - sR) == 0 && std::abs(dC - sC) == 2) { // Horizontal 2-square move (potential castling)
+        if (std::abs(dR - sR) == 0 && std::abs(dC - sC) == 2) {
             if (!king_piece->isValidMove(sR, sC, dR, dC, *board)) {
-                return 21; // Illegal movement for that piece (failed castling conditions)
+                return 21;
             }
-        } else if (!king_piece->isValidMove(sR, sC, dR, dC, *board)) { // Not castling, but normal king move invalid
+        } else if (!king_piece->isValidMove(sR, sC, dR, dC, *board)) {
             return 21;
         }
-    } else if (!src->isValidMove(sR, sC, dR, dC, *board)) { // Other pieces' invalid moves
+    } else if (!src->isValidMove(sR, sC, dR, dC, *board)) {
         return 21;
     }
 
-    // Create a temporary board to check for self-check
     Board temp_board = *board;
     temp_board.applyMove({sR, sC, dR, dC});
     if (temp_board.inCheck(isWhiteTurn_)) {
-        return 31; // this movement will cause you check
+        return 31;
     }
 
-    if (temp_board.inCheck(!isWhiteTurn_)) { // Check if opponent's king is in check after the move
-        return 41; // the legal movement causes check
+    if (temp_board.inCheck(!isWhiteTurn_)) {
+        return 41;
     }
 
-    return 42; // Legal move
+    return 42;
 }
 
 // --- isCheckmate - checks if the current player is in checkmate ---
@@ -184,65 +246,121 @@ bool GameEngine::isStalemate() const
     return legal.empty();
 }
 
-
+// Implements simplified insufficient material checks based on common draw scenarios.
 bool GameEngine::isInsufficientMaterial() const {
-    int whiteMinorPieces = 0; // Count of white Knights and Bishops
-    int blackMinorPieces = 0; // Count of black Knights and Bishops
-    bool whiteHasBishop = false; // To differentiate K+B from K+N
-    bool blackHasBishop = false; // To differentiate K+B from K+N
+    int whiteMinorPieces = 0;
+    int blackMinorPieces = 0;
 
     for (int r = 0; r < 8; ++r) {
         for (int c = 0; c < 8; ++c) {
             const Piece* p = board->getPiece(r, c);
             if (p) {
-                // If any side has a pawn, rook, or queen, it's NOT insufficient material.
-                // We can return false immediately without further checks.
                 if (p->getSymbol() == Colors::Pieces::WHITE_PAWN || p->getSymbol() == Colors::Pieces::BLACK_PAWN ||
                     p->getSymbol() == Colors::Pieces::WHITE_ROOK || p->getSymbol() == Colors::Pieces::BLACK_ROOK ||
                     p->getSymbol() == Colors::Pieces::WHITE_QUEEN || p->getSymbol() == Colors::Pieces::BLACK_QUEEN) {
                     return false;
                 }
 
-                // Count minor pieces (Knights and Bishops)
                 if (p->getIsWhite()) {
                     if (p->getSymbol() == Colors::Pieces::WHITE_KNIGHT) whiteMinorPieces++;
                     else if (p->getSymbol() == Colors::Pieces::WHITE_BISHOP) {
                         whiteMinorPieces++;
-                        whiteHasBishop = true;
                     }
-                } else { // Black piece
+                } else {
                     if (p->getSymbol() == Colors::Pieces::BLACK_KNIGHT) blackMinorPieces++;
                     else if (p->getSymbol() == Colors::Pieces::BLACK_BISHOP) {
                         blackMinorPieces++;
-                        blackHasBishop = true;
                     }
                 }
             }
         }
     }
 
-    // After the loop, we know there are no pawns, rooks, or queens.
-    // Only Kings, Knights, and Bishops remain on the board.
-
-    // Case 1: King vs King (no other pieces on board)
     if (whiteMinorPieces == 0 && blackMinorPieces == 0) {
         return true;
     }
 
-    // Case 2: King and one minor piece vs King
-    // This covers K+N vs K, K+B vs K for either white or black.
     if ((whiteMinorPieces == 1 && blackMinorPieces == 0) ||
         (blackMinorPieces == 1 && whiteMinorPieces == 0)) {
         return true;
     }
 
-    // Case 3: King and one minor piece vs King and one minor piece
-    // This covers K+N vs K+N, K+B vs K+B, K+N vs K+B.
     if (whiteMinorPieces == 1 && blackMinorPieces == 1) {
         return true;
     }
 
-    return false; // Any other combination (e.g., K+2N vs K) is considered sufficient.
+    return false;
+}
+
+// --- isFiftyMoveDraw function ---
+bool GameEngine::isFiftyMoveDraw() const {
+    return m_halfMoveClock >= 100;
+}
+
+// --- getBoardStateString function for Threefold Repetition ---
+std::string GameEngine::getBoardStateString() const {
+    std::string state = "";
+    for (int r = 0; r < 8; ++r) {
+        for (int c = 0; c < 8; ++c) {
+            const Piece* p = board->getPiece(r, c);
+            if (p) {
+                state += p->getSymbol();
+            } else {
+                state += '#';
+            }
+        }
+    }
+
+    state += (isWhiteTurn_ ? 'W' : 'B');
+
+    const Piece* whiteKing = board->getPiece(7, 4);
+    const Piece* blackKing = board->getPiece(0, 4);
+    const Piece* whiteRookH = board->getPiece(7, 7);
+    const Piece* whiteRookA = board->getPiece(7, 0);
+    const Piece* blackRookH = board->getPiece(0, 7);
+    const Piece* blackRookA = board->getPiece(0, 0);
+
+    if (const King* wk = dynamic_cast<const King*>(whiteKing)) {
+        if (!wk->getHasMoved()) {
+            if (const Rook* wrh = dynamic_cast<const Rook*>(whiteRookH)) {
+                if (!wrh->getHasMoved()) state += 'K';
+            }
+            if (const Rook* wra = dynamic_cast<const Rook*>(whiteRookA)) {
+                if (!wra->getHasMoved()) state += 'Q';
+            }
+        }
+    }
+    if (const King* bk = dynamic_cast<const King*>(blackKing)) {
+        if (!bk->getHasMoved()) {
+            if (const Rook* brh = dynamic_cast<const Rook*>(blackRookH)) {
+                if (!brh->getHasMoved()) state += 'k';
+            }
+            if (const Rook* bra = dynamic_cast<const Rook*>(blackRookA)) {
+                if (!bra->getHasMoved()) state += 'q';
+            }
+        }
+    }
+
+    CMove lm = board->getLastMove();
+    if (dynamic_cast<Pawn*>(board->getPiece(lm.destRow, lm.destCol)) && std::abs(lm.srcRow - lm.destRow) == 2) {
+        int epRow = (lm.srcRow + lm.destRow) / 2;
+        int epCol = lm.destCol;
+        state += static_cast<char>('a' + epRow);
+        state += static_cast<char>('1' + epCol);
+    } else {
+        state += '-';
+    }
+
+    return state;
+}
+
+// --- isThreefoldRepetition function ---
+bool GameEngine::isThreefoldRepetition() const {
+    auto it = m_boardHistory.find(getBoardStateString());
+    if (it != m_boardHistory.end()) {
+        return it->second >= 3;
+    }
+    return false;
 }
 
 // --- displayWelcomeBanner ---
@@ -265,51 +383,58 @@ void GameEngine::getUserSettings() {
 
     std::cout << MENU_COLOR << "◆ Enter AI search depth " << GREEN << "(1-5, recommended 3): " << RESET;
     std::cin >> m_searchDepth;
-    if (std::cin.fail() || std::cin.peek() != '\n' || m_searchDepth < 1 || m_searchDepth > 5) { // Added peek() check
+    if (std::cin.fail() || std::cin.peek() != '\n' || m_searchDepth < 1 || m_searchDepth > 5) {
         std::cout << RED << "✗ Invalid input. Defaulting to depth 3." << RESET << std::endl;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         m_searchDepth = 3;
     } else {
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Consume newline if input was good
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
 
     std::cout << std::endl << MENU_COLOR << "◆ Select game mode:" << RESET << std::endl;
     std::cout << CYAN << "  1. " << RESET << "Interactive Game (Player vs. Player)" << std::endl;
-    std::cout << CYAN << "  2. " << RESET << "Automatic Benchmark" << std::endl;
-    std::cout << MENU_COLOR << "◆ Enter mode (1 or 2): " << RESET;
+    std::cout << CYAN << "  2. " << RESET << "Player vs. Computer (AI)" << std::endl;
+    std::cout << CYAN << "  3. " << RESET << "Automatic Benchmark" << std::endl;
+    std::cout << MENU_COLOR << "◆ Enter mode (1, 2 or 3): " << RESET;
     std::cin >> gameMode;
-    if (std::cin.fail() || std::cin.peek() != '\n' || (gameMode != 1 && gameMode != 2)) { // Added peek() check
+    if (std::cin.fail() || std::cin.peek() != '\n' || (gameMode != 1 && gameMode != 2 && gameMode != 3)) {
         std::cout << RED << "✗ Invalid mode. Defaulting to Interactive Game." << RESET << std::endl;
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         gameMode = 1;
     } else {
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Consume newline if input was good
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
-
-    if (gameMode == 2) {
-        std::cout << INFO_COLOR << "\n◆ Starting benchmark mode..." << RESET << std::endl;
+    if (gameMode == 3) {
         runBenchmark(m_searchDepth);
-    } else {
+    } else if (gameMode == 2) {
+        m_playAgainstAI = true;
+        std::cout << Colors::INFO_COLOR << "\n◆ Starting Player vs. Computer game..." << Colors::RESET << std::endl;
+        runInteractiveGame();
+    }
+    else { // Player vs Player
+        m_playAgainstAI = false;
         runInteractiveGame();
     }
 }
 
-// --- runInteractiveGame - Main game loop for interactive play ---
 // --- runInteractiveGame - Main game loop for interactive play ---
 void GameEngine::runInteractiveGame() {
     using namespace Colors;
     std::cout << CYAN << "\n✓ Starting interactive game..." << RESET << std::endl;
     std::cout << BOARD_FRAME << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << RESET << std::endl;
     std::cout << CYAN << "◆ Enter moves in format: " << ORANGE << "a2a4" << RESET << std::endl;
-    std::cout << CYAN << "◆ Type " << ORANGE << "'exit'" << CYAN << " or " << ORANGE << "'quit'" << CYAN << " to end game" << RESET << std::endl;
+    std::cout << CYAN << "◆ Type " << ORANGE << "'exit'" << CYAN << " or " << ORANGE << "'quit'" << CYAN << " to end game" << std::endl;
     std::cout << BOARD_FRAME << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" << RESET << std::endl << std::endl;
 
     std::string initial_board_str = "RNBQKBNRPPPPPPPP################################pppppppprnbqkbnr";
     Chess game_ui(initial_board_str, this);
+
+    // Initial board state for repetition tracking (already done in initGame)
+    // m_boardHistory[getBoardStateString()] = 1;
 
     std::string userInput;
 
@@ -325,18 +450,52 @@ void GameEngine::runInteractiveGame() {
             std::cout << BLUE << BOLD << "STALEMATE! Game is a draw." << RESET << std::endl;
             break;
         }
-        // ADDED Insufficient Material check
         else if (isInsufficientMaterial()) {
-            game_ui.setCodeResponse(98); // Use 98 for draw
+            game_ui.setCodeResponse(98);
             game_ui.displayBoard();
             std::cout << BLUE << BOLD << "DRAW! Insufficient material." << RESET << std::endl;
             break;
         }
-
-        userInput = game_ui.getInput();
-
-        if (userInput == "exit") {
+        else if (isFiftyMoveDraw()) {
+            game_ui.setCodeResponse(98);
+            game_ui.displayBoard();
+            std::cout << BLUE << BOLD << "DRAW! 50-move rule." << RESET << std::endl;
             break;
+        }
+        else if (isThreefoldRepetition()) {
+            game_ui.setCodeResponse(98);
+            game_ui.displayBoard();
+            std::cout << BLUE << BOLD << "DRAW! Threefold repetition." << RESET << std::endl;
+            break;
+        }
+
+
+        bool isAITurn = (m_playAgainstAI && !isWhiteTurn_);
+
+        if (isAITurn) {
+            game_ui.displayBoard();
+            std::cout << Colors::INFO_COLOR << "AI (Black) is thinking..." << Colors::RESET << std::endl;
+
+            auto bestMoves = AI::findBestMoves(currentBoard(), false, 1, 8, m_searchDepth);
+
+            if (!bestMoves.empty()) {
+                CMove aiMove = bestMoves[0].move;
+                userInput = "";
+                userInput += (char)('a' + aiMove.srcRow);
+                userInput += (char)('1' + aiMove.srcCol);
+                userInput += (char)('a' + aiMove.destRow);
+                userInput += (char)('1' + aiMove.destCol);
+                std::cout << Colors::INFO_COLOR << "AI moves: " << Colors::BOLD << userInput << Colors::RESET << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            } else {
+                std::cout << Colors::RED << "AI has no legal moves. Game ends." << Colors::RESET << std::endl;
+                break;
+            }
+        } else {
+            userInput = game_ui.getInput();
+            if (userInput == "exit") {
+                break;
+            }
         }
 
         makeMove(userInput);
@@ -390,7 +549,7 @@ void GameEngine::runBenchmark(int searchDepth) {
         for (const auto& moveStr : gameMoves) {
             temp_engine.makeMove(moveStr);
             auto start_time = std::chrono::high_resolution_clock::now();
-            AI::findBestMoves(temp_engine.currentBoard(), temp_engine.whiteToMove(), searchDepth, threads);
+            AI::findBestMoves(temp_engine.currentBoard(), temp_engine.whiteToMove(), searchDepth, threads, searchDepth);
             auto end_time = std::chrono::high_resolution_clock::now();
             total_duration_ms += std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
         }
@@ -419,4 +578,42 @@ void GameEngine::runBenchmark(int searchDepth) {
 void GameEngine::run() {
     displayWelcomeBanner();
     getUserSettings();
+}
+
+// --- PUBLIC METHODS FOR TESTING ONLY ---
+void GameEngine::resetGameForTest() {
+    board = std::make_unique<Board>();
+    isWhiteTurn_ = true;
+    m_halfMoveClock = 0;
+    m_boardHistory.clear();
+}
+
+void GameEngine::setPieceForTest(int row, int col, Piece* rawPiece) {
+    board->setPiece(row, col, std::unique_ptr<Piece>(rawPiece));
+}
+
+void GameEngine::setTurnForTest(bool isWhite) {
+    isWhiteTurn_ = isWhite;
+}
+
+void GameEngine::setHalfMoveClockForTest(int count) {
+    m_halfMoveClock = count;
+}
+
+void GameEngine::clearBoardHistoryForTest() {
+    m_boardHistory.clear();
+}
+
+void GameEngine::addBoardStateToHistoryForTest() {
+    m_boardHistory[getBoardStateString()]++;
+}
+
+void GameEngine::setPlayAgainstAIForTest(bool value) {
+    m_playAgainstAI = value;
+}
+
+
+void GameEngine::setLastMoveForTest(CMove move) {
+    // Corrected: Call the public setter on the board object
+    board->setLastMoveForTest(move);
 }

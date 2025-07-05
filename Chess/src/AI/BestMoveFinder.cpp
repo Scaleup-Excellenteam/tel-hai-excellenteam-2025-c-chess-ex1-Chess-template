@@ -6,7 +6,7 @@
 #include <climits>
 #include <future>
 #include <vector>
-#include <cctype> // For std::tolower if still needed, but not directly for Unicode strings
+#include <cctype>
 
 namespace AI
 {
@@ -83,13 +83,11 @@ int minimax_ab(const Board& board, int depth, int alpha, int beta, bool isMaximi
     }
 }
 
-
-// Single-threaded findBestMoves updated to use alpha-beta.
+// --- Helper: findBestMoves - finds the best moves for a given board state using alpha-beta pruning.
 std::vector<MoveScorePair>
-findBestMoves(const Board& board, bool isWhite, int limit)
+findBestMoves(const Board& board, bool isWhite, int limit, int searchDepth) // Added searchDepth parameter
 {
     std::vector<MoveScorePair> candidates;
-    const int searchDepth = 3; // Default or adjustable by parameter if needed
 
     std::vector<CMove> legalMoves = board.generateLegalMoves(isWhite);
     candidates.reserve(legalMoves.size());
@@ -97,9 +95,7 @@ findBestMoves(const Board& board, bool isWhite, int limit)
     for (const CMove& move : legalMoves) {
         Board tempBoard = board;
         tempBoard.applyMove(move);
-        // Initial call to minimax_ab: if it's white's turn, and AI is white, then AI is maximizing.
-        // Or generally, the AI is always the maximizing player in its root call.
-        int score = minimax_ab(tempBoard, searchDepth - 1, INT_MIN, INT_MAX, false, isWhite); // isWhite here refers to AI's color
+        int score = minimax_ab(tempBoard, searchDepth - 1, INT_MIN, INT_MAX, false, isWhite);
         candidates.push_back({ move, score });
     }
 
@@ -121,30 +117,24 @@ std::vector<MoveScorePair>
 findBestMoves(const Board& board,
               bool isWhite,
               int limit,
-              int threadCount)
+              int threadCount,
+              int searchDepth) 
 {
     if (threadCount <= 1) {
-        return findBestMoves(board, isWhite, limit);
+        return findBestMoves(board, isWhite, limit, searchDepth); // Pass searchDepth to single-threaded version
     }
 
     ThreadPool pool(threadCount);
-    // Using std::priority_queue directly with a mutex would be simpler than ThreadSafePriorityQueue for this use case
-    // as we collect all results and then sort. ThreadSafePriorityQueue is good if you need to pop highest priority
-    // items *during* computation. For collecting all results, a std::vector of futures or a simple mutex-protected
-    // std::vector + sort at the end is standard. But let's stick to ThreadSafePriorityQueue since it's already there.
     ThreadSafePriorityQueue<MoveScorePair> results_queue;
     std::vector<std::future<void>> futures;
 
     std::vector<CMove> legalMoves = board.generateLegalMoves(isWhite);
-    const int searchDepth = 3; // Default or adjustable by parameter if needed
 
     for (const auto& move : legalMoves) {
         futures.emplace_back(
             pool.enqueue([&board, move, isWhite, searchDepth, &results_queue] {
                 Board tempBoard = board;
                 tempBoard.applyMove(move);
-                // Each thread runs an alpha-beta search for a top-level move.
-                // isWhite in the minimax_ab call here should be the AI's color.
                 int score = minimax_ab(tempBoard, searchDepth - 1, INT_MIN, INT_MAX, false, isWhite);
                 results_queue.push({ move, score });
             })
@@ -175,9 +165,8 @@ findBestMoves(const Board& board,
 
 
 // --- Helper: convert piece symbol (string) to a crude material value. ---
-int BestMoveFinder::pieceValue(const std::string& symbol) // <--- CHANGED PARAMETER TYPE
+int BestMoveFinder::pieceValue(const std::string& symbol)
 {
-    // Compare with the full Unicode string symbols
     if (symbol == Colors::Pieces::WHITE_PAWN || symbol == Colors::Pieces::BLACK_PAWN) return 1;
     if (symbol == Colors::Pieces::WHITE_KNIGHT || symbol == Colors::Pieces::BLACK_KNIGHT) return 3;
     if (symbol == Colors::Pieces::WHITE_BISHOP || symbol == Colors::Pieces::BLACK_BISHOP) return 3;
@@ -186,8 +175,6 @@ int BestMoveFinder::pieceValue(const std::string& symbol) // <--- CHANGED PARAME
     return 0; // King or empty square
 }
 
-// This is no longer the primary evaluation method but can be kept for other purposes.
-// It will now also use the std::string symbol.
 int BestMoveFinder::evaluateMove(const Board& board, const CMove& move) const
 {
     const Piece* src = board.getPiece(move.srcRow,  move.srcCol);
@@ -201,10 +188,9 @@ int BestMoveFinder::evaluateMove(const Board& board, const CMove& move) const
 
 MoveScorePair BestMoveFinder::findBestMove(const Board& board, bool isWhite) const
 {
-    // Default limit for findBestMove that's not multithreaded
-    auto bestMoves = findBestMoves(board, isWhite, 1);
+    auto bestMoves = AI::findBestMoves(board, isWhite, 1, 3); // Default depth 3 if not specified
     if (bestMoves.empty()) {
-        return { CMove{}, isWhite ? INT_MIN : INT_MAX }; // Return very low/high score if no moves
+        return { CMove{}, isWhite ? INT_MIN : INT_MAX };
     }
     return bestMoves[0];
 }

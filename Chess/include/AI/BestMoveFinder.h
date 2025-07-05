@@ -40,14 +40,12 @@ namespace AI
 
         static int pieceValue(const std::string& symbol);
     private:
-
         std::mutex pqMutex;
         std::atomic<bool> stopFlag{false};
 
     };
 
-    std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit);
-
-    std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit, int threadCount);
+    std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit, int searchDepth);
+    std::vector<MoveScorePair> findBestMoves(const Board& board, bool isWhite, int limit, int threadCount, int searchDepth);
 
 } // namespace AI

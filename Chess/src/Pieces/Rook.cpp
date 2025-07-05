@@ -9,7 +9,7 @@ Rook::Rook(bool isWhite) : Piece(isWhite), hasMoved_(false) {
     this->setIsWhite(isWhite);
 }
 
-// Proper clone implementation that preserves hasMoved_ state
+
 std::unique_ptr<Piece> Rook::clone() const {
     auto cloned = std::make_unique<Rook>(this->getIsWhite());
     cloned->setHasMoved(this->hasMoved_);
@@ -28,22 +28,22 @@ std::vector<CMove> Rook::legalMoves(int r, int c, const Board& b) const {
             int destCol = c + dc[i] * step;
 
             if (destRow < 0 || destRow >= 8 || destCol < 0 || destCol >= 8) {
-                break;
+                break; // Out of bounds, stop in this direction
             }
 
+            // If the move is valid, add it.
+            // If it's invalid, it implies an obstacle or invalid target, so break.
             if (isValidMove(r, c, destRow, destCol, b)) {
                 moves.emplace_back(r, c, destRow, destCol);
-            } else {
-                const Piece* destPiece = b.getPiece(destRow, destCol);
-                if (destPiece != nullptr && destPiece->getIsWhite() == this->getIsWhite()) {
-                    break;
-                }
-                if (destPiece != nullptr && destPiece->getIsWhite() != this->getIsWhite()) {
-                    break;
-                }
+                // If the destination contains an opponent's piece, it's a capture,
+                // and further moves in this direction are blocked.
                 if (b.getPiece(destRow, destCol) != nullptr) {
                     break;
                 }
+            } else {
+                // If isValidMove returns false, it's due to an obstacle or invalid target.
+                // Stop checking in this direction.
+                break;
             }
         }
     }

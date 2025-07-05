@@ -58,7 +58,6 @@ class Chess {
 
     void clear() const;
     void setFrames();
-    void setPieces();
     void syncBoardStringWithBoard();
     void show() const;
 public:
