@@ -368,10 +368,10 @@ void GameEngine::displayWelcomeBanner() const {
     using namespace Colors;
     std::cout << INFO_COLOR << "╔═══════════════════════════════════════╗" << RESET << std::endl;
     std::cout << INFO_COLOR << "║" << RESET;
-    std::cout << YELLOW << "          ♔ CHESS GAME ♚             " << RESET;
+    std::cout << YELLOW << "          ♔   CHESS GAME ♚             " << RESET;
     std::cout << INFO_COLOR << "║" << RESET << std::endl;
     std::cout << INFO_COLOR << "║" << RESET;
-    std::cout << INFO_COLOR << "      Classic Strategy Game v1.0      " << RESET;
+    std::cout << INFO_COLOR << "      Classic Strategy Game v1.0       " << RESET;
     std::cout << INFO_COLOR << "║" << RESET << std::endl;
     std::cout << INFO_COLOR << "╚═══════════════════════════════════════╝" << RESET << std::endl << std::endl;
 }
