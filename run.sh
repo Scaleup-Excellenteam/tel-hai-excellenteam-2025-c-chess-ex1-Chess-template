@@ -4,9 +4,10 @@ set -euo pipefail
 ##############################################################################
 # CONFIG
 ##############################################################################
-BUILD_DIR="build"                   # out-of-tree build folder
-SRC_DIR="$(dirname "$0")"           # path to CMakeLists.txt is now the script's dir
-RUN_TESTS=false                     # Flag to control test execution
+BUILD_DIR="build"                                 # out‐of‐tree build folder
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"       # this script’s directory
+SRC_DIR="$SCRIPT_DIR/Chess"                       # CMakeLists.txt lives here now
+RUN_TESTS=false                                   # pass --test to run tests
 
 # Parse arguments
 if [[ "$#" -gt 0 && ("$1" == "--test" || "$1" == "--tests") ]]; then
@@ -32,7 +33,7 @@ echo "🛠️ Building project..."
 case "$(uname -s)" in
   Linux*)  JOBS=$(nproc) ;;
   Darwin*) JOBS=$(sysctl -n hw.ncpu) ;;
-  *)       JOBS=1 ;;                      # Windows MSVC/NMake handles /MP itself
+  *)       JOBS=1 ;;
 esac
 
 cmake --build "$BUILD_DIR" --parallel "$JOBS"
@@ -42,44 +43,24 @@ cmake --build "$BUILD_DIR" --parallel "$JOBS"
 ##############################################################################
 if $RUN_TESTS; then
     echo "▶️ Running tests..."
-    test_exe_path=""
-    if [[ -x "$BUILD_DIR/GameTests" ]]; then
-        test_exe_path="$BUILD_DIR/GameTests"
-    elif [[ -x "$BUILD_DIR/Release/GameTests.exe" ]]; then # For Windows MSVC
-        test_exe_path="$BUILD_DIR/Release/GameTests.exe"
-    elif [[ -x "$BUILD_DIR/GameTests.exe" ]]; then # For Windows Ninja/MinGW
-        test_exe_path="$BUILD_DIR/GameTests.exe"
+    test_exe="$BUILD_DIR/GameTests"
+    if [[ ! -x "$test_exe" ]]; then
+      # try Windows MSVC layouts:
+      test_exe="$BUILD_DIR/Release/GameTests.exe"
+      [[ -x "$test_exe" ]] || test_exe="$BUILD_DIR/GameTests.exe"
     fi
-
-    if [[ -z "$test_exe_path" ]]; then
-        echo "❌ Could not find the GameTests executable after build."
-        exit 1
-    fi
-
-    exec "$test_exe_path"
+    [[ -x "$test_exe" ]] || { echo "❌ Could not find GameTests"; exit 1; }
+    exec "$test_exe"
 else
-    exe_path=""
-    # Single-config generators (Ninja, Makefiles) place it right in $BUILD_DIR
-    if [[ -x "$BUILD_DIR/Chess" ]]; then
-        exe_path="$BUILD_DIR/Chess"
-    elif [[ -x "$BUILD_DIR/Chess.exe" ]]; then
-        exe_path="$BUILD_DIR/Chess.exe"
-    else
-        # Multi-config (Visual Studio, Xcode): default to Release
-        if [[ -x "$BUILD_DIR/Release/Chess.exe" ]]; then
-            exe_path="$BUILD_DIR/Release/Chess.exe"
-        elif [[ -x "$BUILD_DIR/Release/Chess" ]]; then
-            exe_path="$BUILD_DIR/Release/Chess"
-        fi
+    echo "▶️ Running Chess..."
+    exe="$BUILD_DIR/Chess"
+    if [[ ! -x "$exe" ]]; then
+      # try Windows MSVC layouts:
+      exe="$BUILD_DIR/Release/Chess.exe"
+      [[ -x "$exe" ]] || exe="$BUILD_DIR/Release/Chess"
     fi
-
-    if [[ -z "$exe_path" ]]; then
-        echo "❌  Could not find the Chess executable after build."
-        exit 1
-    fi
-
-    echo "▶️ Running $exe_path ..."
-    exec "$exe_path"
+    [[ -x "$exe" ]] || { echo "❌ Could not find Chess executable"; exit 1; }
+    exec "$exe"
 fi
 
 echo "✅ Build and run completed successfully."
