@@ -1,4 +1,3 @@
-// Chess/src/Board.cpp
 #include "Board.h"
 #include "Pieces/Pawn.h"
 #include "Pieces/Bishop.h"
@@ -9,7 +8,6 @@
 #include "Utils/Colors.h"
 #include <algorithm> // For std::min, std::max
 
-// Constructor: Initialize lastMove
 Board::Board() : lastMove(0,0,0,0) {
     grid.reserve(8);
     for (int i = 0; i < 8; ++i) {
@@ -17,7 +15,6 @@ Board::Board() : lastMove(0,0,0,0) {
     }
 }
 
-// Copy Constructor: Copy lastMove
 Board::Board(const Board& other) : lastMove(other.lastMove) {
     grid.reserve(8);
     for (int r = 0; r < 8; ++r)
@@ -32,7 +29,7 @@ Board::Board(const Board& other) : lastMove(other.lastMove) {
     }
 }
 
-// Assignment Operator: Copy lastMove
+
 Board& Board::operator=(const Board& rhs) {
     if (this != &rhs) {
         grid.clear();
@@ -134,22 +131,15 @@ void Board::applyMove(CMove m) {
         if (std::abs(m.srcCol - m.destCol) == 1 && // Diagonal move
             getPiece(m.destRow, m.destCol) == nullptr) // Destination square is empty (pre-move check)
         {
-            // Calculate the square where the captured pawn *would* be.
-            // It's in the attacking pawn's original row, but the destination column.
+            
             int capturedPawnRow = m.srcRow;
             int capturedPawnCol = m.destCol;
 
-            // Check if a piece exists at that "captured" square and it's an opponent's pawn.
-            // This needs to be a check on the board *before* the moving_piece_owner is set
-            // to the dest square, but after it's removed from src.
-            // The isPawnPromotionReady is const, so we can use board->getPiece.
             const Piece* potentialCapturedPiece = getPiece(capturedPawnRow, capturedPawnCol);
             if (potentialCapturedPiece != nullptr && dynamic_cast<const Pawn*>(potentialCapturedPiece) != nullptr &&
                 potentialCapturedPiece->getIsWhite() != pawn_moving->getIsWhite())
             {
-                // This indicates it was an en passant capture. Remove the captured pawn.
-                // The actual check for if it was a valid en passant move (double move, correct rank etc.)
-                // should have happened in Pawn::isValidMove. Here we just perform the capture.
+      
                 removePiece(capturedPawnRow, capturedPawnCol);
             }
         }
@@ -158,7 +148,6 @@ void Board::applyMove(CMove m) {
 
     setPiece(m.destRow, m.destCol, std::move(moving_piece_owner));
 
-    // Update lastMove AFTER the piece has been placed.
     lastMove = m; // Update the last move for the board
 }
 
