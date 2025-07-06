@@ -27,7 +27,8 @@ jobs:
 
       - name: Configure CMake, build project
         run: |
-        mkdir build
-        cd build
-        cmake ..
-        make
+          cd Chess
+          mkdir build
+          cd build
+          cmake ..
+          make
