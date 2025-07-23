@@ -8,7 +8,7 @@
 class Board {
 private:
     std::vector<std::vector<Piece*>> board_game;
-    std::string& sharedBoardString;
+    std::string sharedBoardString;
     bool isWhiteTurn;
     [[nodiscard]] bool isPathClear(int rowSrc, int colSrc, int rowDst, int colDst) const;
     PriorityQueue<std::pair<std::string,int>> bestMoves;
@@ -18,7 +18,7 @@ private:
     static Piece* createPiece(char type);
 
 public:
-    explicit Board(std::string& boardStr);
+    Board(const std::string& boardStr);
     ~Board();
     bool movePiece(const std::string& input, int& responseCode);
     [[nodiscard]] std::string toString() const;
