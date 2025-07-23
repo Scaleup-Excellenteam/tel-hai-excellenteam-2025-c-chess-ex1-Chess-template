@@ -166,7 +166,7 @@ void Chess::setPieces()
 #endif // WINDOWS
 
 // print the only the board to screen 
-void Chess::show() const 
+void Chess::show() const
 {
 	for (size_t row = 0; row < _SIZE; ++row)
 	{
@@ -181,10 +181,10 @@ void Chess::displayBoard() const
 	clear();
 	show();
 	cout << m_msg<< m_errorMsg;
-	
+
 }
 // print the who is turn before getting input 
-void Chess::showAskInput() const 
+void Chess::showAskInput() const
 {
 	if (m_turn)
 		cout << "Player 1 (White - Capital letters) >> ";
@@ -192,10 +192,10 @@ void Chess::showAskInput() const
 		cout << "Player 2 (Black - Small letters)   >> ";
 }
 // check if the source and dest are the same 
-bool Chess::isSame() const 
+bool Chess::isSame() const
 {
 	return ((m_input[0] == m_input[2]) && (m_input[1] == m_input[3]));
-} 
+}
 // check if the input is lockations at board
 bool Chess::isValid() const
 {
@@ -204,9 +204,9 @@ bool Chess::isValid() const
 		(('A' <= m_input[2]) && (m_input[2] <= 'H')) || (('a' <= m_input[2]) && (m_input[2] <= 'h')) &&
 		(('1' <= m_input[3]) && (m_input[3] <= '8')));
 }
-	
+
 // check if the input is exit or quit  
-bool Chess::isExit() const 
+bool Chess::isExit() const
 {
 	return ((m_input == "exit") || (m_input == "quit") || (m_input == "EXIT") || (m_input == "QUIT"));
 }
@@ -215,19 +215,19 @@ void Chess::excute()
 {
 	int row = (m_input[0] - 'a');
 	int col = (m_input[1] - '1');
-	char pieceInSource = m_boardString[(row * 8) + col]; 
-	m_boardString[(row * 8) + col] = '#'; 
+	char pieceInSource = m_boardString[(row * 8) + col];
+	m_boardString[(row * 8) + col] = '#';
 
 	row = (m_input[2] - 'a');
 	col = (m_input[3] - '1');
-	m_boardString[(row * 8) + col] = pieceInSource; 
+	m_boardString[(row * 8) + col] = pieceInSource;
 
-	setPieces(); 
+	setPieces();
 }
 // check the response code and switch turn if needed 
 void Chess::doTurn()
 {
-	m_errorMsg = "\n"; 
+	m_errorMsg = "\n";
 	switch (m_codeResponse)
 	{
 	case 11:
@@ -288,7 +288,7 @@ string Chess::getInput()
 	if (isFirst)
 		isFirst = false;
 	else
-		doTurn(); 
+		doTurn();
 
 	displayBoard();
 	showAskInput();

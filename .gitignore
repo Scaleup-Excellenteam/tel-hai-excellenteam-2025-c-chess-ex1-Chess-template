@@ -1,12 +1,17 @@
 # Ignore build files and compiled binaries
 /build/
-/CMakeCache.txt
-/CMakeFiles/
-/*.o
-/*.a
-/*.so
-/*.exe
-/*.out
+CMakeCache.txt
+CMakeFiles/
+Makefile
+/Chess/cmake-build-debug/
+
+
+# Ignore object files and compiled libraries
+*.o
+*.a
+*.so
+*.exe
+*.out
 
 # Ignore IDE and editor configuration files
 .vscode/
@@ -22,7 +27,8 @@
 *.log
 *.tmp
 *.bak
+*.core
+core
 
 # Ignore temporary image cache
 img/cache/
-
