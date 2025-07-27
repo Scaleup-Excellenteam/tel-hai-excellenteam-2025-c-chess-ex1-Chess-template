@@ -1,0 +1,2 @@
+/usr/bin/ar qc libChessLib.a CMakeFiles/ChessLib.dir/Chess.cpp.o CMakeFiles/ChessLib.dir/main.cpp.o CMakeFiles/ChessLib.dir/Board.cpp.o CMakeFiles/ChessLib.dir/GameManager.cpp.o CMakeFiles/ChessLib.dir/Utils/ThreadPool.cpp.o CMakeFiles/ChessLib.dir/AI/BestMoveFinder.cpp.o CMakeFiles/ChessLib.dir/Pieces/Bishop.cpp.o CMakeFiles/ChessLib.dir/Pieces/King.cpp.o CMakeFiles/ChessLib.dir/Pieces/Knight.cpp.o CMakeFiles/ChessLib.dir/Pieces/Queen.cpp.o CMakeFiles/ChessLib.dir/Pieces/Rook.cpp.o CMakeFiles/ChessLib.dir/Pieces/Pawn.cpp.o
+/usr/bin/ranlib libChessLib.a
