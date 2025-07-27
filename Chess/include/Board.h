@@ -1,6 +1,5 @@
 // Chess/include/Board.h
 #pragma once
-
 #include "Pieces/Piece.h"
 #include <memory>
 #include <vector>

@@ -8,8 +8,7 @@
 #include <vector>
 #include <cctype>
 
-namespace AI
-{
+namespace AI{
 
 // Evaluates the board based on material. Positive score for white, negative for black.
 int evaluateBoard(const Board& board) {

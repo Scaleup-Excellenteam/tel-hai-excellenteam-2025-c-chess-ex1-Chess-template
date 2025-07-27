@@ -1,6 +1,5 @@
 // Chess/include/GameEngine.h
 #pragma once
-
 #include <string>
 #include <memory>
 #include <vector>

@@ -8,6 +8,7 @@
 #include "Utils/Colors.h"
 #include <algorithm> // For std::min, std::max
 
+
 Board::Board() : lastMove(0,0,0,0) {
     grid.reserve(8);
     for (int i = 0; i < 8; ++i) {

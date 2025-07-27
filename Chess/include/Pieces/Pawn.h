@@ -1,6 +1,7 @@
 #pragma once
 #include "Pieces/Piece.h"
 
+
 class Pawn : public Piece {
 public:
     Pawn(bool isWhite); // constructor

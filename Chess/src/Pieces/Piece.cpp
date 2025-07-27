@@ -1,6 +1,7 @@
 #include "Pieces/Piece.h"
 #include "Board.h" // Needed for Board access
 
+
 // Default implementation of legalMoves for any piece can be overridden
 std::vector<CMove> Piece::legalMoves(int r, int c, const Board& b) const {
     std::vector<CMove> out;

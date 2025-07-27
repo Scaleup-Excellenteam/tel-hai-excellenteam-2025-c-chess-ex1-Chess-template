@@ -3,6 +3,7 @@
 #include "Board.h"
 #include <cmath>
 
+
 Rook::Rook(bool isWhite) : Piece(isWhite), hasMoved_(false) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_ROOK : Colors::Pieces::BLACK_ROOK);
     this->setIsAlive(true);

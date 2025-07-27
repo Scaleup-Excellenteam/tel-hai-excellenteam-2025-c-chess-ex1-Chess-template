@@ -5,6 +5,7 @@
 #include "Pieces/Bishop.h" // To use Bishop's isValidMove logic
 #include <cmath> // for abs()
 
+
 Queen::Queen(bool isWhite) : Piece(isWhite) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_QUEEN : Colors::Pieces::BLACK_QUEEN); // Set string symbol
     this->setIsAlive(true);

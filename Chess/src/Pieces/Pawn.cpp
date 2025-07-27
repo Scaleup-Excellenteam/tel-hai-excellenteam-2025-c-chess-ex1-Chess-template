@@ -3,6 +3,7 @@
 #include "Board.h" // For Board::getLastMove()
 #include <cmath> // For std::abs
 
+
 Pawn::Pawn(bool isWhite) : Piece(isWhite) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_PAWN : Colors::Pieces::BLACK_PAWN);
     this->setIsAlive(true);

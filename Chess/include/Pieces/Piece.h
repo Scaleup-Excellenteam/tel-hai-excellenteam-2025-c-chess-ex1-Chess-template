@@ -4,6 +4,7 @@
 #include <vector>
 #include <string> // Added for string symbol
 
+
 class Board; // Forward declaration
 
 class Piece { // Abstract base class for chess pieces

@@ -4,7 +4,6 @@
 #include "AI/BestMoveFinder.h"
 #include "Utils/Colors.h"
 #include "Utils/CMove.h" // Needed for CMove in AI calls
-
 #include <iostream>
 #include <string>
 #include <cctype>

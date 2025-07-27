@@ -1,4 +1,5 @@
 #pragma once
+
 /**
  * @file BestMoveFinder.h
  * @brief A simple material-only evaluator that can pick either

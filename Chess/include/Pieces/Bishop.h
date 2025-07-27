@@ -3,7 +3,6 @@
 #include <cmath> // for abs()
 #include "Board.h"
 
-
 class Bishop : public Piece {
 public:
     Bishop(bool isWhite); // constructor

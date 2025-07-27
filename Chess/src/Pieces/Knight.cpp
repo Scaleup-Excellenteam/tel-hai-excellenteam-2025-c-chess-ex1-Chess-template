@@ -3,6 +3,7 @@
 #include "Board.h"
 #include <cmath> // for abs()
 
+
 Knight::Knight(bool isWhite) : Piece(isWhite) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_KNIGHT : Colors::Pieces::BLACK_KNIGHT); // Set string symbol
     this->setIsAlive(true);

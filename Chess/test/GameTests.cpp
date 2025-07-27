@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include <tuple>   // For std::tuple
-
 // Include necessary game headers
 #include "../include/GameEngine.h"
 #include "../include/Board.h"
