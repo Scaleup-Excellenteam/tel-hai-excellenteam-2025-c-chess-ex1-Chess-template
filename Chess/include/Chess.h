@@ -4,6 +4,7 @@
 #include <Windows.h>
 #endif
 #include <string>
+
 class GameEngine;
 
 using std::cout;

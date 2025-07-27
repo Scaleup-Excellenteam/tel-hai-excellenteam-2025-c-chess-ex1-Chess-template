@@ -1,5 +1,6 @@
 #pragma once
 #include "Pieces/Piece.h"
+
 #include <cmath> // for abs()
 #include "Board.h"
 

@@ -1,8 +1,8 @@
 #include "Pieces/Knight.h"
 #include "Utils/Colors.h" // Include for Unicode symbols
 #include "Board.h"
-#include <cmath> // for abs()
 
+#include <cmath> // for abs()
 
 Knight::Knight(bool isWhite) : Piece(isWhite) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_KNIGHT : Colors::Pieces::BLACK_KNIGHT); // Set string symbol

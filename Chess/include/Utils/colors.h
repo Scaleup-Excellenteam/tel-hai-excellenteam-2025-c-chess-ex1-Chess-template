@@ -2,6 +2,7 @@
 
 #include <string>
 
+
 namespace Colors {
     const std::string PURPLE = "\033[38;5;135m";  // Deep purple
     const std::string GREEN = "\033[38;5;114m";   // Pastel green

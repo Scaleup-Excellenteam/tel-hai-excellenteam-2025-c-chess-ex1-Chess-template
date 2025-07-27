@@ -1,6 +1,7 @@
 #include "Pieces/Pawn.h"
 #include "Utils/Colors.h"
 #include "Board.h" // For Board::getLastMove()
+
 #include <cmath> // For std::abs
 
 

@@ -3,7 +3,6 @@
 #include "Board.h"
 #include <cmath>
 
-
 Bishop::Bishop(bool isWhite) : Piece(isWhite) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_BISHOP : Colors::Pieces::BLACK_BISHOP);
     this->setIsAlive(true);

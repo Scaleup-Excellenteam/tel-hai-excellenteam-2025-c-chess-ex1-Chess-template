@@ -6,8 +6,8 @@
 #include "Pieces/Queen.h"
 #include "Pieces/Rook.h"
 #include "Utils/Colors.h"
-#include <algorithm> // For std::min, std::max
 
+#include <algorithm> // For std::min, std::max
 
 Board::Board() : lastMove(0,0,0,0) {
     grid.reserve(8);

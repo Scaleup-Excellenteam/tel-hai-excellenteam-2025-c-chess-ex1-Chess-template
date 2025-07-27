@@ -1,6 +1,5 @@
 #pragma once
 
-
 /**
  * @brief  Minimal, POD-style chess move.
  *         (src,dst) are 0-based board coordinates: 0 == rank 8 / file A.

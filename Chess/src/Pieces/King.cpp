@@ -5,7 +5,6 @@
 #include <cmath>
 #include "Pieces/Rook.h" // dynamic_cast to Rook
 
-
 King::King(bool isWhite) : Piece(isWhite), hasMoved_(false) {
     this->setSymbol(isWhite ? Colors::Pieces::WHITE_KING : Colors::Pieces::BLACK_KING); // Use Unicode symbols
     this->setIsAlive(true);

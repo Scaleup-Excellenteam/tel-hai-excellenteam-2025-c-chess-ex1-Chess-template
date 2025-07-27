@@ -7,6 +7,7 @@
 #include "Utils/MoveScorePair.h"
 #include "Pieces/Pawn.h"
 
+
 class Board {
 private:
     std::vector<std::vector<std::unique_ptr<Piece>>> grid;
